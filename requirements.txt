@@ -1,6 +1,0 @@
-fastapi
-uvicorn[standard]
-sentry-sdk[fastapi]
-supabase
-pydantic-settings
-python-dotenv
