@@ -1,4 +1,11 @@
-// TODO: implement alerts route
+import { getAlerts } from "../../../lib/alerts";
+
 export async function GET() {
-  return Response.json({ error: "Not implemented" }, { status: 501 });
+  try {
+    const alerts = await getAlerts();
+    return Response.json({ alerts, count: alerts.length });
+  } catch (err) {
+    console.error("[alerts] query failed:", err);
+    return Response.json({ error: "Failed to fetch alerts" }, { status: 500 });
+  }
 }
