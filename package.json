@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "mcp": "tsx mcp/server.ts"
+    "mcp": "tsx mcp/server.ts",
+    "test:acceptance": "tsx scripts/acceptance-test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

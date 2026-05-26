@@ -57,3 +57,29 @@ export interface Relationship {
   overrideNote?: string;
   signals?: Signal[];
 }
+
+// ── View models ───────────────────────────────────────────────────────
+
+export interface CoInvestment {
+  companyName: string;
+  round: string;
+  date: string;
+  alleyRole: string;
+}
+
+export interface InvestorProfile {
+  fundName: string;
+  warmthTier: WarmthTier;
+  lastSignalDate?: string;
+  coInvestments: CoInvestment[];
+  signals: Signal[];
+  suggestedAction: string;
+}
+
+export interface DigestItem {
+  type: "WARMTH_CHANGE" | "NEW_CO_INVESTOR" | "STALE_ALERT";
+  fundName: string;
+  summary: string;
+  deepLinkPath: string; // e.g. /investors/lux-capital
+  generatedAt: string;
+}
