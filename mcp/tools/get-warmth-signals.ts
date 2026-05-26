@@ -1,1 +1,35 @@
-// TODO: get_warmth_signals(investor_id) — returns all signals for a given investor
+import type { Tool, CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { getWarmthSignals } from "../../lib/db.js";
+
+export const tool: Tool = {
+  name: "get_warmth_signals",
+  description:
+    "Returns all warmth signals for a specific investor by their ID. Signals are the individual data points (co-investments, event attendance, press mentions, LinkedIn connections) that make up their warmth tier score. Use this after get_investor to show the evidence behind a warmth classification.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      investor_id: {
+        type: "string",
+        description: "The unique ID of the investor relationship record",
+      },
+    },
+    required: ["investor_id"],
+  },
+};
+
+export async function handler(args: { investor_id: string }): Promise<CallToolResult> {
+  const signals = await getWarmthSignals(args.investor_id);
+
+  if (signals.length === 0) {
+    return { content: [{ type: "text", text: "No signals found for this investor." }] };
+  }
+
+  const entries = signals.map((s) => {
+    const confidence = { high: "●●●", medium: "●●○", low: "●○○" }[s.confidence];
+    return `• [${s.date}] ${s.type.replace(/_/g, " ")} — ${s.source} — ${s.value} ${confidence}`;
+  });
+
+  const text = [`**Warmth signals (${signals.length})**`, "", ...entries].join("\n");
+
+  return { content: [{ type: "text", text }] };
+}
