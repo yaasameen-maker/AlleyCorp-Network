@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
+    "@modelcontextprotocol/sdk": "^1.0.0",
     "@sentry/nextjs": "^8.0.0",
     "next": "^15.0.0",
     "pg": "^8.13.0",
@@ -18,7 +19,6 @@
     "resend": "^4.0.0"
   },
   "devDependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.0",
     "@types/node": "^22.0.0",
     "@types/pg": "^8.11.0",
     "@types/react": "^19.0.0",
