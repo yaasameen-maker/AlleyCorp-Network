@@ -215,7 +215,7 @@ Lauren responded May 19. All data blockers resolved.
 
 - Portfolio list: 20 active companies confirmed. List in hand.
 - Warmth calibration anchors: Riot Ventures, Snowpoint Ventures, General Catalyst, Mach33 confirmed as Hot tier.
-- Event data: Swoogo and Luma exports available. Request files from Lauren before May 21.
+- Event data: Swoogo and Luma exports available. Request files from Lauren as needed.
 
 Public data (Crunchbase, press releases) is sufficient to start seeding. Event files enrich the model when they arrive.
 
