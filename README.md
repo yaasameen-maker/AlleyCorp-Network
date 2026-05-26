@@ -187,12 +187,14 @@ Key principle: signals are stored independently from the warmth tier. The tier c
 
 # Sprint Plan · May 21 – June 4, 2026
 
-**Demo Day: June 24, 2026**
+**Sprint Plan v1.1 · Updated May 25, 2026 · Demo Day: June 24, 2026**
 Luba · Michael · Yaasameen
+
+**Change from v1.0:** Section 7 added — End-to-End Acceptance Criteria. Defines the full Claude → MCP → DB → response acceptance test missing from both the sprint plan and roadmap. Required before Demo Day.
 
 ---
 
-## Confirmed Decisions
+## 1. Confirmed Decisions
 
 From Kabir. These are not open questions. Build from these.
 
@@ -207,25 +209,25 @@ From Kabir. These are not open questions. Build from these.
 
 ---
 
-## What Is Unblocked
+## 2. What Is Unblocked
 
 Lauren responded May 19. All data blockers resolved.
 
 - Portfolio list: 20 active companies confirmed. List in hand.
 - Warmth calibration anchors: Riot Ventures, Snowpoint Ventures, General Catalyst, Mach33 confirmed as Hot tier.
-- Event data: Swoogo and Luma exports available. Files not yet sent — request from Lauren before May 21.
+- Event data: Swoogo and Luma exports available. Request files from Lauren as needed.
 
 Public data (Crunchbase, press releases) is sufficient to start seeding. Event files enrich the model when they arrive.
 
 ---
 
-## Sprint Goal
+## 3. Sprint Goal
 
 > By June 4: a working relationship intelligence platform with all four warmth tiers populated, the first vertical slice fully end-to-end, and the MCP query layer returning real results.
 
----
+### First Vertical Slice — Lux Capital + Viam
 
-## First Vertical Slice — Lux Capital + Viam
+Lux Capital is a confirmed co-investor. Viam is a confirmed active portfolio company. USV/Albert Wenger is a known Hot relationship to contrast against.
 
 - Relationship stored in database
 - Warmth score calculated deterministically
@@ -234,7 +236,7 @@ Public data (Crunchbase, press releases) is sufficient to start seeding. Event f
 - Daily digest generates a stale alert
 - MCP query `list_stale_relationships()` returns Lux Capital
 
-## Four Warmth Tiers — Real Examples
+### Four Warmth Tiers — Real Examples
 
 | Tier | Fund | Connection | Story |
 |---|---|---|---|
@@ -245,20 +247,38 @@ Public data (Crunchbase, press releases) is sufficient to start seeding. Event f
 
 ---
 
-## Proposed Stack
+## 4. Data Model
+
+Five entities. Investor and Fund are separate by design: partners change firms, and tracking individual role changes is a core signal.
+
+| Entity | Key Fields | Notes |
+|---|---|---|
+| Investor | Name, fund_id, role, LinkedIn, stage focus | Individual partner or angel. Tracks role changes over time. |
+| Fund | Name, focus, AUM tier, emerging_manager flag, website | Institutional or solo GP. Parent entity for investors. |
+| Portfolio Company | Name, sector, stage, AlleyCorp role, website | 20 confirmed active Deep Tech companies. |
+| Relationship | fund_id, portfolio_company_id, alley_partner, warmth_tier, last_signal_date, override_note | Links fund to portfolio company. Warmth tier stored separately from signals. |
+| Signal | relationship_id, type, date, source, value, confidence | One row per signal. Stored independently so warmth tier is recalibratable. |
+
+Key principle: signals are stored independently from the warmth tier. Tier can be recalibrated, overridden, or audited without touching signal data.
+
+---
+
+## 5. Proposed Stack
 
 | Layer | Tool | Why |
 |---|---|---|
 | Frontend | Next.js (TypeScript) | React-based, easy deployment, one language across the stack. |
 | Backend API | Next.js API routes (TypeScript) | Keeps frontend and backend in one repo. No context switching. |
-| Database | PostgreSQL via Railway | Structured relational data. Right fit for the warmth model. |
+| Database | PostgreSQL via Railway or Supabase | Structured relational data. Right fit for the warmth model. |
 | Deployment | Vercel (frontend) + Railway (DB) | Free tiers, fast setup, no DevOps overhead. |
 | Email digest | Resend | Simple API, good deliverability, free to start. |
 | MCP server | Anthropic TypeScript SDK | Kabir's recommendation. Powers the NL query layer. |
 
 ---
 
-## Sprint Tasks
+## 6. Sprint Plan
+
+Task owners before the holiday are assigned. After the holiday, team decides together at the start of each day block.
 
 ### Week 1 — May 21–23 · Foundation
 
@@ -269,22 +289,16 @@ Public data (Crunchbase, press releases) is sufficient to start seeding. Event f
 - Set up PostgreSQL database and test connection
 - Email Lauren to request Swoogo + Luma export files
 
-*Owner: Luba (data model) + team (setup)*
-
 **May 23 · Data Model + Co-investor Research**
 - LUBA: Define schema for 5 entities: Investor, Fund, Portfolio Company, Relationship, Signal
 - LUBA: Schema must support Healthcare and General team extension
 - LUBA: Seed first relationships: Lux Capital + Viam, USV + Viam
 - LUBA: Seed warmth anchors: Riot Ventures, Snowpoint, General Catalyst, Mach33
 - LUBA: Confirm all 20 active portfolio companies are in the database
-- PERSON 2: Research and document co-investors for Viam, Glacier, Portal Space Systems, Valar Atomics from public sources (Crunchbase, press releases)
-- PERSON 2: Output: a clean list of fund name, round, date, role for each — ready to seed
-
-*Owner: Luba (schema) · Person 2 (co-investor data)*
+- PERSON 2: Research co-investors for Viam, Glacier, Portal Space Systems, Valar Atomics (Crunchbase, press)
+- PERSON 2: Output: fund name, round, date, role for each — ready to seed
 
 **Memorial Day Weekend · May 24–26 · No build days**
-
----
 
 ### Week 2 — May 27–30 · Warmth Scoring + Frontend
 
@@ -295,18 +309,12 @@ Public data (Crunchbase, press releases) is sufficient to start seeding. Event f
 - Calibrate against Lauren's four Hot anchors
 - Lux Capital should score as Stale after this is running
 
-*Owner: Person 1 · Person 2*
-
 **May 29–30 · Frontend**
 - Investor list view with warmth tier pills visible without clicking
 - Filter by warmth tier: Hot / Warm / Stale / Cold
 - Investor profile card: fund name, warmth tier, active signals, co-investment history, suggested action
 - All four warmth tiers visible in the dashboard with real data
 - Lux Capital profile card complete and correct
-
-*Owner: Person 3*
-
----
 
 ### Week 3 — June 2–4 · MCP + Digest + Integration
 
@@ -319,9 +327,7 @@ Build four MCP tools using Anthropic TypeScript SDK:
 - `get_warmth_signals(investor_id)`
 
 Each tool maps to a real user question. Keep narrow and deterministic.
-Test: `list_stale_relationships()` should return Lux Capital.
-
-*Owner: Person 1 (Luba)*
+Test: `list_stale_relationships()` must return Lux Capital.
 
 **June 3–4 · Daily Digest + Integration**
 - Generate first digest item from Lux Capital stale relationship
@@ -330,13 +336,47 @@ Test: `list_stale_relationships()` should return Lux Capital.
 - Expand dashboard to show full 20-company network
 - Search and filter working across all tiers
 
-*Owner: Person 2 · Person 3*
-
-**June 1 Midpoint · Kabir's email enrichment layer becomes available. Assess integration at this point.**
+**June 1 Midpoint · Kabir's email enrichment layer becomes available. Assess integration at that point.**
 
 ---
 
-## Scope Reminder
+## 7. End-to-End Acceptance Criteria — Added v1.1
+
+The unit test for `list_stale_relationships()` proves the database query and MCP tool wiring are correct. It does not prove the product works. The acceptance test below proves the full chain: a real user types a natural language question into Claude, Claude selects the right MCP tool, the tool queries the database, and Claude returns a useful, actionable answer within 5 seconds.
+
+### Why This Gap Matters
+
+Five failure modes the unit test will not catch:
+
+- Claude picks the wrong MCP tool — routing depends on how well tool descriptions are written
+- The tool returns correct data Claude cannot format usefully — correct data and useful answer are not the same
+- Edge-case natural language queries break the schema — real users ask messily
+- Response time is unacceptable in a live demo even if technically correct
+- The digest and MCP layer drift and return inconsistent results for the same relationship
+
+### Acceptance Test — Required Before Demo Day (June 24)
+
+All five prompts must pass through the full Claude → MCP → DB → response chain. Define passing behavior before running. Any failure is a Demo Day blocker.
+
+| # | User Prompt | Expected Tool | Pass Criteria |
+|---|---|---|---|
+| 1 | Which co-investors should we reconnect with before they lead another round without us? | `list_stale_relationships()` | Returns Lux Capital with specific reason (missed Series A on Inductive Bio) and a suggested action. Response under 5 seconds. |
+| 2 | Who are our warmest relationships in deep tech right now? | `search_relationships(query)` | Returns all four Hot anchors (Riot, Snowpoint, General Catalyst, Mach33) with signal evidence. No hallucinated funds. |
+| 3 | What should I know before our meeting with General Catalyst next week? | `get_investor(name)` + `get_warmth_signals(investor_id)` | Returns co-investment history, HOT warmth tier, and recent signals. Readable and structured, not a raw data dump. |
+| 4 | Are there any top deep tech funds we haven't co-invested with yet? | `search_relationships(query)` | Returns Cold tier targets (a16z American Dynamism, Eclipse, Founders Fund) with context on why they are targets. |
+| 5 | Show me the full picture on Lux Capital. | `get_investor(name)` + `get_warmth_signals(investor_id)` | Returns Stale tier, Inductive Bio history, reason, suggested action. Matches digest entry exactly — no inconsistency. |
+
+### Inconsistency Check
+
+- The MCP response for Lux Capital and the daily digest entry for Lux Capital must return the same warmth tier and the same reason.
+- No fund appears as Hot in one layer and Warm or Stale in another.
+- If any inconsistency is found, the root cause is a divergent code path. Fix the shared scoring function, not the outputs individually.
+
+**Sign-off:** Owner is the team member assigned to MCP in Week 3. Results logged in the shared sprint board. Any failing prompt is a blocker — do not demo until all five pass.
+
+---
+
+## 8. Scope
 
 | We ARE building | We are NOT building |
 |---|---|
@@ -346,9 +386,10 @@ Test: `list_stale_relationships()` should return Lux Capital.
 | Cold tier: target co-investors to build toward | CRM replacement |
 | Daily email digest with authenticated deep-links | Advanced analytics platform |
 | MCP-powered natural language query layer | Email inbox enrichment (Phase 2, assess June 1) |
-| Full 20-company Deep Tech network | Healthcare or General team views (data model supports, nothing built yet) |
+| Full 20-company Deep Tech network | Healthcare or General team views (data model supports, not built yet) |
+| End-to-end acceptance test before Demo Day | |
 
 ---
 
-*Sprint Plan v1.0 · May 21, 2026 · Luba, Michael, Yaasameen*
+*Sprint Plan v1.1 · May 25, 2026 · Luba, Michael, Yaasameen*
 *PRD v2.0 · May 2026 · Next review: upon Lauren and Kabir sign-off*
