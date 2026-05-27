@@ -5,15 +5,19 @@ export type SignalType =
   | "event_attendance"
   | "linkedin_connection"
   | "press_mention"
-  | "recency";
+  | "co_investment_recency";
 
 export interface Fund {
   id: string;
   name: string;
-  focus: string;
+  focus?: string;
   aumTier?: string;
-  emergingManager: boolean;
+  emergingManager?: boolean;
   website?: string;
+  stage?: string;
+  hqLocation?: string;
+  linkedinUrl?: string;
+  notes?: string;
 }
 
 export interface Investor {
@@ -22,8 +26,13 @@ export interface Investor {
   fundId: string;
   fund?: Fund;
   role: string;
-  linkedin?: string;
+  linkedinUrl?: string;
   stageFocus?: string;
+  email?: string;
+  sectorFocus?: string;
+  location?: string;
+  alleyContact?: string;
+  notes?: string;
 }
 
 export interface PortfolioCompany {
@@ -32,7 +41,11 @@ export interface PortfolioCompany {
   sector: string;
   stage: string;
   alleycorpRole: string;
+  status: "active" | "alumni";
   website?: string;
+  team?: string;
+  foundedYear?: number;
+  notes?: string;
 }
 
 export interface Signal {
@@ -42,19 +55,25 @@ export interface Signal {
   date: string;
   source: string;
   value: string;
-  confidence: "high" | "medium" | "low";
+  weight: "high" | "medium" | "low";
+  confidence?: "confirmed" | "inferred" | "pending";
 }
 
 export interface Relationship {
   id: string;
   fundId: string;
   fund?: Fund;
+  investorId?: string;
   portfolioCompanyId: string;
   portfolioCompany?: PortfolioCompany;
   alleyPartner: string;
   warmthTier: WarmthTier;
+  warmthCalculatedAt?: string;
   lastSignalDate?: string;
+  override?: boolean;
   overrideNote?: string;
+  overrideBy?: string;
+  overrideAt?: string;
   signals?: Signal[];
 }
 
