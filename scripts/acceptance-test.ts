@@ -9,6 +9,7 @@
 // 4. Run: npm run test:acceptance
 
 import Anthropic from "@anthropic-ai/sdk";
+import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { tool as getInvestorTool } from "../mcp/tools/get-investor.js";
 import { tool as searchRelationshipsTool } from "../mcp/tools/search-relationships.js";
 import { tool as listStaleTool } from "../mcp/tools/list-stale-relationships.js";
@@ -81,7 +82,9 @@ async function runQuery(prompt: string): Promise<string> {
   const response = await client.messages.create({
     model: "claude-sonnet-4-6",
     max_tokens: 1024,
-    tools: TOOLS as Anthropic.Tool[],
+    // MCP Tool uses inputSchema (camelCase); Anthropic SDK expects input_schema (snake_case).
+    // The shapes are compatible at runtime — cast through unknown to satisfy the type checker.
+    tools: TOOLS as unknown as Anthropic.Tool[],
     messages: [{ role: "user", content: prompt }],
   });
 
@@ -98,7 +101,7 @@ async function runQuery(prompt: string): Promise<string> {
   const toolResults: Anthropic.ToolResultBlockParam[] = [];
   for (const block of toolUses) {
     const tb = block as Anthropic.ToolUseBlock;
-    let result: { content: { type: string; text: string }[] };
+    let result: CallToolResult;
 
     switch (tb.name) {
       case "get_investor":
@@ -117,10 +120,15 @@ async function runQuery(prompt: string): Promise<string> {
         result = { content: [{ type: "text", text: `Unknown tool: ${tb.name}` }] };
     }
 
+    // Extract the first text block from the MCP result content union
+    const textBlock = result.content.find((b) => b.type === "text") as
+      | { type: "text"; text: string }
+      | undefined;
+
     toolResults.push({
       type: "tool_result",
       tool_use_id: tb.id,
-      content: result.content[0].text,
+      content: textBlock?.text ?? "",
     });
   }
 
@@ -128,7 +136,7 @@ async function runQuery(prompt: string): Promise<string> {
   const final = await client.messages.create({
     model: "claude-sonnet-4-6",
     max_tokens: 1024,
-    tools: TOOLS as Anthropic.Tool[],
+    tools: TOOLS as unknown as Anthropic.Tool[],
     messages: [
       { role: "user", content: prompt },
       { role: "assistant", content: response.content },
