@@ -25,8 +25,8 @@ export async function handler(args: { investor_id: string }): Promise<CallToolRe
   }
 
   const entries = signals.map((s) => {
-    const confidence = { high: "●●●", medium: "●●○", low: "●○○" }[s.confidence];
-    return `• [${s.date}] ${s.type.replace(/_/g, " ")} — ${s.source} — ${s.value} ${confidence}`;
+    const weightDots = { high: "●●●", medium: "●●○", low: "●○○" }[s.weight];
+    return `• [${s.date}] ${s.type.replace(/_/g, " ")} — ${s.source} — ${s.value} ${weightDots}`;
   });
 
   const text = [`**Warmth signals (${signals.length})**`, "", ...entries].join("\n");

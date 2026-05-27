@@ -9,7 +9,12 @@
     "mcp": "tsx mcp/server.ts",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:acceptance": "tsx scripts/acceptance-test.ts"
+    "test:acceptance": "tsx scripts/acceptance-test.ts",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
@@ -27,6 +32,10 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "dotenv": "^17.4.2",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^16.2.6",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.8.3",
     "tsx": "^4.0.0",
     "typescript": "^5.0.0",
     "vitest": "^3.2.4"
