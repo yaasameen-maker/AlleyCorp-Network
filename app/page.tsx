@@ -1,185 +1,141 @@
-import Link from "next/link";
-import { mockInvestors } from "./data/mockData";
-import { WarmthBadge } from "./components/WarmthBadge";
+"use client";
 
-export default function Home() {
-  const tierCounts = {
-    Hot: mockInvestors.filter((i) => i.warmthTier === "Hot").length,
-    Warm: mockInvestors.filter((i) => i.warmthTier === "Warm").length,
-    Cold: mockInvestors.filter((i) => i.warmthTier === "Cold").length,
-    Stale: mockInvestors.filter((i) => i.warmthTier === "Stale").length,
-  };
+import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { InvestorCard } from "./components/InvestorCard";
+import { InvestorProfile } from "./components/InvestorProfile";
+import { mockInvestors, type Investor, type WarmthTier } from "./data/mockData";
 
-  const needsAttention = [...mockInvestors]
-    .filter((i) => i.warmthTier === "Stale" || i.warmthTier === "Cold")
-    .slice(0, 3);
+export default function InvestorListPage() {
+  const router = useRouter();
+  const [selectedInvestor, setSelectedInvestor] = useState<Investor | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterTier, setFilterTier] = useState<WarmthTier | "All">("All");
 
-  const hotInvestors = mockInvestors.filter((i) => i.warmthTier === "Hot").slice(0, 3);
+  const filteredInvestors = useMemo(() => {
+    return mockInvestors.filter((investor) => {
+      const matchesSearch =
+        searchQuery === "" ||
+        investor.fund.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        investor.name.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const matchesTier = filterTier === "All" || investor.warmthTier === filterTier;
+
+      return matchesSearch && matchesTier;
+    });
+  }, [searchQuery, filterTier]);
+
+  const tierCounts = useMemo(() => {
+    return {
+      All: mockInvestors.length,
+      Hot: mockInvestors.filter((i) => i.warmthTier === "Hot").length,
+      Warm: mockInvestors.filter((i) => i.warmthTier === "Warm").length,
+      Cold: mockInvestors.filter((i) => i.warmthTier === "Cold").length,
+      Stale: mockInvestors.filter((i) => i.warmthTier === "Stale").length,
+    };
+  }, []);
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
-      <header className="border-b border-slate-800/80 bg-slate-950/95 backdrop-blur">
+      <header className="border-b border-slate-800/80 bg-slate-950/95 backdrop-blur sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-xs uppercase tracking-wider text-blue-400 font-semibold mb-1">
                 AlleyCorp
               </p>
               <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white">
-                Relationship Intelligence
+                Investor Intelligence
               </h1>
+              <p className="text-sm text-slate-400 mt-1">
+                Co-investor relationship intelligence and warmth tracking
+              </p>
             </div>
-            <nav className="hidden sm:flex items-center gap-2">
-              <Link
-                href="/portfolio"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900/60 border border-slate-800 hover:border-slate-700 hover:text-white text-slate-300 text-sm font-medium rounded-lg transition-colors"
-              >
-                Portfolio
-              </Link>
-              <Link
-                href="/investors"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-400 text-white text-sm font-medium rounded-lg transition-colors shadow-sm shadow-blue-500/30"
-              >
-                Investor List
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </Link>
-            </nav>
+            <button
+              onClick={() => router.push("/portfolio")}
+              className="hidden sm:inline-flex items-center gap-2 px-3 py-2 text-slate-300 hover:text-white text-sm font-medium transition-colors"
+            >
+              Portfolio
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
-        <section>
-          <h2 className="text-lg font-semibold text-white mb-1">Warmth distribution</h2>
-          <p className="text-sm text-slate-400 mb-4">
-            {mockInvestors.length} tracked co-investors across the Deep Tech portfolio
-          </p>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCard
-              label="Hot"
-              value={tierCounts.Hot}
-              accent="bg-red-500/15 text-red-300 border-red-500/30"
-            />
-            <StatCard
-              label="Warm"
-              value={tierCounts.Warm}
-              accent="bg-amber-500/15 text-amber-300 border-amber-500/30"
-            />
-            <StatCard
-              label="Cold"
-              value={tierCounts.Cold}
-              accent="bg-sky-500/15 text-sky-300 border-sky-500/30"
-            />
-            <StatCard
-              label="Stale"
-              value={tierCounts.Stale}
-              accent="bg-slate-700/40 text-slate-300 border-slate-600/60"
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="space-y-4">
+          <div className="relative">
+            <svg
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            <input
+              type="text"
+              placeholder="Search investors or funds..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-11 pr-4 py-3 bg-slate-900/60 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/50 transition-colors"
             />
           </div>
-        </section>
 
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Panel
-            title="Needs attention"
-            description="Stale and Cold relationships worth re-engaging."
-          >
-            {needsAttention.length === 0 ? (
-              <EmptyState message="No stale or cold relationships." />
-            ) : (
-              needsAttention.map((investor) => (
-                <InvestorRow key={investor.id} investor={investor} />
-              ))
-            )}
-          </Panel>
+          <div className="flex gap-2 flex-wrap">
+            {(["All", "Hot", "Warm", "Cold", "Stale"] as const).map((tier) => (
+              <button
+                key={tier}
+                onClick={() => setFilterTier(tier)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  filterTier === tier
+                    ? "bg-blue-500 text-white shadow-sm shadow-blue-500/30"
+                    : "bg-slate-900/60 text-slate-300 border border-slate-800 hover:border-slate-700 hover:text-white"
+                }`}
+              >
+                {tier} ({tierCounts[tier]})
+              </button>
+            ))}
+          </div>
+        </div>
 
-          <Panel title="Strongest signals" description="Hot co-investors with recent activity.">
-            {hotInvestors.length === 0 ? (
-              <EmptyState message="No hot relationships yet." />
-            ) : (
-              hotInvestors.map((investor) => <InvestorRow key={investor.id} investor={investor} />)
-            )}
-          </Panel>
-        </section>
+        <p className="mt-5 mb-4 text-sm text-slate-400">
+          Showing {filteredInvestors.length} of {mockInvestors.length} investors
+        </p>
 
-        <section className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:hidden">
-          <Link
-            href="/investors"
-            className="inline-flex items-center gap-2 px-4 py-3 bg-blue-500 hover:bg-blue-400 text-white text-sm font-medium rounded-lg transition-colors w-full justify-center"
-          >
-            View investors
-          </Link>
-          <Link
-            href="/portfolio"
-            className="inline-flex items-center gap-2 px-4 py-3 bg-slate-900/60 border border-slate-800 hover:border-slate-700 hover:text-white text-slate-300 text-sm font-medium rounded-lg transition-colors w-full justify-center"
-          >
-            View portfolio
-          </Link>
-        </section>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {filteredInvestors.map((investor) => (
+            <InvestorCard
+              key={investor.id}
+              investor={investor}
+              onClick={() => setSelectedInvestor(investor)}
+            />
+          ))}
+        </div>
+
+        {filteredInvestors.length === 0 && (
+          <div className="text-center py-16">
+            <p className="text-slate-300 text-lg">No investors found</p>
+            <p className="text-slate-500 text-sm mt-2">Try adjusting your search or filters</p>
+          </div>
+        )}
       </div>
+
+      {selectedInvestor && (
+        <InvestorProfile investor={selectedInvestor} onClose={() => setSelectedInvestor(null)} />
+      )}
     </main>
   );
-}
-
-function StatCard({ label, value, accent }: { label: string; value: number; accent: string }) {
-  return (
-    <div className="bg-slate-900/40 border border-slate-800 rounded-xl p-5">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-sm text-slate-400">{label}</span>
-        <span className={`text-xs px-2 py-0.5 rounded-full border ${accent}`}>{label}</span>
-      </div>
-      <div className="text-3xl font-semibold text-white">{value}</div>
-    </div>
-  );
-}
-
-function Panel({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="bg-slate-900/40 border border-slate-800 rounded-xl p-5">
-      <h3 className="text-base font-semibold text-white">{title}</h3>
-      <p className="text-sm text-slate-400 mt-0.5 mb-4">{description}</p>
-      <div className="space-y-2">{children}</div>
-    </div>
-  );
-}
-
-function InvestorRow({
-  investor,
-}: {
-  investor: (typeof import("./data/mockData"))["mockInvestors"][number];
-}) {
-  return (
-    <Link
-      href="/investors"
-      className="flex items-center justify-between gap-3 p-3 -mx-1 rounded-lg hover:bg-slate-900/60 transition-colors"
-    >
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium text-white truncate">{investor.fund.name}</p>
-        <p className="text-xs text-slate-400 truncate mt-0.5">
-          {investor.lastInteraction
-            ? `Last interaction · ${investor.lastInteraction}`
-            : `${investor.signals.length} signals`}
-        </p>
-      </div>
-      <WarmthBadge tier={investor.warmthTier} size="sm" />
-    </Link>
-  );
-}
-
-function EmptyState({ message }: { message: string }) {
-  return <p className="text-sm text-slate-500 py-2">{message}</p>;
 }

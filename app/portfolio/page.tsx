@@ -86,7 +86,7 @@ export default function PortfolioPage() {
               </div>
             </div>
             <Link
-              href="/investors"
+              href="/"
               className="hidden sm:inline-flex items-center gap-2 px-3 py-2 text-slate-300 hover:text-white text-sm font-medium transition-colors"
             >
               Investors
