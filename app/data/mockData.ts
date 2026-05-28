@@ -1,3 +1,7 @@
+// Mock data aligned to seed.sql (Lauren Young confirmed portfolio, May 2026).
+// Source of truth for company names: PORTFOLIO.md
+// This file is used for UI development until API routes are wired to the live DB.
+
 export type WarmthTier = "Hot" | "Warm" | "Cold" | "Stale";
 
 export interface PortfolioCompany {
@@ -37,227 +41,188 @@ export interface Investor {
   suggestedAction?: string;
 }
 
+// Only companies referenced by mock investors below.
+// Full list of 17 active companies is in PORTFOLIO.md.
 export const portfolioCompanies: PortfolioCompany[] = [
-  { id: "1", name: "Inductive Bio", url: "inductive.bio" },
-  { id: "2", name: "Viam", url: "viam.com" },
-  { id: "3", name: "Valar Atomics", url: "valaratomics.com" },
-  { id: "4", name: "Portal Space Systems", url: "portalsystems.space" },
-  { id: "5", name: "Glacier", url: "endwaste.io" },
+  { id: "1", name: "Valar Atomics",        url: "valaratomics.com" },
+  { id: "2", name: "Eyebot",               url: "eyebot.tech" },
+  { id: "3", name: "Portal Space Systems", url: "portalsystems.space" },
+  { id: "4", name: "Halo Braid",           url: "halobraid.com" },
+  { id: "5", name: "Civ Robotics",         url: "civrobotics.com" },
 ];
 
 export const mockInvestors: Investor[] = [
+  // ── HOT ─────────────────────────────────────────────────────────────────────
+
   {
     id: "1",
-    name: "Lux Capital",
-    fund: { id: "f1", name: "Lux Capital" },
-    warmthTier: "Stale",
-    lastInteraction: "Dec 2023",
+    name: "Riot Ventures",
+    fund: { id: "f1", name: "Riot Ventures" },
+    warmthTier: "Hot",
+    lastInteraction: "Mar 2025",
     suggestedAction:
-      "Co-invested at Inductive Bio Seed (Dec 2023) but not at Series A (May 2025). Relationship may be cooling.",
+      "Co-led Valar Atomics Seed alongside AlleyCorp (Mar 2025). Strong deep tech alignment — prioritize for next round.",
     signals: [
       {
         type: "co-investment",
-        description: "Co-invested in Inductive Bio Seed",
-        date: "Dec 2023",
+        description: "Co-led Valar Atomics Seed $19M",
+        date: "Mar 2025",
         weight: "High",
-      },
-      {
-        type: "co-investment",
-        description: "Did not participate in Inductive Bio Series A",
-        date: "May 2025",
-        weight: "Medium",
       },
     ],
     coInvestments: [
       {
         portfolioCompany: portfolioCompanies[0],
         round: "Seed",
-        date: "Dec 2023",
+        date: "Mar 2025",
         fundParticipated: true,
-      },
-      {
-        portfolioCompany: portfolioCompanies[0],
-        round: "Series A",
-        date: "May 2025",
-        fundParticipated: false,
       },
     ],
   },
+
   {
     id: "2",
-    name: "Riot Ventures",
-    fund: { id: "f2", name: "Riot Ventures" },
-    warmthTier: "Hot",
-    lastInteraction: "Mar 2026",
-    suggestedAction:
-      "Strong relationship. Led Valar Atomics Seed. Consider for future co-investment opportunities.",
-    signals: [
-      {
-        type: "co-investment",
-        description: "Led Valar Atomics Seed",
-        date: "Jan 2024",
-        weight: "High",
-      },
-      {
-        type: "meeting",
-        description: "Partner meeting at SF office",
-        date: "Feb 2026",
-        weight: "High",
-      },
-      {
-        type: "email",
-        description: "Intro thread re: deep tech deal flow",
-        date: "Mar 2026",
-        weight: "Medium",
-      },
-    ],
-    coInvestments: [
-      {
-        portfolioCompany: portfolioCompanies[2],
-        round: "Seed",
-        date: "Jan 2024",
-        fundParticipated: true,
-      },
-    ],
-  },
-  {
-    id: "3",
-    name: "Snowpoint Ventures",
-    fund: { id: "f3", name: "Snowpoint Ventures" },
-    warmthTier: "Hot",
-    lastInteraction: "Apr 2026",
-    suggestedAction: "Strong relationship. Co-invested in Valar Atomics Series A.",
-    signals: [
-      {
-        type: "co-investment",
-        description: "Co-invested in Valar Atomics Series A",
-        date: "Apr 2026",
-        weight: "High",
-      },
-      {
-        type: "event",
-        description: "Met at Defense Tech Summit",
-        date: "Mar 2026",
-        weight: "Medium",
-      },
-    ],
-    coInvestments: [
-      {
-        portfolioCompany: portfolioCompanies[2],
-        round: "Series A",
-        date: "Apr 2026",
-        fundParticipated: true,
-      },
-    ],
-  },
-  {
-    id: "4",
     name: "General Catalyst",
-    fund: { id: "f4", name: "General Catalyst" },
+    fund: { id: "f2", name: "General Catalyst" },
     warmthTier: "Hot",
-    lastInteraction: "May 2026",
-    suggestedAction: "Strong relationship. Multiple co-investments across portfolio.",
+    lastInteraction: "Aug 2025",
+    suggestedAction:
+      "Led Eyebot Series A $20M (Aug 2025) after co-leading Seed with AlleyCorp. Consistent partner across rounds.",
     signals: [
       {
         type: "co-investment",
-        description: "Co-invested in Viam Series B",
-        date: "May 2026",
+        description: "Co-led Eyebot Seed $6M",
+        date: "Jun 2024",
         weight: "High",
       },
       {
-        type: "meeting",
-        description: "Lunch with partner re: AI infra thesis",
-        date: "May 2026",
-        weight: "Medium",
+        type: "co-investment",
+        description: "Led Eyebot Series A $20M",
+        date: "Aug 2025",
+        weight: "High",
       },
     ],
     coInvestments: [
       {
         portfolioCompany: portfolioCompanies[1],
-        round: "Series B",
-        date: "May 2026",
+        round: "Seed",
+        date: "Jun 2024",
+        fundParticipated: true,
+      },
+      {
+        portfolioCompany: portfolioCompanies[1],
+        round: "Series A",
+        date: "Aug 2025",
         fundParticipated: true,
       },
     ],
   },
+
   {
-    id: "5",
-    name: "Founders Fund",
-    fund: { id: "f5", name: "Founders Fund" },
+    id: "3",
+    name: "Mach33",
+    fund: { id: "f3", name: "Mach33" },
     warmthTier: "Hot",
-    lastInteraction: "May 2026",
-    suggestedAction: "Led Portal Space Series A. High signal partner relationship.",
+    lastInteraction: "Apr 2025",
+    suggestedAction:
+      "Co-led Portal Space Systems Seed (Apr 2025). Top space tech fund — keep warm ahead of Series A.",
     signals: [
       {
         type: "co-investment",
-        description: "Led Portal Space Series A",
-        date: "Feb 2026",
+        description: "Co-led Portal Space Systems Seed",
+        date: "Apr 2025",
         weight: "High",
       },
+    ],
+    coInvestments: [
       {
-        type: "email",
-        description: "Follow-up on space/defense thesis alignment",
-        date: "May 2026",
-        weight: "High",
+        portfolioCompany: portfolioCompanies[2],
+        round: "Seed",
+        date: "Apr 2025",
+        fundParticipated: true,
+      },
+    ],
+  },
+
+  // ── WARM ────────────────────────────────────────────────────────────────────
+
+  {
+    id: "4",
+    name: "Flybridge",
+    fund: { id: "f4", name: "Flybridge" },
+    warmthTier: "Warm",
+    lastInteraction: "Jun 2024",
+    suggestedAction:
+      "Co-invested in Halo Braid Seed (Jun 2024) — 23 months ago. Relationship approaching stale threshold. Re-engage before next Halo Braid milestone.",
+    signals: [
+      {
+        type: "co-investment",
+        description: "Co-invested in Halo Braid Seed",
+        date: "Jun 2024",
+        weight: "Medium",
       },
     ],
     coInvestments: [
       {
         portfolioCompany: portfolioCompanies[3],
-        round: "Series A",
-        date: "Feb 2026",
+        round: "Seed",
+        date: "Jun 2024",
         fundParticipated: true,
       },
     ],
   },
+
+  // ── STALE ───────────────────────────────────────────────────────────────────
+
   {
-    id: "6",
-    name: "Andreessen Horowitz",
-    fund: { id: "f6", name: "Andreessen Horowitz" },
-    warmthTier: "Warm",
-    lastInteraction: "Feb 2026",
-    suggestedAction: "One co-investment last year. Re-engage on climate thesis.",
+    id: "5",
+    name: "Trimble Ventures",
+    fund: { id: "f5", name: "Trimble Ventures" },
+    warmthTier: "Stale",
+    lastInteraction: "Sep 2022",
+    suggestedAction:
+      "Co-invested at Civ Robotics Seed (Sep 2022) but did not return for Series A (Jul 2025). 44 months of silence — relationship at risk. Outreach recommended before Series B.",
     signals: [
       {
         type: "co-investment",
-        description: "Co-invested in Glacier Series A",
-        date: "Aug 2025",
-        weight: "High",
+        description: "Co-invested in Civ Robotics Seed $5M",
+        date: "Sep 2022",
+        weight: "Medium",
       },
-      { type: "event", description: "Brief chat at a16z summit", date: "Feb 2026", weight: "Low" },
+      {
+        type: "co-investment",
+        description: "Did not participate in Civ Robotics Series A $7.5M",
+        date: "Jul 2025",
+        weight: "Medium",
+      },
     ],
     coInvestments: [
       {
         portfolioCompany: portfolioCompanies[4],
-        round: "Series A",
-        date: "Aug 2025",
+        round: "Seed",
+        date: "Sep 2022",
         fundParticipated: true,
+      },
+      {
+        portfolioCompany: portfolioCompanies[4],
+        round: "Series A",
+        date: "Jul 2025",
+        fundParticipated: false,
       },
     ],
   },
+
+  // ── COLD ────────────────────────────────────────────────────────────────────
+
   {
-    id: "7",
-    name: "Sequoia Capital",
-    fund: { id: "f7", name: "Sequoia Capital" },
+    id: "6",
+    name: "a16z American Dynamism",
+    fund: { id: "f6", name: "a16z American Dynamism" },
     warmthTier: "Cold",
-    lastInteraction: "Jul 2025",
-    suggestedAction: "Limited recent contact. Worth a check-in given pipeline overlap.",
-    signals: [
-      {
-        type: "co-investment",
-        description: "Co-invested in Viam Series A",
-        date: "Mar 2024",
-        weight: "Medium",
-      },
-      { type: "email", description: "Quarterly update reply", date: "Jul 2025", weight: "Low" },
-    ],
-    coInvestments: [
-      {
-        portfolioCompany: portfolioCompanies[1],
-        round: "Series A",
-        date: "Mar 2024",
-        fundParticipated: true,
-      },
-    ],
+    lastInteraction: undefined,
+    suggestedAction:
+      "No co-investment yet. Top defense/manufacturing fund with strong thesis overlap — Cargo Robotics is a natural intro. High-value target.",
+    signals: [],
+    coInvestments: [],
   },
 ];
