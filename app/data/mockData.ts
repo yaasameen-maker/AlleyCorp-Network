@@ -37,7 +37,11 @@ export interface Investor {
   warmthTier: WarmthTier;
   signals: Signal[];
   coInvestments: CoInvestment[];
-  lastInteraction?: string;
+  // Date of the most recent signal (real evidence) on the relationship.
+  // Mirrors backend Relationship.lastSignalDate (lib/types.ts). NOT derived from
+  // the signals array — it is the authoritative last_signal_date from the seed.
+  // Undefined for Cold relationships that have no signals yet.
+  lastSignalDate?: string;
   suggestedAction?: string;
 }
 
@@ -59,7 +63,7 @@ export const mockInvestors: Investor[] = [
     name: "Riot Ventures",
     fund: { id: "f1", name: "Riot Ventures" },
     warmthTier: "Hot",
-    lastInteraction: "Mar 2025",
+    lastSignalDate: "Mar 2025",
     suggestedAction:
       "Co-led Valar Atomics Seed alongside AlleyCorp (Mar 2025). Strong deep tech alignment — prioritize for next round.",
     signals: [
@@ -85,7 +89,7 @@ export const mockInvestors: Investor[] = [
     name: "General Catalyst",
     fund: { id: "f2", name: "General Catalyst" },
     warmthTier: "Hot",
-    lastInteraction: "Aug 2025",
+    lastSignalDate: "Aug 2025",
     suggestedAction:
       "Led Eyebot Series A $20M (Aug 2025) after co-leading Seed with AlleyCorp. Consistent partner across rounds.",
     signals: [
@@ -123,7 +127,7 @@ export const mockInvestors: Investor[] = [
     name: "Mach33",
     fund: { id: "f3", name: "Mach33" },
     warmthTier: "Hot",
-    lastInteraction: "Apr 2025",
+    lastSignalDate: "Apr 2025",
     suggestedAction:
       "Co-led Portal Space Systems Seed (Apr 2025). Top space tech fund — keep warm ahead of Series A.",
     signals: [
@@ -151,7 +155,7 @@ export const mockInvestors: Investor[] = [
     name: "Flybridge",
     fund: { id: "f4", name: "Flybridge" },
     warmthTier: "Warm",
-    lastInteraction: "Jun 2024",
+    lastSignalDate: "Jun 2024",
     suggestedAction:
       "Co-invested in Halo Braid Seed (Jun 2024) — 23 months ago. Relationship approaching stale threshold. Re-engage before next Halo Braid milestone.",
     signals: [
@@ -179,7 +183,7 @@ export const mockInvestors: Investor[] = [
     name: "Trimble Ventures",
     fund: { id: "f5", name: "Trimble Ventures" },
     warmthTier: "Stale",
-    lastInteraction: "Sep 2022",
+    lastSignalDate: "Sep 2022",
     suggestedAction:
       "Co-invested at Civ Robotics Seed (Sep 2022) but did not return for Series A (Jul 2025). 44 months of silence — relationship at risk. Outreach recommended before Series B.",
     signals: [
@@ -219,7 +223,7 @@ export const mockInvestors: Investor[] = [
     name: "a16z American Dynamism",
     fund: { id: "f6", name: "a16z American Dynamism" },
     warmthTier: "Cold",
-    lastInteraction: undefined,
+    lastSignalDate: undefined,
     suggestedAction:
       "No co-investment yet. Top defense/manufacturing fund with strong thesis overlap — Cargo Robotics is a natural intro. High-value target.",
     signals: [],
