@@ -6,11 +6,13 @@ interface WarmthBadgeProps {
 }
 
 export function WarmthBadge({ tier, size = "md" }: WarmthBadgeProps) {
+  // Hot/Warm use the brand signal colors. Cold/Stale aren't defined by the
+  // brand guide — filled here within the neutral palette (see globals.css).
   const styles: Record<WarmthTier, string> = {
-    Hot: "bg-red-500/15 text-red-300 border-red-500/30",
-    Warm: "bg-amber-500/15 text-amber-300 border-amber-500/30",
-    Cold: "bg-sky-500/15 text-sky-300 border-sky-500/30",
-    Stale: "bg-slate-700/40 text-slate-300 border-slate-600/60",
+    Hot: "bg-signal-green/10 text-signal-green border-signal-green/30",
+    Warm: "bg-signal-amber/10 text-signal-amber border-signal-amber/30",
+    Cold: "bg-mist text-muted border-line",
+    Stale: "bg-navy/5 text-navy border-navy/25",
   };
 
   const sizeClasses = {

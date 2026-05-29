@@ -41,24 +41,24 @@ export default function InvestorListPage() {
   }, [allInvestors]);
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100">
-      <header className="border-b border-slate-800/80 bg-slate-950/95 backdrop-blur sticky top-0 z-10">
+    <main className="min-h-screen bg-paper text-ink">
+      <header className="border-b border-line bg-paper/95 backdrop-blur sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-wider text-blue-400 font-semibold mb-1">
+              <p className="text-xs uppercase tracking-wider text-muted font-semibold mb-1">
                 AlleyCorp
               </p>
-              <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white">
+              <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-ink">
                 Investor Intelligence
               </h1>
-              <p className="text-sm text-slate-400 mt-1">
+              <p className="text-sm text-muted mt-1">
                 Co-investor relationship intelligence and warmth tracking
               </p>
             </div>
             <button
               onClick={() => router.push("/portfolio")}
-              className="hidden sm:inline-flex items-center gap-2 px-3 py-2 text-slate-300 hover:text-white text-sm font-medium transition-colors"
+              className="hidden sm:inline-flex items-center gap-2 px-3 py-2 text-muted hover:text-ink text-sm font-medium transition-colors"
             >
               Portfolio
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -78,7 +78,7 @@ export default function InvestorListPage() {
         <div className="space-y-4">
           <div className="relative">
             <svg
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500"
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -95,7 +95,7 @@ export default function InvestorListPage() {
               placeholder="Search investors or funds..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 bg-slate-900/60 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/50 transition-colors"
+              className="w-full pl-11 pr-4 py-3 bg-paper border border-line rounded-xl text-ink placeholder-muted focus:outline-none focus:ring-2 focus:ring-ink/15 focus:border-ink transition-colors"
             />
           </div>
 
@@ -106,8 +106,8 @@ export default function InvestorListPage() {
                 onClick={() => setFilterTier(tier)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   filterTier === tier
-                    ? "bg-blue-500 text-white shadow-sm shadow-blue-500/30"
-                    : "bg-slate-900/60 text-slate-300 border border-slate-800 hover:border-slate-700 hover:text-white"
+                    ? "bg-ink text-paper"
+                    : "bg-paper text-muted border border-line hover:border-ink hover:text-ink"
                 }`}
               >
                 {tier} ({tierCounts[tier]})
@@ -116,7 +116,7 @@ export default function InvestorListPage() {
           </div>
         </div>
 
-        <p className="mt-5 mb-4 text-sm text-slate-400">
+        <p className="mt-5 mb-4 text-sm text-muted">
           Showing {filteredInvestors.length} of {allInvestors.length} investors
         </p>
 
@@ -132,8 +132,8 @@ export default function InvestorListPage() {
 
         {filteredInvestors.length === 0 && (
           <div className="text-center py-16">
-            <p className="text-slate-300 text-lg">No investors found</p>
-            <p className="text-slate-500 text-sm mt-2">Try adjusting your search or filters</p>
+            <p className="text-ink text-lg">No investors found</p>
+            <p className="text-muted text-sm mt-2">Try adjusting your search or filters</p>
           </div>
         )}
       </div>
