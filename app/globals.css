@@ -1,1 +1,20 @@
 @import "tailwindcss";
+
+/*
+ * Brand palette — see BRAND-LANGUAGE-GUIDE.md.
+ * Black & white primary. Navy for data-table headers only. Signal colors
+ * for warmth tiers only. No blue, no gradients.
+ *
+ * Cold / Stale are not defined by the brand guide; filled here within the
+ * allowed neutral palette (Cold = mid gray, Stale = deep navy outline).
+ */
+@theme {
+  --color-ink: #111111; /* primary text, headings, table headers */
+  --color-paper: #ffffff; /* page + card background */
+  --color-mist: #f5f5f5; /* alternating rows, callout fills */
+  --color-muted: #666666; /* supporting text, metadata */
+  --color-line: #e2e2e2; /* hairline borders on white */
+  --color-navy: #1a2744; /* data-table headers only, sparingly */
+  --color-signal-green: #1a7a3a; /* warmth: Hot */
+  --color-signal-amber: #b45309; /* warmth: Warm */
+}
