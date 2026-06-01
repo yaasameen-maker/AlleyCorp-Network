@@ -10,7 +10,10 @@ function getPool(): Pool {
   return _pool;
 }
 // Keep a named export for callers that import `pool` directly (e.g. migration scripts).
-const pool = { query: (...args: Parameters<Pool["query"]>) => getPool().query(...args) };
+const pool = {
+  query: (...args: Parameters<Pool["query"]>) => getPool().query(...args),
+  end: () => getPool().end(),
+};
 
 // ─────────────────────────────────────────
 // Helpers
