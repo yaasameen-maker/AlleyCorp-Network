@@ -1,7 +1,16 @@
 import { Pool } from "pg";
 import type { Relationship, Signal, WarmthTier } from "./types";
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+// Lazy pool — created on first use so that DATABASE_URL is read after dotenv runs.
+let _pool: Pool | null = null;
+function getPool(): Pool {
+  if (!_pool) {
+    _pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  }
+  return _pool;
+}
+// Keep a named export for callers that import `pool` directly (e.g. migration scripts).
+const pool = { query: (...args: Parameters<Pool["query"]>) => getPool().query(...args) };
 
 // ─────────────────────────────────────────
 // Helpers
@@ -125,13 +134,14 @@ export async function getInvestorByName(name: string): Promise<Relationship | nu
   return toRelationship(rows[0], signalRows.map(toSignal));
 }
 
-// Search relationships by fund name, portfolio company name, sector, or warmth tier.
+// Search relationships by fund name, fund focus, portfolio company name, sector, or warmth tier.
 // Signals are not loaded here — callers only need the count (r.signals?.length).
 export async function searchRelationships(query: string): Promise<Relationship[]> {
   const term = `%${query}%`;
   const { rows } = await pool.query(
     `${RELATIONSHIP_SELECT}
      WHERE f.name ILIKE $1
+        OR f.focus ILIKE $1
         OR pc.name ILIKE $1
         OR pc.sector ILIKE $1
         OR r.warmth_tier ILIKE $1
