@@ -52,9 +52,9 @@ export function InvestorProfile({ investor, onClose }: InvestorProfileProps) {
                 </div>
               </div>
               <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-4">
-                <div className="text-xs sm:text-sm text-slate-400 mb-1">Last Interaction</div>
+                <div className="text-xs sm:text-sm text-slate-400 mb-1">Last Signal</div>
                 <div className="text-xl sm:text-2xl text-white font-semibold">
-                  {investor.lastInteraction || "N/A"}
+                  {investor.lastSignalDate || "No signals yet"}
                 </div>
               </div>
             </div>

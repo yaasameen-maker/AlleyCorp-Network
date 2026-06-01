@@ -4,7 +4,8 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { InvestorCard } from "./components/InvestorCard";
 import { InvestorProfile } from "./components/InvestorProfile";
-import { mockInvestors, type Investor, type WarmthTier } from "./data/mockData";
+import { getInvestors } from "./data/investors";
+import { type Investor, type WarmthTier } from "./data/mockData";
 
 export default function InvestorListPage() {
   const router = useRouter();
@@ -12,8 +13,12 @@ export default function InvestorListPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterTier, setFilterTier] = useState<WarmthTier | "All">("All");
 
+  // Single source of investor data. Swap getInvestors() to a real fetch when the
+  // backend is live (see app/data/investors.ts) — no other UI changes needed.
+  const allInvestors = useMemo(() => getInvestors(), []);
+
   const filteredInvestors = useMemo(() => {
-    return mockInvestors.filter((investor) => {
+    return allInvestors.filter((investor) => {
       const matchesSearch =
         searchQuery === "" ||
         investor.fund.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -23,17 +28,17 @@ export default function InvestorListPage() {
 
       return matchesSearch && matchesTier;
     });
-  }, [searchQuery, filterTier]);
+  }, [allInvestors, searchQuery, filterTier]);
 
   const tierCounts = useMemo(() => {
     return {
-      All: mockInvestors.length,
-      Hot: mockInvestors.filter((i) => i.warmthTier === "Hot").length,
-      Warm: mockInvestors.filter((i) => i.warmthTier === "Warm").length,
-      Cold: mockInvestors.filter((i) => i.warmthTier === "Cold").length,
-      Stale: mockInvestors.filter((i) => i.warmthTier === "Stale").length,
+      All: allInvestors.length,
+      Hot: allInvestors.filter((i) => i.warmthTier === "Hot").length,
+      Warm: allInvestors.filter((i) => i.warmthTier === "Warm").length,
+      Cold: allInvestors.filter((i) => i.warmthTier === "Cold").length,
+      Stale: allInvestors.filter((i) => i.warmthTier === "Stale").length,
     };
-  }, []);
+  }, [allInvestors]);
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
@@ -112,7 +117,7 @@ export default function InvestorListPage() {
         </div>
 
         <p className="mt-5 mb-4 text-sm text-slate-400">
-          Showing {filteredInvestors.length} of {mockInvestors.length} investors
+          Showing {filteredInvestors.length} of {allInvestors.length} investors
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

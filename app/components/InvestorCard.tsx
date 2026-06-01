@@ -30,10 +30,10 @@ export function InvestorCard({ investor, onClick }: InvestorCardProps) {
           <span className="text-slate-100 font-medium">{investor.coInvestments.length}</span>
         </div>
 
-        {investor.lastInteraction && (
+        {investor.lastSignalDate && (
           <div className="flex items-center gap-2 text-sm">
-            <span className="text-slate-400">Last interaction:</span>
-            <span className="text-slate-100 font-medium">{investor.lastInteraction}</span>
+            <span className="text-slate-400">Last signal:</span>
+            <span className="text-slate-100 font-medium">{investor.lastSignalDate}</span>
           </div>
         )}
 
