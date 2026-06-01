@@ -24,9 +24,17 @@ export async function handler(args: { investor_id: string }): Promise<CallToolRe
     return { content: [{ type: "text", text: "No signals found for this investor." }] };
   }
 
+  const formatDate = (d: unknown): string => {
+    if (!d) return "unknown";
+    const date = d instanceof Date ? d : new Date(String(d));
+    return isNaN(date.getTime())
+      ? String(d)
+      : date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  };
+
   const entries = signals.map((s) => {
     const weightDots = { high: "●●●", medium: "●●○", low: "●○○" }[s.weight];
-    return `• [${s.date}] ${s.type.replace(/_/g, " ")} — ${s.source} — ${s.value} ${weightDots}`;
+    return `• [${formatDate(s.date)}] ${s.type.replace(/_/g, " ")} — ${s.source} — ${s.value} ${weightDots}`;
   });
 
   const text = [`**Warmth signals (${signals.length})**`, "", ...entries].join("\n");

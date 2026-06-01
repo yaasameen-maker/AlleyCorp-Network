@@ -30,8 +30,16 @@ export async function handler(args: { name: string }): Promise<CallToolResult> {
   const company = relationship.portfolioCompany;
   const signals = relationship.signals ?? [];
 
+  const formatDate = (d: unknown): string => {
+    if (!d) return "unknown date";
+    const date = d instanceof Date ? d : new Date(String(d));
+    return isNaN(date.getTime())
+      ? String(d)
+      : date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  };
+
   const signalSummary = signals.length
-    ? signals.map((s) => `• ${s.type} — ${s.source} (${s.date})`).join("\n")
+    ? signals.map((s) => `• ${s.type} — ${s.source} (${formatDate(s.date)})`).join("\n")
     : "No signals on record.";
 
   const suggestedAction = {
@@ -45,7 +53,8 @@ export async function handler(args: { name: string }): Promise<CallToolResult> {
     `**${fund?.name ?? args.name}**`,
     `Warmth tier: ${relationship.warmthTier}`,
     company ? `Co-investment: ${company.name} (${company.stage})` : "",
-    `Last signal: ${relationship.lastSignalDate ?? "Unknown"}`,
+    `Last signal: ${formatDate(relationship.lastSignalDate)}`,
+    `Relationship ID: ${relationship.id}`,
     ``,
     `Signals:`,
     signalSummary,

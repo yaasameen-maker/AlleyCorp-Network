@@ -22,8 +22,15 @@ export async function handler(): Promise<CallToolResult> {
   const entries = relationships.map((r) => {
     const fund = r.fund?.name ?? "Unknown fund";
     const company = r.portfolioCompany?.name ?? "Unknown company";
-    const lastSignal = r.lastSignalDate ?? "unknown date";
-    return `• **${fund}** — last signal ${lastSignal} on ${company}. Reconnect before their next investment in this space.`;
+    const parsed = r.lastSignalDate ? new Date(r.lastSignalDate) : null;
+    const lastSignal = parsed && !isNaN(parsed.getTime())
+      ? parsed.toLocaleDateString("en-US", { month: "short", year: "numeric" })
+      : "unknown date";
+    const monthsAgo = parsed && !isNaN(parsed.getTime())
+      ? Math.floor((Date.now() - parsed.getTime()) / (1000 * 60 * 60 * 24 * 30))
+      : null;
+    const age = monthsAgo ? ` (${monthsAgo} months ago)` : "";
+    return `• **${fund}** — last signal ${lastSignal}${age} on ${company}. Reconnect before their next investment in this space.`;
   });
 
   const text = [`**Stale co-investor relationships (${relationships.length})**`, "", ...entries].join("\n");

@@ -19,7 +19,9 @@ function toSignal(row: Record<string, unknown>): Signal {
     id: row.id as string,
     relationshipId: row.relationship_id as string,
     type: row.signal_type as Signal["type"],
-    date: String(row.signal_date).slice(0, 10),
+    date: row.signal_date instanceof Date
+      ? row.signal_date.toISOString().slice(0, 10)
+      : String(row.signal_date).slice(0, 10),
     source: row.source as string,
     value: (row.value ?? "") as string,
     weight: row.weight as Signal["weight"],
@@ -70,7 +72,11 @@ function toRelationship(row: Record<string, unknown>, signals: Signal[] = []): R
     alleyPartner: (row.alleyPartner ?? "") as string,
     warmthTier: toWarmthTier(row.warmthTier as string),
     warmthCalculatedAt: row.warmthCalculatedAt ? String(row.warmthCalculatedAt) : undefined,
-    lastSignalDate: row.lastSignalDate ? String(row.lastSignalDate).slice(0, 10) : undefined,
+    lastSignalDate: row.lastSignalDate
+      ? (row.lastSignalDate instanceof Date
+          ? row.lastSignalDate.toISOString().slice(0, 10)
+          : String(row.lastSignalDate).slice(0, 10))
+      : undefined,
     override: row.override != null ? (row.override as boolean) : undefined,
     overrideNote: row.overrideNote ? (row.overrideNote as string) : undefined,
     overrideBy: row.overrideBy ? (row.overrideBy as string) : undefined,
