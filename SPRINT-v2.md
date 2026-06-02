@@ -7,6 +7,8 @@
 
 **June 1 update:** Midpoint gate cleared. DB schema live locally, all 4 warmth tiers seeded, 5/5 acceptance tests passing. Critical path now moves to Neon provisioning + frontend wire-up.
 
+**⚠️ New constraint:** AlleyCorp office visit June 11. Need working product with real data by June 10. Weeks 3–4 replanned accordingly.
+
 ---
 
 ## What Is Already Done
@@ -127,64 +129,88 @@
 
 ---
 
-## Week 3 — June 2–6 · Digest + Full Network + API Routes
+## Week 3 — June 2–6 · Neon + Real Data + Core UI Features
 
-**Goal:** Daily digest live. Full 20-company network on dashboard. Search and filter working end-to-end.
+**Goal:** Real data on the dashboard by June 6. Alerts, email drafts, and MCP chatbot UI built. Everything wired end-to-end before the office visit.
 
-### June 2–3 · Digest / Full Network
+### June 2–3 · Neon + API Routes
+
+**Luba**
+- Provision Neon PostgreSQL (free tier)
+- Run `seed.sql` against Neon — confirm all tiers present
+- Import DTNY event signals (`luba/swoogo-signals` branch) — 6 co-investor attendees, Jan 28 2026
+- Share `DATABASE_URL` with Michael and Yaasameen via secure channel
+- Implement `GET /api/investors` — wire `app/data/investors.ts` seam to real DB
+
+**Yaasameen**
+- Implement `GET /api/alerts` — returns stale + warm-at-risk relationships
+- Implement `GET /api/events` — returns recent signals
+
+### June 4–6 · Frontend Features
+
+**Yaasameen**
+- Implement `POST /api/chat` — proxies natural language queries from the chatbot UI to the MCP server, returns readable text response
+- This is the backend Michael's chatbot UI connects to — must be live before Michael can wire the frontend
+
+**Michael**
+- Wire dashboard to real data via `GET /api/investors` (3-line change in `investors.ts`)
+- Stale alerts banner — top of dashboard, sorted by severity, links to profile
+- Investor profile — email draft section (subject + body, tier-aware, editable, copy button)
+- MCP chatbot interface — query input on dashboard, inline readable response (connects to `POST /api/chat`)
+
+---
+
+## June 9–10 · Integration + Office Visit Prep
+
+**Goal:** Everything working together on Neon data. Good enough to show AlleyCorp on June 11.
+
+### All
+- End-to-end smoke test: dashboard loads real data → click stale alert → profile opens → MCP query works
+- Fix any integration bugs from Week 3
+- Run `npm run test:acceptance` → must be 5/5 on Neon DB
+
+### Luba
+- Co-investor research for highest-priority companies (focus on stale + hot relationships)
+- Data QA: confirm what's shown on screen matches acceptance test expectations
+
+### Demo script (casual — June 11)
+1. Open dashboard → real investor list with warmth tiers
+2. Point to alerts banner → "these are the relationships at risk"
+3. Click Trimble Ventures → profile with signals + email draft
+4. Type MCP query → "Who are our warmest deep tech relationships?" → live response
+
+---
+
+## June 11 · AlleyCorp Office Visit
+Casual check-in. Show working product with real data. Not a formal demo — no polish required.
+
+---
+
+## June 12–13 · Post-Visit Fixes + Digest
+
+**Goal:** Address any feedback from the office visit. Build digest.
 
 **Yaasameen**
 - Create `lib/digest.ts` — generates `DigestItem[]` from stale relationships
 - Wire Resend API: send digest email to configured recipient
-- Digest item for Trimble Ventures must match acceptance test #5 output exactly (same tier, same reason)
+- Digest item for Trimble Ventures must match acceptance test #5 output exactly
 
 **Michael**
-- Expand dashboard to all 20 portfolio companies
-- Search working across fund name, company name, warmth tier
-- Filter by tier working end-to-end with real data
-
-### June 4–6 · API Routes + Deep-Link Integration
-
-**Yaasameen**
-- Implement `GET /api/alerts` — returns stale relationships for frontend polling
-- Implement `GET /api/events` — returns recent signals
-
-**Michael**
-- Wire frontend to real API routes (replace any placeholder data)
-- Deep-link from digest email → investor profile card (authenticated)
-
-**Luba**
-- Complete co-investor research for all 20 companies (Crunchbase, press — fund name, round, date, role)
-- Seed into DB
-- Final data QA: confirm Stale and Cold data matches acceptance test expectations exactly
+- Address any UI feedback from June 11
+- Portfolio Explorer page — companies, co-investor count, sector filter
+- Digest view (`/digest`) — read-only, "Send Digest Email" button
 
 ---
 
-## Week 4 — June 9–13 · Hardening + Demo Rehearsal Prep
-
-**Goal:** No crashes. 5/5 acceptance tests pass clean. Demo script rehearsed.
-
-### June 9–10 · Bug Fix Sprint (All)
-- Fix any acceptance test failures from Week 3 integration
-- Fix any UI bugs found during full 20-company render
-- Confirm `recalibrateAll()` in `lib/scoring.ts` runs against real DB without error
-
-### June 11–13 · QA + Polish (All)
-- Run `npm run test:acceptance` → 5/5 required before moving to Demo Prep week
-- Walk through Demo Day script: Abe POV — network view → stale alert → Trimble Ventures profile → MCP query
-- UI polish: tier pill colors, spacing, empty states
-- Optional cleanup: implement `lib/env.ts` (`isDev()`) and `lib/trace.ts` (AsyncLocalStorage trace ID)
-
----
-
-## Demo Day Prep — June 16–24
+## June 16–24 · QA + Demo Day Prep
 
 | Days | Task |
 |---|---|
-| June 16–17 | Final acceptance test run. Any failure is a blocker — fix before proceeding. |
+| June 16–17 | Full QA pass. Fix any bugs from post-visit feedback. UI polish: tier pill colors, spacing, empty states. |
+| June 16–17 | Final acceptance test run — 5/5 required before proceeding. |
 | June 18–19 | Demo rehearsal with Kabir. Abe scenario end-to-end. Time the full run. |
-| June 20 | Feature freeze. Emergency fixes only from this point forward. |
-| June 21–23 | Final dry runs. Confirm all 5 MCP queries return correct results live. |
+| June 20 | Feature freeze. Emergency fixes only. |
+| June 21–23 | Final dry runs. Confirm all 5 MCP queries return correct results live on Neon. |
 | June 24 | **Demo Day** |
 
 ---
