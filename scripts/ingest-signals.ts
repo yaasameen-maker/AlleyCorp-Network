@@ -49,6 +49,19 @@ interface CandidateSignal {
 // ── Targets ───────────────────────────────────────────────────────────────────
 
 const TARGETS: SearchTarget[] = [
+
+  // ── STALE (highest priority — demo day critical) ──────────────────────────
+
+  {
+    relationshipId: "34ddba26-d2d6-432b-82c0-85e6a2fc15ec",
+    fundName: "SineWave Ventures",
+    companyName: "Aon 3D",
+    queries: [
+      "Aon 3D SineWave Ventures investment funding",
+      "Aon 3D metal 3D printing startup funding investors 2021",
+      "Aon 3D aerospace manufacturing startup investment",
+    ],
+  },
   {
     relationshipId: "ba731a1f-acfd-4c2a-ad44-41b46278dbc4",
     fundName: "Trimble Ventures",
@@ -57,6 +70,178 @@ const TARGETS: SearchTarget[] = [
       "Civ Robotics Trimble Ventures funding round",
       "Civ Robotics Series A investment 2023 2024 2025",
       "Civ Robotics construction robotics funding investors",
+    ],
+  },
+  {
+    relationshipId: "6f9767da-d39d-47bd-bdb1-17a5b418a8b2",
+    fundName: "BOLD Capital Partners",
+    companyName: "Earth Force",
+    queries: [
+      "Earth Force BOLD Capital Partners investment",
+      "Earth Force climate startup funding round investors",
+      "Earth Force environmental technology venture capital",
+    ],
+  },
+
+  // ── HOT with missing last_signal_date (need evidence) ────────────────────
+
+  {
+    relationshipId: "ad3c1e30-6fd1-4526-98df-a0fedcef8d7b",
+    fundName: "Riot Ventures",
+    companyName: "Valar Atomics",
+    queries: [
+      "Valar Atomics Riot Ventures funding investment",
+      "Valar Atomics nuclear energy startup seed round investors 2024 2025",
+      "Valar Atomics funding announcement investors",
+    ],
+  },
+  {
+    relationshipId: "cacec229-4320-4e23-a3cc-c25e992d8050",
+    fundName: "Snowpoint Ventures",
+    companyName: "Valar Atomics",
+    queries: [
+      "Valar Atomics Snowpoint Ventures investment",
+      "Valar Atomics nuclear startup investors 2024 2025",
+      "Valar Atomics seed funding round announcement",
+    ],
+  },
+  {
+    relationshipId: "3322eaea-b060-43ec-956d-23c093e616a7",
+    fundName: "Mach33",
+    companyName: "Portal Space Systems",
+    queries: [
+      "Portal Space Systems Mach33 investment funding",
+      "Portal Space Systems space propulsion startup investors 2025 2026",
+      "Portal Space Systems funding round announcement",
+    ],
+  },
+
+  // ── HOT with recent signals (validate) ───────────────────────────────────
+
+  {
+    relationshipId: "6c6f5824-7a0f-4eee-8e3b-eafa63ecac06",
+    fundName: "General Catalyst",
+    companyName: "Eyebot",
+    queries: [
+      "Eyebot General Catalyst investment funding",
+      "Eyebot eye surgery robotics startup funding 2025",
+      "Eyebot ophthalmic robotics investors Series A",
+    ],
+  },
+  {
+    relationshipId: "78f6face-5fb0-44d0-bd22-7187412c3642",
+    fundName: "Ubiquity Ventures",
+    companyName: "Eyebot",
+    queries: [
+      "Eyebot Ubiquity Ventures funding",
+      "Eyebot robotic eye surgery startup investors 2025",
+      "Eyebot funding round announcement investors",
+    ],
+  },
+  {
+    relationshipId: "97281765-a82c-43f6-8103-2b67505f049e",
+    fundName: "SOSV",
+    companyName: "Renovate Robotics",
+    queries: [
+      "Renovate Robotics SOSV HAX investment",
+      "Renovate Robotics roofing robot startup funding investors",
+      "Renovate Robotics funding round 2024 2025",
+    ],
+  },
+  {
+    relationshipId: "fce3f571-76af-49cd-b600-c06b430f38af",
+    fundName: "Geodesic Capital",
+    companyName: "Portal Space Systems",
+    queries: [
+      "Portal Space Systems Geodesic Capital investment",
+      "Portal Space Systems Series A funding 2026 investors",
+      "Portal Space Systems propulsion startup funding announcement",
+    ],
+  },
+  {
+    relationshipId: "34e1ca8d-e2fc-4e3b-83b5-0183e07fe404",
+    fundName: "Day One Ventures",
+    companyName: "Valar Atomics",
+    queries: [
+      "Valar Atomics Day One Ventures investment funding",
+      "Valar Atomics nuclear fission startup investors 2025",
+      "Valar Atomics venture funding round deep tech",
+    ],
+  },
+  {
+    relationshipId: "24e92376-97c1-4c31-8178-4cbb22a14be7",
+    fundName: "Amazon Climate Pledge Fund",
+    companyName: "Glacier",
+    queries: [
+      "Glacier Amazon Climate Pledge Fund investment",
+      "Glacier recycling robotics AI startup funding investors 2025",
+      "Glacier waste sorting robot startup funding round",
+    ],
+  },
+  {
+    relationshipId: "1f669b0e-ce02-42a3-a59b-cee0be204d1e",
+    fundName: "NEA",
+    companyName: "Glacier",
+    queries: [
+      "Glacier NEA venture capital investment funding",
+      "Glacier recycling AI startup Series A investors 2025",
+      "Glacier climate tech startup funding announcement",
+    ],
+  },
+
+  // ── WARM ─────────────────────────────────────────────────────────────────
+
+  {
+    relationshipId: "cdfc0f52-9ef7-4b31-8b02-fc0b93b2d888",
+    fundName: "Flybridge",
+    companyName: "Halo Braid",
+    queries: [
+      "Halo Braid Flybridge investment funding",
+      "Halo Braid hair braiding robotics startup investors 2024",
+      "Halo Braid automated hair braiding funding round",
+    ],
+  },
+  {
+    relationshipId: "557e9b32-0b44-447d-a213-b6848870aa35",
+    fundName: "Cherubic Ventures",
+    companyName: "Cargo Robotics",
+    queries: [
+      "Cargo Robotics Cherubic Ventures investment funding",
+      "Cargo Robotics logistics startup funding investors 2024",
+      "Cargo Robotics autonomous cargo handling investment",
+    ],
+  },
+
+  // ── COLD (potential targets — look for any signals) ───────────────────────
+
+  {
+    relationshipId: "d0bf6b1f-2218-4e95-9d2f-1e50ec870f41",
+    fundName: "a16z American Dynamism",
+    companyName: "Cargo Robotics",
+    queries: [
+      "Cargo Robotics a16z American Dynamism investment",
+      "Cargo Robotics logistics robotics startup Series A 2024 2025",
+      "Cargo Robotics funding round announcement investors",
+    ],
+  },
+  {
+    relationshipId: "65e92c3a-c8e1-43be-889a-9712855ec776",
+    fundName: "Eclipse Ventures",
+    companyName: "Civ Robotics",
+    queries: [
+      "Civ Robotics Eclipse Ventures investment co-investment",
+      "Civ Robotics construction surveying robot funding 2023 2024",
+      "Civ Robotics investors funding deep tech",
+    ],
+  },
+  {
+    relationshipId: "0e9adc58-c4b9-4e11-9ac3-ba9e63fcbfda",
+    fundName: "Founders Fund",
+    companyName: "Valar Atomics",
+    queries: [
+      "Valar Atomics Founders Fund investment nuclear",
+      "Valar Atomics nuclear energy investors 2024 2025 deep tech",
+      "Valar Atomics advanced nuclear startup funding",
     ],
   },
 ];
@@ -153,20 +338,28 @@ ${pages.map((p, i) => `[${i + 1}] Title: ${p.title}\nURL: ${p.url}\nContent: ${p
     .map((b) => (b as { type: "text"; text: string }).text)
     .join("");
 
-  // Extract JSON from response
-  const match = text.match(/\{[\s\S]*\}/);
-  if (!match) {
+  // Extract JSON — try code block first, then bare object
+  const codeBlock = text.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+  const bareObject = text.match(/\{[\s\S]*\}/);
+  const raw = codeBlock?.[1] ?? bareObject?.[0];
+
+  if (!raw) {
     console.log("   No JSON found in Claude response");
     return [];
   }
 
-  const parsed = JSON.parse(match[0]) as { signals: Omit<CandidateSignal, "relationshipId" | "fundName" | "companyName">[] };
-  return parsed.signals.map((s) => ({
-    ...s,
-    relationshipId: target.relationshipId,
-    fundName: target.fundName,
-    companyName: target.companyName,
-  }));
+  try {
+    const parsed = JSON.parse(raw) as { signals: Omit<CandidateSignal, "relationshipId" | "fundName" | "companyName">[] };
+    return (parsed.signals ?? []).map((s) => ({
+      ...s,
+      relationshipId: target.relationshipId,
+      fundName: target.fundName,
+      companyName: target.companyName,
+    }));
+  } catch (parseErr) {
+    console.error(`   JSON parse error: ${parseErr}`);
+    return [];
+  }
 }
 
 // ── Step 3: Dedupe hash ───────────────────────────────────────────────────────
@@ -234,6 +427,7 @@ async function run() {
   let totalDuplicates = 0;
 
   for (const target of TARGETS) {
+    try {
     // Step 1: Search
     const pages = await searchForSignals(target);
     console.log(`\n   Found ${pages.length} unique pages`);
@@ -285,6 +479,9 @@ async function run() {
     if (latestDate) {
       await updateRelationshipDate(target.relationshipId, latestDate);
       console.log(`   📅 Updated last_signal_date → ${latestDate}`);
+    }
+    } catch (err) {
+      console.error(`   ✗ Target failed (${target.fundName} + ${target.companyName}): ${err}`);
     }
   }
 
