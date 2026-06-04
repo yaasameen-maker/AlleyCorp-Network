@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { InvestorCard } from "./components/InvestorCard";
 import { InvestorProfile } from "./components/InvestorProfile";
@@ -12,10 +12,16 @@ export default function InvestorListPage() {
   const [selectedInvestor, setSelectedInvestor] = useState<Investor | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterTier, setFilterTier] = useState<WarmthTier | "All">("All");
+  const [allInvestors, setAllInvestors] = useState<Investor[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Single source of investor data. Swap getInvestors() to a real fetch when the
-  // backend is live (see app/data/investors.ts) — no other UI changes needed.
-  const allInvestors = useMemo(() => getInvestors(), []);
+  useEffect(() => {
+    getInvestors()
+      .then(setAllInvestors)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   const filteredInvestors = useMemo(() => {
     return allInvestors.filter((investor) => {
@@ -116,25 +122,42 @@ export default function InvestorListPage() {
           </div>
         </div>
 
-        <p className="mt-5 mb-4 text-sm text-muted">
-          Showing {filteredInvestors.length} of {allInvestors.length} investors
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filteredInvestors.map((investor) => (
-            <InvestorCard
-              key={investor.id}
-              investor={investor}
-              onClick={() => setSelectedInvestor(investor)}
-            />
-          ))}
-        </div>
-
-        {filteredInvestors.length === 0 && (
+        {loading && (
           <div className="text-center py-16">
-            <p className="text-ink text-lg">No investors found</p>
-            <p className="text-muted text-sm mt-2">Try adjusting your search or filters</p>
+            <p className="text-muted text-sm">Loading investors...</p>
           </div>
+        )}
+
+        {error && (
+          <div className="text-center py-16">
+            <p className="text-ink text-lg">Failed to load investors</p>
+            <p className="text-muted text-sm mt-2">{error}</p>
+          </div>
+        )}
+
+        {!loading && !error && (
+          <>
+            <p className="mt-5 mb-4 text-sm text-muted">
+              Showing {filteredInvestors.length} of {allInvestors.length} investors
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filteredInvestors.map((investor) => (
+                <InvestorCard
+                  key={investor.id}
+                  investor={investor}
+                  onClick={() => setSelectedInvestor(investor)}
+                />
+              ))}
+            </div>
+
+            {filteredInvestors.length === 0 && (
+              <div className="text-center py-16">
+                <p className="text-ink text-lg">No investors found</p>
+                <p className="text-muted text-sm mt-2">Try adjusting your search or filters</p>
+              </div>
+            )}
+          </>
         )}
       </div>
 
