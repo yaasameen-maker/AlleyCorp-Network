@@ -1,4 +1,5 @@
 import { Pool } from "pg";
+import type { QueryConfig, QueryResult, QueryResultRow } from "pg";
 import type { Relationship, Signal, WarmthTier } from "./types";
 
 // Lazy pool — created on first use so that DATABASE_URL is read after dotenv runs.
@@ -9,10 +10,20 @@ function getPool(): Pool {
   }
   return _pool;
 }
-// Keep a named export for callers that import `pool` directly (e.g. migration scripts).
+
+// Thin proxy with explicit generic signature matching pg's public API.
 const pool = {
-  query: (...args: Parameters<Pool["query"]>) => getPool().query(...args),
-  end: () => getPool().end(),
+  query<R extends QueryResultRow = QueryResultRow>(
+    textOrConfig: string | QueryConfig,
+    values?: unknown[]
+  ): Promise<QueryResult<R>> {
+    return values !== undefined
+      ? getPool().query<R>(textOrConfig as string, values)
+      : getPool().query<R>(textOrConfig as QueryConfig);
+  },
+  end(): Promise<void> {
+    return getPool().end();
+  },
 };
 
 // ─────────────────────────────────────────

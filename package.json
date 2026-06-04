@@ -9,6 +9,8 @@
     "mcp": "tsx mcp/server.ts",
     "test": "vitest",
     "test:run": "vitest run",
+    "test:unit": "vitest run tests/scoring.test.ts",
+    "test:integration": "RUN_DB_TESTS=1 vitest run tests/alerts.test.ts",
     "test:acceptance": "tsx scripts/acceptance-test.ts",
     "ingest:signals": "tsx scripts/ingest-signals.ts",
     "lint": "eslint .",

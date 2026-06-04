@@ -1,14 +1,13 @@
 /**
  * Signal Ingestion Pipeline
  *
- * Searches the web for co-investment signals using Exa, parses them with Claude,
+ * Searches the web for co-investment signals using Exa, parses them with Claude
+ * tool_use (schema-enforced — no JSON.parse), derives confidence from source URL,
  * and writes real signal rows into Neon. Safe to re-run — deduplicates via unique_hash.
  *
  * Usage:
  *   npm run ingest:signals            # dry run (no DB writes)
  *   npm run ingest:signals -- --write # real run (writes to Neon)
- *
- * Phase 1 target: Trimble Ventures + Civ Robotics
  */
 
 import dotenv from "dotenv";
@@ -37,29 +36,30 @@ interface CandidateSignal {
   fundName: string;
   companyName: string;
   signalType: "co_investment" | "press_mention";
-  signalDate: string;       // YYYY-MM-DD
+  signalDate: string;
   sourceTitle: string;
   sourceUrl: string;
   rawSnippet: string;
-  value: string;            // human-readable description
+  value: string;
   confidence: "confirmed" | "inferred" | "pending";
   weight: "high" | "medium" | "low";
 }
 
 // ── Targets ───────────────────────────────────────────────────────────────────
+// Queries use exact quoted company names to prevent false positives.
 
 const TARGETS: SearchTarget[] = [
 
-  // ── STALE (highest priority — demo day critical) ──────────────────────────
+  // ── STALE ────────────────────────────────────────────────────────────────
 
   {
     relationshipId: "34ddba26-d2d6-432b-82c0-85e6a2fc15ec",
     fundName: "SineWave Ventures",
     companyName: "Aon 3D",
     queries: [
-      "Aon 3D SineWave Ventures investment funding",
-      "Aon 3D metal 3D printing startup funding investors 2021",
-      "Aon 3D aerospace manufacturing startup investment",
+      '"AON3D" "SineWave Ventures" investment 2021',
+      '"AON3D" Series A investors list 2021',
+      '"AON3D" "$11.5M" funding round investors Astrobotic',
     ],
   },
   {
@@ -67,9 +67,9 @@ const TARGETS: SearchTarget[] = [
     fundName: "Trimble Ventures",
     companyName: "Civ Robotics",
     queries: [
-      "Civ Robotics Trimble Ventures funding round",
-      "Civ Robotics Series A investment 2023 2024 2025",
-      "Civ Robotics construction robotics funding investors",
+      '"Civ Robotics" "Trimble Ventures" funding',
+      '"Civ Robotics" seed round investors 2022',
+      '"Civ Robotics" construction surveying robot funding announcement',
     ],
   },
   {
@@ -77,22 +77,22 @@ const TARGETS: SearchTarget[] = [
     fundName: "BOLD Capital Partners",
     companyName: "Earth Force",
     queries: [
-      "Earth Force BOLD Capital Partners investment",
-      "Earth Force climate startup funding round investors",
-      "Earth Force environmental technology venture capital",
+      '"Earth Force" "BOLD Capital Partners" investment',
+      '"Earth Force Technologies" funding investors 2022',
+      '"Earth Force" seed round venture capital 2022',
     ],
   },
 
-  // ── HOT with missing last_signal_date (need evidence) ────────────────────
+  // ── HOT with missing last_signal_date ────────────────────────────────────
 
   {
     relationshipId: "ad3c1e30-6fd1-4526-98df-a0fedcef8d7b",
     fundName: "Riot Ventures",
     companyName: "Valar Atomics",
     queries: [
-      "Valar Atomics Riot Ventures funding investment",
-      "Valar Atomics nuclear energy startup seed round investors 2024 2025",
-      "Valar Atomics funding announcement investors",
+      '"Valar Atomics" "Riot Ventures" funding',
+      '"Valar Atomics" seed round investors 2025',
+      '"Valar Atomics" "$19M" investors announcement',
     ],
   },
   {
@@ -100,9 +100,9 @@ const TARGETS: SearchTarget[] = [
     fundName: "Snowpoint Ventures",
     companyName: "Valar Atomics",
     queries: [
-      "Valar Atomics Snowpoint Ventures investment",
-      "Valar Atomics nuclear startup investors 2024 2025",
-      "Valar Atomics seed funding round announcement",
+      '"Valar Atomics" "Snowpoint Ventures" funding',
+      '"Valar Atomics" Series A investors "$130M" 2025',
+      '"Valar Atomics" nuclear startup Series A co-investors',
     ],
   },
   {
@@ -110,22 +110,22 @@ const TARGETS: SearchTarget[] = [
     fundName: "Mach33",
     companyName: "Portal Space Systems",
     queries: [
-      "Portal Space Systems Mach33 investment funding",
-      "Portal Space Systems space propulsion startup investors 2025 2026",
-      "Portal Space Systems funding round announcement",
+      '"Portal Space Systems" "Mach33" funding',
+      '"Portal Space Systems" Series A investors 2026',
+      '"Portal Space Systems" "$50M" round investors',
     ],
   },
 
-  // ── HOT with recent signals (validate) ───────────────────────────────────
+  // ── HOT with recent signals ───────────────────────────────────────────────
 
   {
     relationshipId: "6c6f5824-7a0f-4eee-8e3b-eafa63ecac06",
     fundName: "General Catalyst",
     companyName: "Eyebot",
     queries: [
-      "Eyebot General Catalyst investment funding",
-      "Eyebot eye surgery robotics startup funding 2025",
-      "Eyebot ophthalmic robotics investors Series A",
+      '"Eyebot" "General Catalyst" funding Series A',
+      '"Eyebot" "$20M" Series A investors 2025',
+      '"Eyebot" vision kiosk funding announcement investors',
     ],
   },
   {
@@ -133,9 +133,9 @@ const TARGETS: SearchTarget[] = [
     fundName: "Ubiquity Ventures",
     companyName: "Eyebot",
     queries: [
-      "Eyebot Ubiquity Ventures funding",
-      "Eyebot robotic eye surgery startup investors 2025",
-      "Eyebot funding round announcement investors",
+      '"Eyebot" "Ubiquity Ventures" funding',
+      '"Eyebot" "$6M" seed investors "AlleyCorp" "Ubiquity"',
+      '"Eyebot" seed round investors 2024',
     ],
   },
   {
@@ -143,9 +143,9 @@ const TARGETS: SearchTarget[] = [
     fundName: "SOSV",
     companyName: "Renovate Robotics",
     queries: [
-      "Renovate Robotics SOSV HAX investment",
-      "Renovate Robotics roofing robot startup funding investors",
-      "Renovate Robotics funding round 2024 2025",
+      '"Renovate Robotics" "SOSV" OR "HAX" funding',
+      '"Renovate Robotics" pre-seed investors "$2.5M"',
+      '"Renovate Robotics" roofing robot funding announcement',
     ],
   },
   {
@@ -153,9 +153,9 @@ const TARGETS: SearchTarget[] = [
     fundName: "Geodesic Capital",
     companyName: "Portal Space Systems",
     queries: [
-      "Portal Space Systems Geodesic Capital investment",
-      "Portal Space Systems Series A funding 2026 investors",
-      "Portal Space Systems propulsion startup funding announcement",
+      '"Portal Space Systems" "Geodesic Capital" funding',
+      '"Portal Space Systems" Series A 2026 co-investors',
+      '"Portal Space Systems" "$50M" investors "Geodesic"',
     ],
   },
   {
@@ -163,9 +163,9 @@ const TARGETS: SearchTarget[] = [
     fundName: "Day One Ventures",
     companyName: "Valar Atomics",
     queries: [
-      "Valar Atomics Day One Ventures investment funding",
-      "Valar Atomics nuclear fission startup investors 2025",
-      "Valar Atomics venture funding round deep tech",
+      '"Valar Atomics" "Day One Ventures" investment',
+      '"Valar Atomics" Series A "$130M" "Day One" investors',
+      '"Valar Atomics" nuclear funding "Day One Ventures"',
     ],
   },
   {
@@ -173,9 +173,9 @@ const TARGETS: SearchTarget[] = [
     fundName: "Amazon Climate Pledge Fund",
     companyName: "Glacier",
     queries: [
-      "Glacier Amazon Climate Pledge Fund investment",
-      "Glacier recycling robotics AI startup funding investors 2025",
-      "Glacier waste sorting robot startup funding round",
+      '"Glacier" "Amazon Climate Pledge Fund" investment recycling',
+      '"Glacier" recycling robot funding "$7.7M" investors Amazon NEA',
+      '"Glacier" "$16M" Series A investors Amazon',
     ],
   },
   {
@@ -183,9 +183,9 @@ const TARGETS: SearchTarget[] = [
     fundName: "NEA",
     companyName: "Glacier",
     queries: [
-      "Glacier NEA venture capital investment funding",
-      "Glacier recycling AI startup Series A investors 2025",
-      "Glacier climate tech startup funding announcement",
+      '"Glacier" "NEA" OR "New Enterprise Associates" recycling robot funding',
+      '"Glacier" "$7.7M" investors NEA Amazon 2024',
+      '"Glacier" recycling startup "New Enterprise Associates" investment',
     ],
   },
 
@@ -196,9 +196,9 @@ const TARGETS: SearchTarget[] = [
     fundName: "Flybridge",
     companyName: "Halo Braid",
     queries: [
-      "Halo Braid Flybridge investment funding",
-      "Halo Braid hair braiding robotics startup investors 2024",
-      "Halo Braid automated hair braiding funding round",
+      '"Halo Braid" "Flybridge" funding',
+      '"Halo Braid" startup funding investors 2024',
+      '"Halo Braid" hair braiding robot investment round',
     ],
   },
   {
@@ -206,22 +206,22 @@ const TARGETS: SearchTarget[] = [
     fundName: "Cherubic Ventures",
     companyName: "Cargo Robotics",
     queries: [
-      "Cargo Robotics Cherubic Ventures investment funding",
-      "Cargo Robotics logistics startup funding investors 2024",
-      "Cargo Robotics autonomous cargo handling investment",
+      '"Cargo Robotics" "Cherubic Ventures" funding',
+      '"Cargo Robotics" seed investors 2024',
+      '"Cargo Robotics" autonomous cargo startup investment',
     ],
   },
 
-  // ── COLD (potential targets — look for any signals) ───────────────────────
+  // ── COLD ─────────────────────────────────────────────────────────────────
 
   {
     relationshipId: "d0bf6b1f-2218-4e95-9d2f-1e50ec870f41",
     fundName: "a16z American Dynamism",
     companyName: "Cargo Robotics",
     queries: [
-      "Cargo Robotics a16z American Dynamism investment",
-      "Cargo Robotics logistics robotics startup Series A 2024 2025",
-      "Cargo Robotics funding round announcement investors",
+      '"Cargo Robotics" "a16z" OR "Andreessen Horowitz" funding',
+      '"Cargo Robotics" investors Series A funding round',
+      '"Cargo Robotics" "American Dynamism" investment',
     ],
   },
   {
@@ -229,9 +229,9 @@ const TARGETS: SearchTarget[] = [
     fundName: "Eclipse Ventures",
     companyName: "Civ Robotics",
     queries: [
-      "Civ Robotics Eclipse Ventures investment co-investment",
-      "Civ Robotics construction surveying robot funding 2023 2024",
-      "Civ Robotics investors funding deep tech",
+      '"Civ Robotics" "Eclipse Ventures" funding',
+      '"Civ Robotics" Series A investors 2023 2024',
+      '"Civ Robotics" construction robot all investors funding',
     ],
   },
   {
@@ -239,21 +239,89 @@ const TARGETS: SearchTarget[] = [
     fundName: "Founders Fund",
     companyName: "Valar Atomics",
     queries: [
-      "Valar Atomics Founders Fund investment nuclear",
-      "Valar Atomics nuclear energy investors 2024 2025 deep tech",
-      "Valar Atomics advanced nuclear startup funding",
+      '"Valar Atomics" "Founders Fund" investment nuclear',
+      '"Valar Atomics" Series A all investors list "$130M"',
+      '"Valar Atomics" "$19M" seed investors "Founders Fund"',
     ],
   },
 ];
 
+// ── Tool schema for Claude structured extraction ───────────────────────────────
+// Using tool_use forces schema-valid output — eliminates JSON.parse failures.
+
+const EXTRACT_TOOL: Anthropic.Tool = {
+  name: "extract_signals",
+  description: "Extract co-investment signals found in the search results. Only include signals explicitly mentioning both the fund and the company.",
+  input_schema: {
+    type: "object" as const,
+    properties: {
+      signals: {
+        type: "array",
+        description: "List of signals found. Empty array if none found.",
+        items: {
+          type: "object",
+          properties: {
+            signalType: {
+              type: "string",
+              enum: ["co_investment", "press_mention"],
+              description: "co_investment = fund invested in company. press_mention = article confirms relationship.",
+            },
+            signalDate: {
+              type: "string",
+              description: "Date in YYYY-MM-DD format. Use YYYY-01-01 if only year is known.",
+            },
+            sourceTitle: { type: "string", description: "Title of the article or page." },
+            sourceUrl: { type: "string", description: "Full URL of the source." },
+            rawSnippet: {
+              type: "string",
+              description: "Exact quote from the source that confirms the signal. Max 300 chars.",
+            },
+            value: {
+              type: "string",
+              description: "Human-readable description, e.g. 'Trimble Ventures co-invested in Civ Robotics $5M Seed round (Sep 2022)'.",
+            },
+            weight: {
+              type: "string",
+              enum: ["high", "medium", "low"],
+              description: "high = direct co-investment confirmed. medium = participation mentioned. low = inferred or indirect.",
+            },
+          },
+          required: ["signalType", "signalDate", "sourceTitle", "sourceUrl", "rawSnippet", "value", "weight"],
+        },
+      },
+    },
+    required: ["signals"],
+  },
+};
+
+// ── Priority 4: Source-based confidence ──────────────────────────────────────
+// Derived automatically from URL — not left to Claude's judgment.
+
+const HIGH_CONFIDENCE_DOMAINS = [
+  "techcrunch.com", "bloomberg.com", "prnewswire.com",
+  "businesswire.com", "axios.com", "reuters.com", "venturebeat.com",
+];
+const MEDIUM_CONFIDENCE_DOMAINS = [
+  "crunchbase.com", "news.crunchbase.com", "forbes.com",
+  "wsj.com", "ft.com", "cnbc.com",
+];
+
+function confidenceFromUrl(url: string): "confirmed" | "inferred" | "pending" {
+  if (HIGH_CONFIDENCE_DOMAINS.some((d) => url.includes(d))) return "confirmed";
+  if (MEDIUM_CONFIDENCE_DOMAINS.some((d) => url.includes(d))) return "inferred";
+  return "pending";
+}
+
 // ── Step 1: Search ────────────────────────────────────────────────────────────
 
-async function searchForSignals(target: SearchTarget): Promise<{ url: string; title: string; snippet: string }[]> {
+async function searchForSignals(
+  target: SearchTarget
+): Promise<{ url: string; title: string; snippet: string }[]> {
   console.log(`\n🔍 Searching for: ${target.fundName} + ${target.companyName}`);
   const found: { url: string; title: string; snippet: string }[] = [];
 
   for (const query of target.queries) {
-    console.log(`   Query: "${query}"`);
+    console.log(`   Query: ${query}`);
     try {
       const results = await exa.search(query, {
         type: "auto",
@@ -267,10 +335,11 @@ async function searchForSignals(target: SearchTarget): Promise<{ url: string; ti
       });
 
       for (const r of results.results) {
-        const snippet = (r as unknown as { highlights?: string[] }).highlights?.join(" ") ?? "";
+        const snippet =
+          (r as unknown as { highlights?: string[] }).highlights?.join(" ") ?? "";
         if (snippet || r.title) {
           found.push({ url: r.url, title: r.title ?? "", snippet });
-          console.log(`   ✓ ${r.title} — ${r.url}`);
+          console.log(`   ✓ ${r.title}`);
         }
       }
     } catch (err) {
@@ -278,11 +347,10 @@ async function searchForSignals(target: SearchTarget): Promise<{ url: string; ti
     }
   }
 
-  // Dedupe by URL
   return [...new Map(found.map((f) => [f.url, f])).values()];
 }
 
-// ── Step 2: Parse with Claude ─────────────────────────────────────────────────
+// ── Step 2: Extract with Claude tool_use (schema-enforced) ───────────────────
 
 async function parseSignals(
   target: SearchTarget,
@@ -290,74 +358,58 @@ async function parseSignals(
 ): Promise<CandidateSignal[]> {
   if (pages.length === 0) return [];
 
-  console.log(`\n🤖 Parsing ${pages.length} pages with Claude...`);
+  console.log(`\n🤖 Extracting signals via Claude tool_use (${pages.length} pages)...`);
 
-  const prompt = `You are extracting co-investment signals for a VC relationship intelligence platform.
+  const prompt = `Extract co-investment signals from these search results.
 
-Fund we are tracking: ${target.fundName}
+Fund: ${target.fundName}
 Portfolio company: ${target.companyName}
 
-Here are web search results. Extract ONLY real, factual signals about:
-1. Funding rounds where ${target.fundName} co-invested in ${target.companyName}
-2. Press mentions that confirm a relationship between them
-
-For each signal found, return JSON with this exact shape:
-{
-  "signals": [
-    {
-      "signalType": "co_investment" | "press_mention",
-      "signalDate": "YYYY-MM-DD",
-      "sourceTitle": "article title",
-      "sourceUrl": "https://...",
-      "rawSnippet": "exact quote from the article",
-      "value": "human readable description, e.g. Trimble Ventures co-led Civ Robotics $8M Seed round",
-      "confidence": "confirmed" | "inferred" | "pending",
-      "weight": "high" | "medium" | "low"
-    }
-  ]
-}
-
 Rules:
-- Only include signals where BOTH ${target.fundName} AND ${target.companyName} are explicitly mentioned
-- Never fabricate — if not clearly stated, skip it
+- Only extract signals where BOTH "${target.fundName}" AND "${target.companyName}" are explicitly mentioned
+- Never fabricate — skip anything not clearly stated
 - If date is only a year, use YYYY-01-01
-- Return empty signals array if nothing found
-- confidence "confirmed" = explicitly stated, "inferred" = strongly implied, "pending" = uncertain
+- Call extract_signals with an empty signals array if nothing found
 
 Search results:
-${pages.map((p, i) => `[${i + 1}] Title: ${p.title}\nURL: ${p.url}\nContent: ${p.snippet}`).join("\n\n")}`;
-
-  const response = await claude.messages.create({
-    model: "claude-sonnet-4-6",
-    max_tokens: 1024,
-    messages: [{ role: "user", content: prompt }],
-  });
-
-  const text = response.content
-    .filter((b) => b.type === "text")
-    .map((b) => (b as { type: "text"; text: string }).text)
-    .join("");
-
-  // Extract JSON — try code block first, then bare object
-  const codeBlock = text.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
-  const bareObject = text.match(/\{[\s\S]*\}/);
-  const raw = codeBlock?.[1] ?? bareObject?.[0];
-
-  if (!raw) {
-    console.log("   No JSON found in Claude response");
-    return [];
-  }
+${pages.map((p, i) => `[${i + 1}] ${p.title}\n${p.url}\n${p.snippet}`).join("\n\n")}`;
 
   try {
-    const parsed = JSON.parse(raw) as { signals: Omit<CandidateSignal, "relationshipId" | "fundName" | "companyName">[] };
-    return (parsed.signals ?? []).map((s) => ({
+    const response = await claude.messages.create({
+      model: "claude-sonnet-4-6",
+      max_tokens: 2048,
+      tools: [EXTRACT_TOOL],
+      tool_choice: { type: "tool", name: "extract_signals" },
+      messages: [{ role: "user", content: prompt }],
+    });
+
+    const toolUse = response.content.find((b) => b.type === "tool_use") as
+      | Anthropic.ToolUseBlock
+      | undefined;
+
+    if (!toolUse) {
+      console.log("   No tool_use block in response — skipping");
+      return [];
+    }
+
+    const input = toolUse.input as { signals: Omit<CandidateSignal, "relationshipId" | "fundName" | "companyName" | "confidence">[] };
+    const signals = input.signals ?? [];
+
+    if (signals.length === 0) {
+      console.log("   No signals found in content");
+      return [];
+    }
+
+    // Derive confidence from source URL — not from Claude
+    return signals.map((s) => ({
       ...s,
       relationshipId: target.relationshipId,
       fundName: target.fundName,
       companyName: target.companyName,
+      confidence: confidenceFromUrl(s.sourceUrl),
     }));
-  } catch (parseErr) {
-    console.error(`   JSON parse error: ${parseErr}`);
+  } catch (err) {
+    console.error(`   Extraction error: ${err}`);
     return [];
   }
 }
@@ -371,7 +423,9 @@ function makeHash(s: CandidateSignal): string {
 
 // ── Step 4: Write to DB ───────────────────────────────────────────────────────
 
-async function writeSignal(s: CandidateSignal): Promise<"inserted" | "duplicate" | "error"> {
+async function writeSignal(
+  s: CandidateSignal
+): Promise<"inserted" | "duplicate" | "error"> {
   const hash = makeHash(s);
 
   try {
@@ -397,7 +451,6 @@ async function writeSignal(s: CandidateSignal): Promise<"inserted" | "duplicate"
       ]
     );
 
-    // rowCount = 1 if inserted, 0 if duplicate (ON CONFLICT DO NOTHING)
     return (result.rowCount ?? 0) > 0 ? "inserted" : "duplicate";
   } catch (err) {
     console.error(`   DB error: ${err}`);
@@ -428,70 +481,62 @@ async function run() {
 
   for (const target of TARGETS) {
     try {
-    // Step 1: Search
-    const pages = await searchForSignals(target);
-    console.log(`\n   Found ${pages.length} unique pages`);
+      const pages = await searchForSignals(target);
+      console.log(`\n   Found ${pages.length} unique pages`);
 
-    if (pages.length === 0) {
-      console.log("   Nothing found — skipping");
-      continue;
-    }
-
-    // Step 2: Parse
-    const candidates = await parseSignals(target, pages);
-    totalFound += candidates.length;
-
-    if (candidates.length === 0) {
-      console.log("   Claude found no usable signals in the content");
-      continue;
-    }
-
-    console.log(`\n📋 Candidate signals (${candidates.length}):`);
-    for (const c of candidates) {
-      console.log(`   [${c.signalType}] ${c.signalDate} | ${c.confidence} | ${c.value}`);
-      console.log(`   Source: ${c.sourceUrl}`);
-      console.log(`   Snippet: ${c.rawSnippet.slice(0, 120)}...`);
-    }
-
-    if (DRY_RUN) {
-      console.log("\n⏸  Dry run — skipping DB writes. Run with --write to insert.");
-      continue;
-    }
-
-    // Step 3+4: Write
-    console.log("\n💾 Writing to Neon...");
-    let latestDate = "";
-    for (const c of candidates) {
-      const result = await writeSignal(c);
-      if (result === "inserted") {
-        totalInserted++;
-        if (!latestDate || c.signalDate > latestDate) latestDate = c.signalDate;
-        console.log(`   ✓ Inserted: ${c.value}`);
-      } else if (result === "duplicate") {
-        totalDuplicates++;
-        console.log(`   ⟳ Duplicate skipped: ${c.value}`);
-      } else {
-        console.log(`   ✗ Error on: ${c.value}`);
+      if (pages.length === 0) {
+        console.log("   Nothing found — skipping");
+        continue;
       }
-    }
 
-    // Step 5: Update relationship date
-    if (latestDate) {
-      await updateRelationshipDate(target.relationshipId, latestDate);
-      console.log(`   📅 Updated last_signal_date → ${latestDate}`);
-    }
+      const candidates = await parseSignals(target, pages);
+      totalFound += candidates.length;
+
+      if (candidates.length === 0) continue;
+
+      console.log(`\n📋 Candidate signals (${candidates.length}):`);
+      for (const c of candidates) {
+        console.log(`   [${c.signalType}] ${c.signalDate} | ${c.confidence} | ${c.value}`);
+        console.log(`   Source: ${c.sourceUrl}`);
+      }
+
+      if (DRY_RUN) {
+        console.log("\n⏸  Dry run — skipping DB writes.");
+        continue;
+      }
+
+      console.log("\n💾 Writing to Neon...");
+      let latestDate = "";
+      for (const c of candidates) {
+        const result = await writeSignal(c);
+        if (result === "inserted") {
+          totalInserted++;
+          if (!latestDate || c.signalDate > latestDate) latestDate = c.signalDate;
+          console.log(`   ✓ Inserted: ${c.value}`);
+        } else if (result === "duplicate") {
+          totalDuplicates++;
+          console.log(`   ⟳ Duplicate: ${c.value}`);
+        } else {
+          console.log(`   ✗ Error: ${c.value}`);
+        }
+      }
+
+      if (latestDate) {
+        await updateRelationshipDate(target.relationshipId, latestDate);
+        console.log(`   📅 Updated last_signal_date → ${latestDate}`);
+      }
     } catch (err) {
       console.error(`   ✗ Target failed (${target.fundName} + ${target.companyName}): ${err}`);
     }
   }
 
   console.log(`\n=== Summary ===`);
-  console.log(`Candidates found:  ${totalFound}`);
+  console.log(`Candidates found:   ${totalFound}`);
   if (!DRY_RUN) {
-    console.log(`Inserted:          ${totalInserted}`);
+    console.log(`Inserted:           ${totalInserted}`);
     console.log(`Duplicates skipped: ${totalDuplicates}`);
   }
-  console.log(DRY_RUN ? "\nRun with --write to insert into Neon." : "\nDone.");
+  console.log(DRY_RUN ? "\nRun with --write to insert." : "\nDone.");
 
   await pool.end();
 }
