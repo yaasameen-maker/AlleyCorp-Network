@@ -55,15 +55,13 @@
 //   }
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { mockInvestors, type Investor } from "./mockData";
+import type { Investor } from "./mockData";
 
 /**
- * Returns all investors for the list view.
- *
- * Currently returns mock data (see mockData.ts, aligned to seed.sql).
- * Swap the body to fetch /api/investors when the backend is live — see the
- * HOLD FOR LUBA / YAASAMEEN block above.
+ * Returns all investors for the list view from the real DB via GET /api/investors.
  */
-export function getInvestors(): Investor[] {
-  return mockInvestors;
+export async function getInvestors(): Promise<Investor[]> {
+  const res = await fetch("/api/investors", { cache: "no-store" });
+  if (!res.ok) throw new Error(`Failed to load investors: ${res.status}`);
+  return res.json();
 }
