@@ -1,5 +1,5 @@
 {
-  "name": "acrip-cursor",
+  "name": "alleycorp-network",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -7,23 +7,45 @@
     "dev:clean": "node scripts/dev-clean.mjs",
     "build": "next build",
     "start": "next start",
+    "mcp": "tsx mcp/server.ts",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:unit": "vitest run tests/scoring.test.ts",
+    "test:integration": "RUN_DB_TESTS=1 vitest run tests/alerts.test.ts",
+    "test:acceptance": "tsx scripts/acceptance-test.ts",
+    "ingest:signals": "tsx scripts/ingest-signals.ts",
+    "recalibrate": "tsx scripts/recalibrate.ts",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@sentry/nextjs": "^8.0.0",
+    "exa-js": "^2.13.0",
     "next": "^15.0.0",
+    "pg": "^8.13.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "resend": "^4.0.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.0",
     "@types/node": "^22.0.0",
+    "@types/pg": "^8.11.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "dotenv": "^17.4.2",
     "eslint": "^9.39.4",
-    "eslint-config-next": "^15.0.0",
+    "eslint-config-next": "^16.2.6",
     "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.8.3",
     "tailwindcss": "^4.3.0",
-    "typescript": "^5.0.0"
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^3.2.4"
   }
 }

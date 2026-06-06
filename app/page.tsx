@@ -2,13 +2,12 @@
 
 import { useMemo, useRef, useState } from "react";
 import { AppSidebar, type AppView } from "@/app/components/AppSidebar";
+import { MobileNavTools } from "@/app/components/MobileNavTools";
 import { PageScrim } from "@/app/components/PageScrim";
-import { InvestorListSection } from "@/app/components/InvestorListSection";
 import { ScrollContainerContext } from "@/app/context/ScrollContainerContext";
 import { useMediaQuery } from "@/app/hooks/useMediaQuery";
 import { InvestorProfileTransparency } from "@/stories/InvestorProfileTransparency";
 import { StaleAlertsBanner } from "@/stories/StaleAlertsBanner";
-import { MCPQueryInterface } from "@/stories/MCPQueryInterface";
 import { EmailDigestView } from "@/stories/EmailDigestView";
 import { PortfolioExplorer } from "@/stories/PortfolioExplorer";
 import { getInvestors } from "@/app/data/investors";
@@ -81,58 +80,30 @@ export default function DashboardPage() {
     }
   };
 
+  const navToolsProps = {
+    investors: allInvestors,
+    onSelectInvestor: (i: Investor) => openProfile(i),
+    searchQuery,
+    onSearchChange: setSearchQuery,
+    filterTier,
+    onFilterTierChange: setFilterTier,
+    tierCounts,
+    filteredInvestors,
+    totalCount: allInvestors.length,
+    selectedInvestorId: selectedInvestor?.id,
+  };
+
   return (
     <ScrollContainerContext.Provider value={scrollRef}>
       <div className="app-shell bg-paper text-ink min-h-[100dvh] flex lg:flex-row">
-        <AppSidebar activeView={activeView} onNavigate={handleNavigate} />
+        <AppSidebar activeView={activeView} onNavigate={handleNavigate} {...navToolsProps} />
 
         <div className="flex-1 flex flex-col min-w-0 min-h-0 max-md:h-full md:min-h-[100dvh]">
-          <header className="shrink-0 border-b border-line bg-paper/95 backdrop-blur z-10 safe-top safe-x lg:hidden max-md:sticky max-md:top-0 md:relative">
-            <div className="px-4 py-3 flex items-center justify-between gap-2">
-              <div className="min-w-0">
-                <p className="text-[10px] uppercase tracking-wider text-muted font-semibold">
-                  AlleyCorp
-                </p>
-                <h1 className="text-[17px] leading-tight font-semibold tracking-tight text-ink truncate">
-                  Investor Intelligence
-                </h1>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <button
-                  type="button"
-                  onClick={openPortfolio}
-                  aria-label="Portfolio"
-                  className="touch-target touch-press flex items-center justify-center w-11 h-11 rounded-2xl border border-line bg-mist text-ink md:w-auto md:h-auto md:px-3 md:py-2 md:gap-1.5 md:rounded-xl md:text-xs md:font-medium"
-                >
-                  <svg className="w-5 h-5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                    />
-                  </svg>
-                  <span className="hidden md:inline">Portfolio</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={openDigest}
-                  aria-label="Email digest"
-                  className="touch-target touch-press flex items-center justify-center w-11 h-11 rounded-2xl border border-line bg-mist text-ink md:w-auto md:h-auto md:px-3 md:py-2 md:gap-1.5 md:rounded-xl md:text-xs md:font-medium"
-                >
-                  <svg className="w-5 h-5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                    />
-                  </svg>
-                  <span className="hidden md:inline">Digest</span>
-                </button>
-              </div>
-            </div>
-          </header>
+          <MobileNavTools
+            {...navToolsProps}
+            onOpenPortfolio={openPortfolio}
+            onOpenDigest={openDigest}
+          />
 
           <main
             ref={scrollRef}
@@ -141,37 +112,17 @@ export default function DashboardPage() {
             <div className="flex-1 lg:flex lg:min-h-0 lg:overflow-hidden">
               <div className="flex-1 flex flex-col min-w-0 lg:overflow-hidden">
                 {activeView === "dashboard" && (
-                  <>
-                    <div className="shrink-0 lg:px-6 lg:pt-6">
-                      <StaleAlertsBanner
-                        investors={allInvestors}
-                        onSelectInvestor={(i) => openProfile(i)}
-                      />
-                    </div>
-
-                    <div className="lg:grid lg:grid-cols-[minmax(0,22rem)_1fr] xl:grid-cols-[minmax(0,26rem)_1fr] lg:divide-x lg:divide-line lg:flex-1 lg:min-h-0 lg:overflow-hidden max-lg:contents">
-                      <div className="lg:overflow-y-auto lg:py-6">
-                        <MCPQueryInterface
+                  <div className="flex-1 flex flex-col max-md:min-h-0 lg:overflow-y-auto">
+                    <div className="flex-1 flex max-md:items-center max-md:justify-center max-md:py-8 max-md:pb-12 items-start lg:items-center justify-center px-4 py-6 md:px-6 md:py-8 lg:px-10 lg:py-10">
+                      <div className="w-full max-w-4xl mx-auto max-md:shrink-0">
+                        <StaleAlertsBanner
+                          variant="hero"
                           investors={allInvestors}
                           onSelectInvestor={(i) => openProfile(i)}
                         />
                       </div>
-
-                      <div className="lg:overflow-y-auto lg:pb-0 max-md:pb-4 md:pb-6">
-                        <InvestorListSection
-                          filteredInvestors={filteredInvestors}
-                          totalCount={allInvestors.length}
-                          searchQuery={searchQuery}
-                          onSearchChange={setSearchQuery}
-                          filterTier={filterTier}
-                          onFilterTierChange={setFilterTier}
-                          tierCounts={tierCounts}
-                          selectedInvestorId={selectedInvestor?.id}
-                          onSelectInvestor={(i) => openProfile(i)}
-                        />
-                      </div>
                     </div>
-                  </>
+                  </div>
                 )}
 
                 {isDesktop && activeView === "digest" && (
@@ -213,8 +164,8 @@ export default function DashboardPage() {
           />
         )}
 
-        {isDesktop && selectedInvestor && (
-          <PageScrim onClose={() => setSelectedInvestor(null)} />
+        {isDesktop && selectedInvestor && activeView === "dashboard" && (
+          <PageScrim />
         )}
 
         {!isDesktop && (

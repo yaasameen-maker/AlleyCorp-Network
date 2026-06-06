@@ -20,7 +20,7 @@ export function ProfileModal({ onClose, children, layout = "modal" }: ProfileMod
   }
 
   return (
-    <DialogShell onClose={onClose} ariaLabelledBy="profile-title">
+    <DialogShell onClose={onClose} ariaLabelledBy="profile-title" stackLevel="above">
       <SheetHandle />
       {children}
     </DialogShell>
