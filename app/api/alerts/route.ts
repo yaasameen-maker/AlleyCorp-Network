@@ -1,4 +1,4 @@
-import { getAlerts } from "../../../lib/alerts";
+import { getAlerts } from "../../../lib/alerts.server";
 
 export async function GET() {
   try {

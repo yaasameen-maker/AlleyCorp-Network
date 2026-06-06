@@ -365,7 +365,7 @@ async function searchForSignals(
 // ── Step 2: Extract with Claude tool_use (schema-enforced) ───────────────────
 
 async function parseSignals(
-  target: SearchTarget,
+  target: ResolvedTarget,
   pages: { url: string; title: string; snippet: string }[]
 ): Promise<CandidateSignal[]> {
   if (pages.length === 0) return [];

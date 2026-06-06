@@ -1,4 +1,3 @@
-import { pool } from "./db";
 import { isWarmAtRisk } from "./scoring";
 
 // ─────────────────────────────────────────
@@ -17,68 +16,74 @@ export interface Alert {
   message: string;
 }
 
-// ─────────────────────────────────────────
-// Query
-// ─────────────────────────────────────────
+// ── Frontend alert type (richer shape for UI components) ─────────────────────
+export interface RelationshipAlert {
+  id: string;
+  investorId: string;
+  type: AlertType;
+  severity: AlertSeverity;
+  fund: string;
+  fundName: string;          // alias for fund — used by AlertCard
+  portfolioCompany: string;
+  warmthTier: WarmthTier;
+  lastSignalDate: string | null;
+  message: string;
+  suggestedAction: string;   // alias for message — used by AlertCard
+}
 
-/**
- * Returns all relationships that need human attention:
- *   - Stale: co-investor has gone cold. High severity.
- *   - Warm at risk: warm but no signal in 90+ days. Medium severity.
- *
- * Results are ordered by severity (high first), then by oldest last signal.
- */
-export async function getAlerts(): Promise<Alert[]> {
-  const { rows } = await pool.query<{
-    warmth_tier: string;
-    last_signal_date: Date | null;
-    fund_name: string;
-    company_name: string;
-  }>(`
-    SELECT
-      r.warmth_tier,
-      r.last_signal_date,
-      f.name  AS fund_name,
-      pc.name AS company_name
-    FROM relationship r
-    JOIN fund f             ON f.id  = r.fund_id
-    JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
-    WHERE r.warmth_tier IN ('stale', 'warm')
-    ORDER BY
-      CASE r.warmth_tier WHEN 'stale' THEN 0 ELSE 1 END,
-      r.last_signal_date ASC NULLS FIRST
-  `);
+// Frontend version — derives alerts from already-loaded Investor[] (no DB call).
+// Used by StaleAlertsBanner and other UI components.
+import type { Investor, WarmthTier } from "@/app/data/mockData";
 
-  const alerts: Alert[] = [];
+export function getRelationshipAlerts(investors: Investor[]): RelationshipAlert[] {
+  const alerts: RelationshipAlert[] = [];
 
-  for (const row of rows) {
-    const lastSignalDate = row.last_signal_date
-      ? row.last_signal_date.toISOString().slice(0, 10)
-      : null;
-
-    if (row.warmth_tier === "stale") {
+  for (const investor of investors) {
+    if (investor.warmthTier === "Stale") {
       alerts.push({
+        id: `alert-${investor.id}`,
+        investorId: investor.id,
         type: "stale_relationship",
         severity: "high",
-        fund: row.fund_name,
-        portfolioCompany: row.company_name,
-        lastSignalDate,
-        message: `${row.fund_name} has gone stale on ${row.company_name}. Reconnect before their next round in this space.`,
+        fund: investor.fund.name,
+        fundName: investor.fund.name,
+        portfolioCompany: investor.coInvestments[0]?.portfolioCompany.name ?? "",
+        warmthTier: investor.warmthTier,
+        lastSignalDate: investor.lastSignalDate ?? null,
+        message: investor.suggestedAction ?? `${investor.fund.name} has gone stale. Reconnect before their next round.`,
+        suggestedAction: investor.suggestedAction ?? `${investor.fund.name} has gone stale. Reconnect before their next round.`,
       });
-      continue;
-    }
-
-    if (row.warmth_tier === "warm" && isWarmAtRisk(lastSignalDate)) {
+    } else if (investor.warmthTier === "Warm" && isWarmAtRisk(investor.lastSignalDate)) {
       alerts.push({
+        id: `alert-${investor.id}`,
+        investorId: investor.id,
         type: "warm_at_risk",
         severity: "medium",
-        fund: row.fund_name,
-        portfolioCompany: row.company_name,
-        lastSignalDate,
-        message: `${row.fund_name} is warm on ${row.company_name} but no signal in 90+ days. Schedule a touchpoint soon.`,
+        fund: investor.fund.name,
+        fundName: investor.fund.name,
+        portfolioCompany: investor.coInvestments[0]?.portfolioCompany.name ?? "",
+        warmthTier: investor.warmthTier,
+        lastSignalDate: investor.lastSignalDate ?? null,
+        message: investor.suggestedAction ?? `${investor.fund.name} is warm but cooling. Schedule a touchpoint soon.`,
+        suggestedAction: investor.suggestedAction ?? `${investor.fund.name} is warm but cooling. Schedule a touchpoint soon.`,
       });
     }
   }
 
-  return alerts;
+  return alerts.sort((a, b) => {
+    if (a.severity !== b.severity) return a.severity === "high" ? -1 : 1;
+    if (!a.lastSignalDate) return -1;
+    if (!b.lastSignalDate) return 1;
+    return a.lastSignalDate.localeCompare(b.lastSignalDate);
+  });
+}
+
+export { isWarmAtRisk } from "./scoring";
+
+export function isSignalActive(signal: { date: string }, now: Date = new Date()): boolean {
+  const d = new Date(signal.date);
+  if (isNaN(d.getTime())) return false;
+  const cutoff = new Date(now);
+  cutoff.setMonth(cutoff.getMonth() - 24);
+  return d >= cutoff;
 }

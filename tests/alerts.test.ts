@@ -1,5 +1,5 @@
 import { describe, it, expect, afterAll } from "vitest";
-import { getAlerts } from "../lib/alerts";
+import { getAlerts } from "../lib/alerts.server";
 import { pool } from "../lib/db";
 
 // Close the pg connection pool after all tests so the process exits cleanly.
@@ -8,20 +8,19 @@ afterAll(async () => {
 });
 
 // ─────────────────────────────────────────
-// Integration tests — run against the local alleycorp DB with seed data.
+// Integration tests — run against Railway DB.
 //
-// Expected alerts from seed data (as of 2026-05-27):
-//   Stale (3, ordered oldest signal first):
-//     1. SineWave Ventures + Aon 3D          → stale_relationship (high)   2021-09-02
-//     2. Trimble Ventures + Civ Robotics     → stale_relationship (high)   2022-09-21
-//     3. BOLD Capital Partners + Earth Force → stale_relationship (high)   2022-11-29
-//   Warm-at-risk (2, ordered oldest signal first):
-//     4. Flybridge + Halo Braid              → warm_at_risk       (medium) 2024-06-15
-//     5. Cherubic Ventures + Cargo Robotics  → warm_at_risk       (medium) 2024-10-01
+// Expected alerts (as of 2026-06-04 after recalibration):
+//   Stale (5, ordered oldest signal first):
+//     1. Trimble Ventures + Civ Robotics     → stale_relationship (high)   2022-09-22
+//     2. Flybridge + Halo Braid              → stale_relationship (high)   2024-06-15
+//     3. Cherubic Ventures + Cargo Robotics  → stale_relationship (high)   2024-10-01
+//     4. BOLD Capital Partners + Earth Force → stale_relationship (high)   2026-01-28
+//     5. SineWave Ventures + Aon 3D          → stale_relationship (high)   2026-01-28
 //
-//   NOTE: Lux Capital + Inductive Bio and USV + Viam removed — Inductive Bio
-//   and Viam are not on Lauren Young's confirmed Deep Tech portfolio list.
-//   NOTE: SOSV + Renovate Robotics is HOT — HAX returned for Seed VC-II Aug 2025.
+//   NOTE: Flybridge and Cherubic recalibrated Warm → Stale (last signal >180 days ago).
+//   NOTE: SineWave last_signal_date updated to 2026-01-28 (Cycle Capital follow-on found by scraper).
+//   NOTE: BOLD last_signal_date updated to 2026-01-28 (DTNY event attendance signal).
 // ─────────────────────────────────────────
 
 describe("getAlerts (integration)", () => {
@@ -36,6 +35,8 @@ describe("getAlerts (integration)", () => {
     const severities = alerts.map((a) => a.severity);
     const firstMedium = severities.indexOf("medium");
     const lastHigh = severities.lastIndexOf("high");
+    // If no medium alerts, ordering constraint is trivially satisfied
+    if (firstMedium === -1) return;
     // All highs must appear before all mediums
     expect(lastHigh).toBeLessThan(firstMedium);
   });
@@ -61,7 +62,7 @@ describe("getAlerts (integration)", () => {
       const alerts = await getAlerts();
       const alert = alerts.find((a) => a.fund === "SineWave Ventures");
       expect(alert).toBeDefined();
-      expect(alert!.lastSignalDate).toBe("2021-09-02");
+      expect(alert!.lastSignalDate).toBe("2026-01-28");
     });
 
     it("has a non-empty message that names the fund", async () => {
@@ -73,13 +74,13 @@ describe("getAlerts (integration)", () => {
     });
   });
 
-  describe("warm-at-risk alert — Flybridge on Halo Braid", () => {
+  describe("stale alert — Flybridge on Halo Braid", () => {
     it("has the correct type and severity", async () => {
       const alerts = await getAlerts();
       const alert = alerts.find((a) => a.fund === "Flybridge");
       expect(alert).toBeDefined();
-      expect(alert!.type).toBe("warm_at_risk");
-      expect(alert!.severity).toBe("medium");
+      expect(alert!.type).toBe("stale_relationship");
+      expect(alert!.severity).toBe("high");
     });
 
     it("identifies the correct fund and portfolio company", async () => {
