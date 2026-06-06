@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { Investor, WarmthTier } from "@/app/data/mockData";
 import { useMediaQuery } from "@/app/hooks/useMediaQuery";
 import { AskNetworkPullDown } from "./AskNetworkPullDown";
@@ -40,9 +40,11 @@ export function MobileNavTools({
   const [askOpen, setAskOpen] = useState(false);
   const isMobileOrTablet = useMediaQuery("(max-width: 1023px)");
 
-  useEffect(() => {
-    if (!isMobileOrTablet) setAskOpen(false);
-  }, [isMobileOrTablet]);
+  // Close the Ask panel when leaving the mobile/tablet breakpoint. Adjusting
+  // state during render (guarded by askOpen) instead of in an effect.
+  if (!isMobileOrTablet && askOpen) {
+    setAskOpen(false);
+  }
 
   return (
     <div className="lg:hidden shrink-0 border-b border-line bg-paper safe-x relative z-[80]">

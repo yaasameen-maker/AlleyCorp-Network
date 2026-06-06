@@ -32,6 +32,10 @@ export function DialogShell({
   const touchStartY = useRef<number | null>(null);
 
   useEffect(() => {
+    // Client-mount gate: portal targets document.body (absent during SSR), so we
+    // only render after mount. The synchronous setState is the intentional,
+    // canonical mount pattern here.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setReady(true);
     const frame = requestAnimationFrame(() => setVisible(true));
     document.body.style.overflow = "hidden";

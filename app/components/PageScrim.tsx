@@ -9,6 +9,10 @@ export function PageScrim() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    // Client-mount gate: the portal targets document.body, which doesn't exist
+    // during SSR, so we only render after mount. The synchronous setState is the
+    // canonical, intentional mount pattern here.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setReady(true);
     const frame = requestAnimationFrame(() => setVisible(true));
     return () => cancelAnimationFrame(frame);

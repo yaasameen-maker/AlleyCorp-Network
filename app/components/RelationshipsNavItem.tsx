@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { Investor, WarmthTier } from "@/app/data/mockData";
 import { useMediaQuery } from "@/app/hooks/useMediaQuery";
 import { DialogShell } from "./DialogShell";
@@ -50,12 +50,14 @@ export function RelationshipsNavItem({
     // Mobile/tablet: keep relationships modal open behind profile dialog
   };
 
-  useEffect(() => {
-    if (reopenAfterProfile && !selectedInvestorId) {
-      setModalOpen(true);
-      setReopenAfterProfile(false);
-    }
-  }, [reopenAfterProfile, selectedInvestorId]);
+  // Reopen the relationships list once the desktop profile panel closes
+  // (selectedInvestorId cleared). Adjusting state during render — the
+  // React-recommended alternative to a setState-in-effect — the guard flips
+  // reopenAfterProfile so this runs exactly once.
+  if (reopenAfterProfile && !selectedInvestorId) {
+    setReopenAfterProfile(false);
+    setModalOpen(true);
+  }
 
   return (
     <>
