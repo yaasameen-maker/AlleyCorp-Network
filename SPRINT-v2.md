@@ -3,7 +3,11 @@
 **Updated:** June 3, 2026 · **Demo Day:** June 24, 2026
 **Team:** Luba · Michael · Yaasameen
 
-**Change from v1.1:** Full replan based on current repo state. MCP server, 4-layer security, warmth scoring, and acceptance test suite are complete (Yaasameen, ahead of schedule). Database is now the critical path — everything else is blocked until Railway is provisioned and Luba's schema is live.
+**Change from v1.1:** Full replan based on current repo state. MCP server, 4-layer security, warmth scoring, and acceptance test suite are complete (Yaasameen, ahead of schedule). Database is now the critical path — everything else is blocked until Neon is provisioned and Luba's schema is live.
+
+**June 1 update:** Midpoint gate cleared. DB schema live locally, all 4 warmth tiers seeded, 5/5 acceptance tests passing. Critical path now moves to Neon provisioning + frontend wire-up.
+
+**⚠️ New constraint:** AlleyCorp office visit June 11. Need working product with real data by June 10. Weeks 3–4 replanned accordingly.
 
 ---
 
@@ -63,7 +67,7 @@
 - WarmthTier column uses title case values: `Hot`, `Warm`, `Stale`, `Cold`
 
 ### Kabir (external dependency)
-- Provision Railway PostgreSQL
+- Provision Neon PostgreSQL
 - Post `DATABASE_URL` to team via secure channel
 
 ### All
@@ -74,17 +78,15 @@
 
 ## Week 2 — May 27–30 · Database + First Vertical Slice + Frontend Scaffold
 
-**Goal:** Lux Capital end-to-end by May 30. All 4 warmth tiers in DB. Frontend scaffold live.
+**Goal:** All 4 warmth tiers in DB by May 30. Frontend scaffold live. ✅ Both done.
 
 ### May 27–28 · Schema + Seeding / SQL Wiring / Layout
 
 **Luba**
-- Write and run Postgres migrations for 5 tables on Railway
+- Write and run Postgres migrations for 5 tables on Neon
 - Seed Hot anchors: Riot Ventures, Snowpoint Ventures, General Catalyst, Mach33
-- Seed first vertical slice — Lux Capital (Stale) + Viam:
-  - Co-investment: Inductive Bio Seed round, AlleyCorp did not return at Series A
-  - `last_signal_date` must be >180 days ago so `lib/scoring.ts` classifies as Stale
-- Seed Warm example: USV (Albert Wenger) + Viam
+- Seed stale examples: SineWave+Aon3D, Trimble+CivRobotics, BOLD+EarthForce ✅
+- Seed warm-at-risk: Flybridge+HaloBraid, Cherubic+CargoRobotics ✅
 - Seed Cold targets: a16z American Dynamism, Eclipse, Founders Fund — no relationship row; search returns them as unfamiliar funds
 - Seed all 20 active Deep Tech portfolio companies
 
@@ -105,7 +107,7 @@
 
 **Yaasameen**
 - Run `npm run test:acceptance` — iterate until all 5 prompts pass under 5 seconds
-- Verify inconsistency check: MCP response for Lux Capital must match what digest will output (same warmth tier, same reason text)
+- Verify inconsistency check: MCP response for Trimble Ventures must match what digest will output (same warmth tier, same reason)
 - If Claude picks wrong tools: update tool descriptions in `mcp/tools/*.ts` to fix routing
 
 **Michael**
@@ -115,77 +117,99 @@
 
 ---
 
-## June 1 — Midpoint Gate
+## June 1 — Midpoint Gate ✅ CLEARED
 
-All of the following must be true before Week 3 begins:
+- [x] Stale co-investors in DB → `listStaleRelationships()` returns SineWave, Trimble, BOLD
+- [x] All 4 warmth tiers present in DB with real data (Lauren Young's confirmed portfolio)
+- [x] All 5 acceptance tests pass: `npm run test:acceptance` → 5/5
+- [ ] Digest consistency check — `lib/digest.ts` not built yet (Week 3, Yaasameen)
 
-- [ ] Lux Capital in DB → `listStaleRelationships()` returns it → profile card renders correctly
-- [ ] All 4 warmth tiers present in DB with real data
-- [ ] All 5 acceptance tests pass locally: `npm run test:acceptance` → 5/5
-- [ ] MCP and digest return the same warmth tier and reason for Lux Capital
-
-**Email enrichment** (Kabir): Available June 1. Team assesses integration fit at this point. Do not build toward it before then.
+**Email enrichment** (Kabir): Assess integration fit now. Do not build before confirming data format.
 
 ---
 
-## Week 3 — June 2–6 · Digest + Full Network + API Routes
+## Week 3 — June 2–6 · Neon + Real Data + Core UI Features
 
-**Goal:** Daily digest live. Full 20-company network on dashboard. Search and filter working end-to-end.
+**Goal:** Real data on the dashboard by June 6. Alerts, email drafts, and MCP chatbot UI built. Everything wired end-to-end before the office visit.
 
-### June 2–3 · Digest / Full Network
+### June 2–3 · Neon + API Routes
+
+**Luba**
+- Provision Neon PostgreSQL (free tier)
+- Run `seed.sql` against Neon — confirm all tiers present
+- Import DTNY event signals (`luba/swoogo-signals` branch) — 6 co-investor attendees, Jan 28 2026
+- Share `DATABASE_URL` with Michael and Yaasameen via secure channel
+- Implement `GET /api/investors` — wire `app/data/investors.ts` seam to real DB
+
+**Yaasameen**
+- Implement `GET /api/alerts` — returns stale + warm-at-risk relationships
+- Implement `GET /api/events` — returns recent signals
+
+### June 4–6 · Frontend Features
+
+**Yaasameen**
+- Implement `POST /api/chat` — proxies natural language queries from the chatbot UI to the MCP server, returns readable text response
+- This is the backend Michael's chatbot UI connects to — must be live before Michael can wire the frontend
+
+**Michael**
+- Wire dashboard to real data via `GET /api/investors` (3-line change in `investors.ts`)
+- Stale alerts banner — top of dashboard, sorted by severity, links to profile
+- Investor profile — email draft section (subject + body, tier-aware, editable, copy button)
+- MCP chatbot interface — query input on dashboard, inline readable response (connects to `POST /api/chat`)
+
+---
+
+## June 9–10 · Integration + Office Visit Prep
+
+**Goal:** Everything working together on Neon data. Good enough to show AlleyCorp on June 11.
+
+### All
+- End-to-end smoke test: dashboard loads real data → click stale alert → profile opens → MCP query works
+- Fix any integration bugs from Week 3
+- Run `npm run test:acceptance` → must be 5/5 on Neon DB
+
+### Luba
+- Co-investor research for highest-priority companies (focus on stale + hot relationships)
+- Data QA: confirm what's shown on screen matches acceptance test expectations
+
+### Demo script (casual — June 11)
+1. Open dashboard → real investor list with warmth tiers
+2. Point to alerts banner → "these are the relationships at risk"
+3. Click Trimble Ventures → profile with signals + email draft
+4. Type MCP query → "Who are our warmest deep tech relationships?" → live response
+
+---
+
+## June 11 · AlleyCorp Office Visit
+Casual check-in. Show working product with real data. Not a formal demo — no polish required.
+
+---
+
+## June 12–13 · Post-Visit Fixes + Digest
+
+**Goal:** Address any feedback from the office visit. Build digest.
 
 **Yaasameen**
 - Create `lib/digest.ts` — generates `DigestItem[]` from stale relationships
 - Wire Resend API: send digest email to configured recipient
-- Digest item for Lux Capital must match acceptance test #5 output exactly (same tier, same reason)
+- Digest item for Trimble Ventures must match acceptance test #5 output exactly
 
 **Michael**
-- Expand dashboard to all 20 portfolio companies
-- Search working across fund name, company name, warmth tier
-- Filter by tier working end-to-end with real data
-
-### June 4–6 · API Routes + Deep-Link Integration
-
-**Yaasameen**
-- Implement `GET /api/alerts` — returns stale relationships for frontend polling
-- Implement `GET /api/events` — returns recent signals
-
-**Michael**
-- Wire frontend to real API routes (replace any placeholder data)
-- Deep-link from digest email → investor profile card (authenticated)
-
-**Luba**
-- Complete co-investor research for all 20 companies (Crunchbase, press — fund name, round, date, role)
-- Seed into DB
-- Final data QA: confirm Stale and Cold data matches acceptance test expectations exactly
+- Address any UI feedback from June 11
+- Portfolio Explorer page — companies, co-investor count, sector filter
+- Digest view (`/digest`) — read-only, "Send Digest Email" button
 
 ---
 
-## Week 4 — June 9–13 · Hardening + Demo Rehearsal Prep
-
-**Goal:** No crashes. 5/5 acceptance tests pass clean. Demo script rehearsed.
-
-### June 9–10 · Bug Fix Sprint (All)
-- Fix any acceptance test failures from Week 3 integration
-- Fix any UI bugs found during full 20-company render
-- Confirm `recalibrateAll()` in `lib/scoring.ts` runs against real DB without error
-
-### June 11–13 · QA + Polish (All)
-- Run `npm run test:acceptance` → 5/5 required before moving to Demo Prep week
-- Walk through Demo Day script: Abe POV — network view → stale alert → Lux Capital profile → MCP query
-- UI polish: tier pill colors, spacing, empty states
-- Optional cleanup: implement `lib/env.ts` (`isDev()`) and `lib/trace.ts` (AsyncLocalStorage trace ID)
-
----
-
-## Demo Day Prep — June 16–24
+## June 16–24 · QA + Demo Day Prep
 
 | Days | Task |
 |---|---|
-| June 16–17 | Final acceptance test run. Any failure is a blocker — fix before proceeding. |
+| June 16–17 | Full QA pass. Fix any bugs from post-visit feedback. UI polish: tier pill colors, spacing, empty states. |
+| June 16–17 | Final acceptance test run — 5/5 required before proceeding. |
 | June 18–19 | Demo rehearsal with Kabir. Abe scenario end-to-end. Time the full run. |
-| June 20 | Feature freeze. Emergency fixes only from this point forward. |
-| June 21–23 | Final dry runs. Confirm all 5 MCP queries return correct results live. |
+| June 20 | Feature freeze. Emergency fixes only. |
+| June 21–23 | Final dry runs. Confirm all 5 MCP queries return correct results live on Neon. |
 | June 24 | **Demo Day** |
 
 ---
@@ -194,15 +218,15 @@ All of the following must be true before Week 3 begins:
 
 Run: `npm run test:acceptance` — all 5 must pass before Demo Day.
 
-| # | User Prompt | Expected Tool | Pass Criteria |
-|---|---|---|---|
-| 1 | Which co-investors should we reconnect with before they lead another round without us? | `list_stale_relationships()` | Returns Lux Capital with Inductive Bio reason and suggested action. Under 5 seconds. |
-| 2 | Who are our warmest relationships in deep tech right now? | `search_relationships(query)` | All four Hot anchors with signal evidence. No hallucinated funds. |
-| 3 | What should I know before our meeting with General Catalyst next week? | `get_investor(name)` + `get_warmth_signals(investor_id)` | Co-investment history, Hot tier, recent signals. Readable, not a raw dump. |
-| 4 | Are there any top deep tech funds we haven't co-invested with yet? | `search_relationships(query)` | Cold tier targets: a16z American Dynamism, Eclipse, Founders Fund. |
-| 5 | Show me the full picture on Lux Capital. | `get_investor(name)` + `get_warmth_signals(investor_id)` | Stale tier, Inductive Bio history, reason, action. Matches digest entry — no inconsistency. |
+| # | User Prompt | Expected Tool | Pass Criteria | Status |
+|---|---|---|---|---|
+| 1 | Which co-investors should we reconnect with before they lead another round without us? | `list_stale_relationships()` | Returns stale funds (SineWave, Trimble, BOLD) with portfolio company and suggested action. | ✅ Pass |
+| 2 | Who are our warmest relationships in deep tech right now? | `search_relationships(query)` | Hot anchors including Riot Ventures, General Catalyst, Mach33. No hallucinated funds. | ✅ Pass |
+| 3 | What should I know before our meeting with General Catalyst next week? | `get_investor(name)` + `get_warmth_signals(investor_id)` | Co-investment history, Hot tier, recent signals. Readable, not a raw dump. | ✅ Pass |
+| 4 | Are there any top deep tech funds we haven't co-invested with yet? | `search_relationships(query)` | Cold tier targets: a16z American Dynamism, Eclipse, Founders Fund. | ✅ Pass |
+| 5 | Show me the full picture on Trimble Ventures. | `get_investor(name)` + `get_warmth_signals(investor_id)` | Stale tier, Civ Robotics co-investment history, reason for going stale, suggested action. | ✅ Pass |
 
-**Inconsistency rule:** MCP and digest must return the same warmth tier and reason for Lux Capital. Any divergence means a shared code path has split — fix `lib/scoring.ts`, not the outputs individually.
+**Inconsistency rule:** MCP and digest must return the same warmth tier and reason for Trimble Ventures. Any divergence means a shared code path has split — fix `lib/scoring.ts`, not the outputs individually.
 
 ---
 

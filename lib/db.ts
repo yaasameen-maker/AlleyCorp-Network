@@ -1,5 +1,6 @@
 import { Pool } from "pg";
-import type { Relationship, Signal } from "./types.js";
+import type { QueryConfig, QueryResult, QueryResultRow } from "pg";
+import type { Relationship, Signal, WarmthTier } from "./types";
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -56,6 +57,8 @@ const REL_SELECT = `
   LEFT JOIN signals s              ON s.relationship_id = r.id
 `;
 
+// Look up the first relationship whose fund name matches the search string.
+// Returns the full relationship with fund, portfolio company, and all signals attached.
 export async function getInvestorByName(name: string): Promise<Relationship | null> {
   const { rows } = await pool.query(
     `${REL_SELECT}
@@ -67,6 +70,8 @@ export async function getInvestorByName(name: string): Promise<Relationship | nu
   return (rows[0] as Relationship) ?? null;
 }
 
+// Search relationships by fund name, fund focus, portfolio company name, sector, or warmth tier.
+// Signals are not loaded here — callers only need the count (r.signals?.length).
 export async function searchRelationships(query: string): Promise<Relationship[]> {
   const param = `%${query}%`;
   const { rows } = await pool.query(
@@ -90,6 +95,36 @@ export async function searchRelationships(query: string): Promise<Relationship[]
   return rows as Relationship[];
 }
 
+// Return all relationships with their signals, ordered by warmth tier then last signal date.
+// Used by GET /api/investors to power the dashboard list view.
+export async function getAllRelationships(): Promise<Relationship[]> {
+  const { rows } = await pool.query(
+    `${RELATIONSHIP_SELECT}
+     ORDER BY
+       CASE r.warmth_tier WHEN 'hot' THEN 1 WHEN 'warm' THEN 2 WHEN 'stale' THEN 3 WHEN 'cold' THEN 4 END,
+       r.last_signal_date DESC NULLS LAST`
+  );
+
+  if (rows.length === 0) return [];
+
+  // Load all signals in one query and attach to relationships
+  const ids = rows.map((r) => r.id as string);
+  const { rows: signalRows } = await pool.query(
+    `SELECT * FROM signal WHERE relationship_id = ANY($1) ORDER BY signal_date DESC`,
+    [ids]
+  );
+
+  const signalsByRelId = new Map<string, Signal[]>();
+  for (const s of signalRows) {
+    const rel = s.relationship_id as string;
+    if (!signalsByRelId.has(rel)) signalsByRelId.set(rel, []);
+    signalsByRelId.get(rel)!.push(toSignal(s));
+  }
+
+  return rows.map((row) => toRelationship(row, signalsByRelId.get(row.id as string) ?? []));
+}
+
+// Return all stale relationships ordered oldest signal first (most at-risk first).
 export async function listStaleRelationships(): Promise<Relationship[]> {
   const { rows } = await pool.query(
     `${REL_SELECT}
@@ -100,6 +135,9 @@ export async function listStaleRelationships(): Promise<Relationship[]> {
   return rows as Relationship[];
 }
 
+// Return all signals for a given relationship id, newest first.
+// The parameter is named investorId to match the MCP tool surface but resolves
+// against relationship.id — the MCP tool description clarifies this is a relationship record id.
 export async function getWarmthSignals(investorId: string): Promise<Signal[]> {
   const { rows } = await pool.query(
     `SELECT

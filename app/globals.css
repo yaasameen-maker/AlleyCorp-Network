@@ -1,0 +1,290 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #f0f2f5;
+  --color-paper: #0d1320;
+  --color-mist: #1a2744;
+  --color-muted: #8fa3bc;
+  --color-line: #2d4268;
+  --color-navy: #243352;
+  --color-signal-green: #34d399;
+  --color-signal-amber: #fbbf24;
+}
+
+/* Dimmed page behind dialog sheets — adjust opacity/color here */
+:root {
+  /* Use black (not navy) so dimming is visible on the dark dashboard */
+  --dialog-backdrop: rgba(0, 0, 0, 0.42);
+  --dialog-backdrop-blur: 1px;
+}
+
+.dialog-overlay {
+  opacity: 0;
+  transition: opacity 0.22s ease-out;
+}
+
+.dialog-overlay--visible {
+  opacity: 1;
+}
+
+.dialog-scrim {
+  background: var(--dialog-backdrop);
+  backdrop-filter: blur(var(--dialog-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--dialog-backdrop-blur));
+}
+
+.dialog-panel {
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.55);
+}
+
+@media (min-width: 768px) {
+  .dialog-panel {
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.65);
+  }
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-dialog-in {
+  animation: dialog-in 0.28s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+html {
+  color-scheme: dark;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  overscroll-behavior-y: none;
+}
+
+/* ── iPhone Pro Max mobile shell (<768px) ── */
+@media (max-width: 767px) {
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    background-color: var(--color-paper);
+  }
+
+  .app-shell {
+    width: 100%;
+    max-width: 430px;
+    margin-inline: auto;
+    height: 100dvh;
+    height: 100svh;
+    max-height: 100dvh;
+    max-height: 100svh;
+    overflow: hidden;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 0 0 1px var(--color-line);
+  }
+
+  .mobile-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* App shell — tablet centered column; desktop full width */
+.app-shell {
+  min-height: 100dvh;
+  max-width: 100%;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  html,
+  body {
+    height: auto;
+    overflow: auto;
+  }
+
+  .app-shell {
+    max-width: 100%;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    box-shadow: none;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .app-shell {
+    max-width: 768px;
+    margin-left: auto;
+    margin-right: auto;
+    border-left: 1px solid var(--color-line);
+    border-right: 1px solid var(--color-line);
+  }
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.safe-x {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.touch-press {
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.touch-press:active {
+  transform: scale(0.97);
+  opacity: 0.92;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.snap-scroll-x {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.snap-item {
+  scroll-snap-align: start;
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-sheet-up {
+  animation: sheet-up 0.38s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+.animate-backdrop-in {
+  animation: fade-in 0.25s ease-out both;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes draw-line {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.45s ease-out both;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.8s ease-out both;
+  transform-origin: left center;
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.timeline-draw {
+  stroke-dasharray: 100;
+  animation: draw-line 1.2s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog-overlay--visible {
+    opacity: 1;
+  }
+
+  .animate-sheet-up,
+  .animate-backdrop-in,
+  .animate-dialog-in,
+  .dialog-overlay,
+  .animate-fade-in-up,
+  .animate-scale-in,
+  .animate-pulse-dot,
+  .timeline-draw {
+    animation: none;
+    transition: none;
+  }
+
+  .touch-press:active {
+    transform: none;
+    opacity: 1;
+  }
+}

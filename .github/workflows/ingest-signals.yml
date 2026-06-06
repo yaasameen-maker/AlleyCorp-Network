@@ -1,0 +1,55 @@
+# Daily signal ingestion — runs every morning at 7am ET
+# Searches for new co-investment signals across all tracked relationships
+# and writes real signal rows into Neon.
+#
+# IMPORTANT: Do NOT enable the schedule trigger until local runs are stable.
+# To enable: uncomment the `schedule` block below and remove the `workflow_dispatch` only comment.
+#
+# Required secrets (set in GitHub repo → Settings → Secrets):
+#   DATABASE_URL      — Neon connection string
+#   ANTHROPIC_API_KEY — Claude API key
+#   EXA_API_KEY       — Exa search API key
+
+name: Daily Signal Ingestion
+
+on:
+  # Uncomment to enable daily schedule:
+  # schedule:
+  #   - cron: '0 12 * * *'  # 7am ET (12:00 UTC)
+
+  # Manual trigger — use this until local runs are stable
+  workflow_dispatch:
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run signal ingestion
+        run: npm run ingest:signals -- --write
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+
+      - name: Upload run log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ingestion-log-${{ github.run_number }}
+          path: /tmp/ingestion-*.log
+          if-no-files-found: ignore
+          retention-days: 7
