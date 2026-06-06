@@ -1,4 +1,6 @@
-// TODO: implement alerts route
+import { listStaleRelationships } from "@/lib/db";
+
 export async function GET() {
-  return Response.json({ error: "Not implemented" }, { status: 501 });
+  const stale = await listStaleRelationships();
+  return Response.json(stale);
 }

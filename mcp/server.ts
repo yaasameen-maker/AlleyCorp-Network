@@ -9,7 +9,7 @@ import { tool as getInvestorTool, handler as getInvestor } from "./tools/get-inv
 import { tool as searchRelationshipsTool, handler as searchRelationships } from "./tools/search-relationships.js";
 import { tool as listStaleTool, handler as listStaleRelationships } from "./tools/list-stale-relationships.js";
 import { tool as getWarmthSignalsTool, handler as getWarmthSignals } from "./tools/get-warmth-signals.js";
-import { checkAllowlist } from "./security/index.js";
+import { checkAllowlist } from "./security/allowlist.js";
 import type { ToolName } from "./security/tokens.js";
 
 const server = new Server(
