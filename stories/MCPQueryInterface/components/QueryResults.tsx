@@ -7,9 +7,18 @@ interface QueryResultsProps {
   result: MCPQueryResult | null;
   isLoading: boolean;
   onSelectInvestor: (investor: Investor) => void;
+  /** Limit visible result rows; scroll to see the rest */
+  previewItemCount?: number;
+  compact?: boolean;
 }
 
-export function QueryResults({ result, isLoading, onSelectInvestor }: QueryResultsProps) {
+export function QueryResults({
+  result,
+  isLoading,
+  onSelectInvestor,
+  previewItemCount,
+  compact = false,
+}: QueryResultsProps) {
   if (isLoading) {
     return (
       <div className="rounded-2xl border border-line bg-paper p-6 text-center animate-pulse">
@@ -55,7 +64,18 @@ export function QueryResults({ result, isLoading, onSelectInvestor }: QueryResul
           {formatToolLabel(result.tool)}
         </span>
       </div>
-      <div className="p-3 space-y-2">
+      <div
+        className={`p-3 space-y-2 ${
+          previewItemCount
+            ? `${compact ? "max-h-[12rem]" : "max-h-[15.5rem]"} overflow-y-auto overscroll-contain scrollbar-hide`
+            : ""
+        }`}
+      >
+        {previewItemCount && result.items.length > previewItemCount && (
+          <p className="text-[11px] text-muted text-center pb-1 sticky top-0 bg-mist/95 py-1 z-[1]">
+            Scroll to see all {result.items.length} results
+          </p>
+        )}
         {result.items.map((item) => (
           <QueryResultRow
             key={item.investor.id}
