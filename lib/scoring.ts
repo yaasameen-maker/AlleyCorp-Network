@@ -67,11 +67,21 @@ const SIGNAL_WEIGHTS: Record<ScoringSignalType, number> = {
 };
 
 // Lauren-confirmed Hot calibration anchors — always Hot regardless of score
+// Updated June 4 2026 — Luba added funds confirmed hot by Lauren Young
 export const HOT_ANCHORS = new Set([
+  // Original anchors
   "Riot Ventures",
   "Snowpoint Ventures",
   "General Catalyst",
   "Mach33",
+  // Lauren-confirmed additions (active co-investors with recent deal activity)
+  "SOSV",
+  "Day One Ventures",
+  "Amazon Climate Pledge Fund",
+  "NEA",
+  "Ubiquity Ventures",
+  "Geodesic Capital",
+  "ff Venture Capital",
 ]);
 
 // ─────────────────────────────────────────
