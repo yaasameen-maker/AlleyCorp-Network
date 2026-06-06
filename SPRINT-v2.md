@@ -295,7 +295,7 @@ Agent 1 owns the full data pipeline. It is the only agent that writes to the dat
 
 1. **Ingest (Bronze → Silver):** Accept raw exports — Swoogo/Luma CSVs, news feeds, LinkedIn exports, Crunchbase dumps. Parse and normalize each row into the `signals` table format.
 2. **Enrich (Silver enrichment):** For sparse contacts (email only), fill in full name, company, job title, LinkedIn so signals can be linked to `funds` and `relationships` records.
-   - Tier 1 — Email domain parsing (free, instant): `bz@luxcapital.com` → Lux Capital
+   - Tier 1 — Email domain parsing (free, instant): `wmccreadie@generalcatalyst.com` → General Catalyst
    - Tier 2 — Notes extraction (Claude, no web search): parses existing contact notes into structured fields
    - Tier 3 — Claude + web search (Serper.dev, ~$0.001/call): for personal emails only. Returns blank if not found — never fabricates.
 3. **Score (Silver → Gold):** After new signals land, call `recalibrateAll()` from `lib/scoring.ts`. This re-scores every relationship and writes updated `warmth_tier` to the `relationships` table. This is the moment raw data becomes actionable intelligence.
@@ -342,7 +342,7 @@ Single entry point for all agent requests. Detects intent and routes — or chai
 | Request | Route |
 |---|---|
 | "Who should we reconnect with?" | → Agent 3 (chatbot) |
-| "Generate a brief on Lux Capital" | → Agent 2 (brief) |
+| "Generate a brief on General Catalyst" | → Agent 2 (brief) |
 | "Enrich this contact list" | → Agent 1 (enrichment) |
 | "Enrich these contacts then brief their companies" | → Agent 1 → Agent 2 |
 
