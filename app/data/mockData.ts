@@ -28,6 +28,7 @@ export interface Signal {
   description: string;
   date: string;
   weight: "High" | "Medium" | "Low";
+  source?: string;
 }
 
 export interface Investor {
