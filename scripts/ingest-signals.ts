@@ -25,10 +25,40 @@ const claude = new Anthropic();
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface SearchTarget {
-  relationshipId: string;
   fundName: string;
   companyName: string;
   queries: string[];
+}
+
+// Resolved at runtime from the live DB — works on any DB (Neon, Railway, local)
+interface ResolvedTarget extends SearchTarget {
+  relationshipId: string;
+}
+
+// ── Resolve relationship IDs from live DB ─────────────────────────────────────
+
+async function resolveRelationshipIds(targets: SearchTarget[]): Promise<ResolvedTarget[]> {
+  const { rows } = await pool.query<{ id: string; fund: string; company: string }>(
+    `SELECT r.id, f.name AS fund, pc.name AS company
+     FROM relationship r
+     JOIN fund f ON f.id = r.fund_id
+     JOIN portfolio_company pc ON pc.id = r.portfolio_company_id`
+  );
+
+  const lookup = new Map(rows.map((r) => [`${r.fund}|${r.company}`, r.id]));
+  const resolved: ResolvedTarget[] = [];
+
+  for (const t of targets) {
+    const id = lookup.get(`${t.fundName}|${t.companyName}`);
+    if (!id) {
+      console.warn(`⚠️  No relationship found for: ${t.fundName} + ${t.companyName} — skipping`);
+      continue;
+    }
+    resolved.push({ ...t, relationshipId: id });
+  }
+
+  console.log(`✓ Resolved ${resolved.length}/${targets.length} relationship IDs from DB\n`);
+  return resolved;
 }
 
 interface CandidateSignal {
@@ -53,7 +83,6 @@ const TARGETS: SearchTarget[] = [
   // ── STALE ────────────────────────────────────────────────────────────────
 
   {
-    relationshipId: "34ddba26-d2d6-432b-82c0-85e6a2fc15ec",
     fundName: "SineWave Ventures",
     companyName: "Aon 3D",
     queries: [
@@ -63,7 +92,6 @@ const TARGETS: SearchTarget[] = [
     ],
   },
   {
-    relationshipId: "ba731a1f-acfd-4c2a-ad44-41b46278dbc4",
     fundName: "Trimble Ventures",
     companyName: "Civ Robotics",
     queries: [
@@ -73,7 +101,6 @@ const TARGETS: SearchTarget[] = [
     ],
   },
   {
-    relationshipId: "6f9767da-d39d-47bd-bdb1-17a5b418a8b2",
     fundName: "BOLD Capital Partners",
     companyName: "Earth Force",
     queries: [
@@ -86,7 +113,6 @@ const TARGETS: SearchTarget[] = [
   // ── HOT with missing last_signal_date ────────────────────────────────────
 
   {
-    relationshipId: "ad3c1e30-6fd1-4526-98df-a0fedcef8d7b",
     fundName: "Riot Ventures",
     companyName: "Valar Atomics",
     queries: [
@@ -96,7 +122,6 @@ const TARGETS: SearchTarget[] = [
     ],
   },
   {
-    relationshipId: "cacec229-4320-4e23-a3cc-c25e992d8050",
     fundName: "Snowpoint Ventures",
     companyName: "Valar Atomics",
     queries: [
@@ -106,7 +131,6 @@ const TARGETS: SearchTarget[] = [
     ],
   },
   {
-    relationshipId: "3322eaea-b060-43ec-956d-23c093e616a7",
     fundName: "Mach33",
     companyName: "Portal Space Systems",
     queries: [
@@ -119,7 +143,6 @@ const TARGETS: SearchTarget[] = [
   // ── HOT with recent signals ───────────────────────────────────────────────
 
   {
-    relationshipId: "6c6f5824-7a0f-4eee-8e3b-eafa63ecac06",
     fundName: "General Catalyst",
     companyName: "Eyebot",
     queries: [
@@ -129,7 +152,6 @@ const TARGETS: SearchTarget[] = [
     ],
   },
   {
-    relationshipId: "78f6face-5fb0-44d0-bd22-7187412c3642",
     fundName: "Ubiquity Ventures",
     companyName: "Eyebot",
     queries: [
@@ -139,7 +161,6 @@ const TARGETS: SearchTarget[] = [
     ],
   },
   {
-    relationshipId: "97281765-a82c-43f6-8103-2b67505f049e",
     fundName: "SOSV",
     companyName: "Renovate Robotics",
     queries: [
@@ -149,7 +170,6 @@ const TARGETS: SearchTarget[] = [
     ],
   },
   {
-    relationshipId: "fce3f571-76af-49cd-b600-c06b430f38af",
     fundName: "Geodesic Capital",
     companyName: "Portal Space Systems",
     queries: [
@@ -159,7 +179,6 @@ const TARGETS: SearchTarget[] = [
     ],
   },
   {
-    relationshipId: "34e1ca8d-e2fc-4e3b-83b5-0183e07fe404",
     fundName: "Day One Ventures",
     companyName: "Valar Atomics",
     queries: [
@@ -169,7 +188,6 @@ const TARGETS: SearchTarget[] = [
     ],
   },
   {
-    relationshipId: "24e92376-97c1-4c31-8178-4cbb22a14be7",
     fundName: "Amazon Climate Pledge Fund",
     companyName: "Glacier",
     queries: [
@@ -179,7 +197,6 @@ const TARGETS: SearchTarget[] = [
     ],
   },
   {
-    relationshipId: "1f669b0e-ce02-42a3-a59b-cee0be204d1e",
     fundName: "NEA",
     companyName: "Glacier",
     queries: [
@@ -192,7 +209,6 @@ const TARGETS: SearchTarget[] = [
   // ── WARM ─────────────────────────────────────────────────────────────────
 
   {
-    relationshipId: "cdfc0f52-9ef7-4b31-8b02-fc0b93b2d888",
     fundName: "Flybridge",
     companyName: "Halo Braid",
     queries: [
@@ -202,7 +218,6 @@ const TARGETS: SearchTarget[] = [
     ],
   },
   {
-    relationshipId: "557e9b32-0b44-447d-a213-b6848870aa35",
     fundName: "Cherubic Ventures",
     companyName: "Cargo Robotics",
     queries: [
@@ -215,7 +230,6 @@ const TARGETS: SearchTarget[] = [
   // ── COLD ─────────────────────────────────────────────────────────────────
 
   {
-    relationshipId: "d0bf6b1f-2218-4e95-9d2f-1e50ec870f41",
     fundName: "a16z American Dynamism",
     companyName: "Cargo Robotics",
     queries: [
@@ -225,7 +239,6 @@ const TARGETS: SearchTarget[] = [
     ],
   },
   {
-    relationshipId: "65e92c3a-c8e1-43be-889a-9712855ec776",
     fundName: "Eclipse Ventures",
     companyName: "Civ Robotics",
     queries: [
@@ -235,7 +248,6 @@ const TARGETS: SearchTarget[] = [
     ],
   },
   {
-    relationshipId: "0e9adc58-c4b9-4e11-9ac3-ba9e63fcbfda",
     fundName: "Founders Fund",
     companyName: "Valar Atomics",
     queries: [
@@ -473,13 +485,20 @@ async function updateRelationshipDate(relationshipId: string, latestDate: string
 
 async function run() {
   console.log("=== AlleyCorp Signal Ingestion Pipeline ===");
-  console.log(`Mode: ${DRY_RUN ? "DRY RUN (no DB writes)" : "LIVE (writing to Neon)"}\n`);
+  console.log(`Mode: ${DRY_RUN ? "DRY RUN (no DB writes)" : "LIVE (writing to DB)"}\n`);
+
+  // Resolve relationship IDs from live DB — works on any DB
+  const targets = await resolveRelationshipIds(TARGETS);
+  if (targets.length === 0) {
+    console.error("No targets resolved — check DB connection and seed data.");
+    process.exit(1);
+  }
 
   let totalFound = 0;
   let totalInserted = 0;
   let totalDuplicates = 0;
 
-  for (const target of TARGETS) {
+  for (const target of targets) {
     try {
       const pages = await searchForSignals(target);
       console.log(`\n   Found ${pages.length} unique pages`);
@@ -505,7 +524,7 @@ async function run() {
         continue;
       }
 
-      console.log("\n💾 Writing to Neon...");
+      console.log("\n💾 Writing to DB...");
       let latestDate = "";
       for (const c of candidates) {
         const result = await writeSignal(c);

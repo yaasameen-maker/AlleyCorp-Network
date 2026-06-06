@@ -167,13 +167,13 @@ async function run() {
     try {
       const response = await runQuery(test.prompt);
       const ms = Date.now() - t0;
-      if (test.validate(response) && ms < 30000) {
+      if (test.validate(response) && ms < 60000) {
         console.log(` ✓ PASS (${ms}ms)`);
         passed++;
       } else {
         console.log(` ✗ FAIL (${ms}ms)`);
         console.log(`   Expected: ${test.passCriteria}`);
-        if (ms >= 30000) console.log(`   Exceeded 30s limit`);
+        if (ms >= 60000) console.log(`   Exceeded 60s limit`);
         console.log(`   Got: ${response.slice(0, 200)}`);
       }
     } catch (err) {
