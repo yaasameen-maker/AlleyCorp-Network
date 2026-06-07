@@ -106,10 +106,10 @@ export default function DashboardPage() {
 
   return (
     <ScrollContainerContext.Provider value={scrollRef}>
-      <div className="app-shell bg-paper text-ink min-h-[100dvh] flex lg:flex-row">
+      <div className="app-shell bg-paper text-ink h-[100dvh] flex lg:flex-row overflow-hidden">
         <AppSidebar activeView={activeView} onNavigate={handleNavigate} {...navToolsProps} />
 
-        <div className="flex-1 flex flex-col min-w-0 min-h-0 max-md:h-full md:min-h-[100dvh]">
+        <div className="flex-1 flex flex-col min-w-0 min-h-0 max-md:h-full lg:h-[100dvh]">
           <MobileNavTools
             {...navToolsProps}
             onOpenPortfolio={openPortfolio}
@@ -120,17 +120,17 @@ export default function DashboardPage() {
             ref={scrollRef}
             className="mobile-scroll flex-1 min-h-0 safe-x safe-bottom max-md:pb-[max(1rem,env(safe-area-inset-bottom))] lg:overflow-hidden lg:flex lg:flex-col"
           >
-            <div className="flex-1 lg:relative lg:min-h-0 lg:overflow-hidden">
+            <div className="flex-1 h-full lg:relative lg:min-h-0 lg:overflow-hidden">
               <div className="flex-1 flex flex-col min-w-0 w-full h-full lg:overflow-hidden">
                 {activeView === "dashboard" && (
-                  <div className="flex-1 flex flex-col max-md:min-h-0 lg:min-h-full lg:overflow-y-auto">
+                  <div className="flex-1 flex flex-col min-h-0 h-full overflow-y-auto">
                     {loading ? (
                       <div className="flex-1 flex items-center justify-center px-4 py-12">
                         <p className="text-sm text-muted">Loading investors…</p>
                       </div>
                     ) : (
-                      <div className="flex-1 flex max-md:items-center max-md:justify-center max-md:py-8 max-md:pb-12 lg:min-h-full items-start lg:items-center justify-center px-4 py-6 md:px-6 md:py-8 lg:px-10 lg:py-10">
-                        <div className="w-full max-w-4xl mx-auto max-md:shrink-0">
+                      <div className="flex-1 flex items-start lg:items-center justify-center px-4 py-6 md:px-6 md:py-8 lg:px-10 lg:py-10">
+                        <div className="w-full max-w-4xl mx-auto">
                           <StaleAlertsBanner
                             variant="hero"
                             investors={allInvestors}
@@ -143,19 +143,23 @@ export default function DashboardPage() {
                 )}
 
                 {isDesktop && activeView === "digest" && (
-                  <EmailDigestView
-                    variant="inline"
-                    investors={allInvestors}
-                    onSelectInvestor={(i) => openProfile(i)}
-                  />
+                  <div className="flex-1 h-full min-h-0 overflow-y-auto">
+                    <EmailDigestView
+                      variant="inline"
+                      investors={allInvestors}
+                      onSelectInvestor={(i) => openProfile(i)}
+                    />
+                  </div>
                 )}
 
                 {isDesktop && activeView === "portfolio" && (
-                  <PortfolioExplorer
-                    variant="inline"
-                    investors={allInvestors}
-                    onSelectInvestor={(i) => openProfile(i)}
-                  />
+                  <div className="flex-1 h-full min-h-0 overflow-y-auto">
+                    <PortfolioExplorer
+                      variant="inline"
+                      investors={allInvestors}
+                      onSelectInvestor={(i) => openProfile(i)}
+                    />
+                  </div>
                 )}
               </div>
 

@@ -93,7 +93,7 @@ export function AskNetworkNavPanel({
       </form>
 
       {showResults && (
-        <div className="mt-2 relative">
+        <div className="mt-2 relative max-h-[40vh] overflow-y-auto rounded-xl">
           <button
             type="button"
             onClick={reset}

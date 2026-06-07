@@ -81,13 +81,13 @@ export function AppSidebar({
   selectedInvestorId,
 }: AppSidebarProps) {
   return (
-    <aside className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 shrink-0 border-r border-line bg-paper min-h-[100dvh] sticky top-0 relative z-[170]">
+    <aside className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 shrink-0 border-r border-line bg-paper h-[100dvh] relative z-[170]">
       <div className="px-5 py-6 border-b border-line shrink-0">
         <p className="text-[11px] uppercase tracking-wider text-muted font-semibold">AlleyCorp</p>
         <h1 className="text-lg font-semibold tracking-tight text-ink mt-0.5">Investor Intelligence</h1>
       </div>
 
-      <nav className="flex-1 p-3 space-y-1 overflow-y-auto" aria-label="Main navigation">
+      <nav className="flex-1 min-h-0 p-3 space-y-1 overflow-y-auto" aria-label="Main navigation">
         {NAV_ITEMS.map((item) => {
           const active = activeView === item.id;
           return (
