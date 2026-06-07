@@ -1,5 +1,5 @@
-import { listStaleRelationships } from "./db.js";
-import type { DigestItem, Relationship } from "./types.js";
+import { listStaleRelationships } from "./db";
+import type { DigestItem, Relationship } from "./types";
 
 function toSlug(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
