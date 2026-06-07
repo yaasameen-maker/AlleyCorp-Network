@@ -1,5 +1,5 @@
 import { Resend } from "resend";
-import { generateDigest } from "./digest";
+import { generateDigest } from "./digest-server";
 import type { DigestItem } from "./types";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
