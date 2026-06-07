@@ -28,7 +28,7 @@ A relationship intelligence tool for AlleyCorp's Deep Tech team. It surfaces co-
 
 | Person | Owns |
 |---|---|
-| **Luba** | `schema.sql`, `seed.sql`, `lib/db.ts`, `lib/scoring.ts`, `lib/alerts.ts`, `app/api/alerts/route.ts`, data research (co-investor seeding) |
+| **Luba** | `schema.sql`, `seed.sql`, `seed-dtny-signals.sql`, `lib/db.ts`, `lib/scoring.ts`, `lib/alerts.ts`, `lib/alerts.server.ts`, `app/api/alerts/route.ts`, data research (co-investor seeding) |
 | **Yaasameen** | `mcp/` (server + 4 tools + security), `lib/scoring.ts` (weighted scorer), `lib/digest.ts`, `scripts/acceptance-test.ts`, `app/api/events/route.ts` |
 | **Michael** | `app/page.tsx`, `app/layout.tsx`, all frontend pages, warmth tier UI, investor profile card |
 
@@ -88,10 +88,11 @@ mkdir -p data
 ### Data flow
 ```
 PostgreSQL (Railway)
-  └── lib/db.ts          — 4 SQL queries, typed mappers
-  └── lib/scoring.ts     — deterministic warmth tier logic (no AI)
-  └── lib/alerts.ts      — stale + warm-at-risk detection
-  └── lib/digest.ts      — daily digest item generation (Yaasameen)
+  └── lib/db.ts              — 4 SQL queries, typed mappers
+  └── lib/scoring.ts         — deterministic warmth tier logic (no AI)
+  └── lib/alerts.ts          — client-safe alert types + getRelationshipAlerts (no DB import)
+  └── lib/alerts.server.ts   — server-only getAlerts() with DB query (never import in client components)
+  └── lib/digest.ts          — daily digest item generation (Yaasameen)
 
 Next.js App Router
   └── app/api/alerts     — GET /api/alerts
@@ -122,17 +123,32 @@ Do not merge them. They serve different purposes.
 Full schema: `schema.sql` — idempotent, safe to re-run.
 
 ### Seeding
-`seed.sql` — truncates all tables then re-inserts:
-- 20 active Deep Tech portfolio companies (Lauren Young confirmed list)
-- 6 funds (Lux, USV, Riot, Snowpoint, GC, Mach33)
-- 5 relationships (stale, warm, hot × 3)
-- 2 signals (Lux+Inductive Bio, USV+Viam)
+Run in this order:
+```bash
+psql $DATABASE_URL -f schema.sql          # idempotent schema
+psql $DATABASE_URL -f seed.sql            # truncates + re-seeds all data
+psql $DATABASE_URL -f seed-dtny-signals.sql  # DTNY event signals (Jan 28 2026)
+```
+
+`seed.sql` inserts:
+- 20 portfolio companies (17 active + 3 alumni — Lauren Young confirmed list, May 2026)
+- 9 funds (Riot, Snowpoint, GC, Mach33, SOSV + 3 cold targets + others)
+- 19 relationships across all 4 warmth tiers
+- Signals for hot/warm/stale relationships
+
+`seed-dtny-signals.sql` adds:
+- 7 event_attendance signals from DTNY Jan 28 2026 (Riot, BOLD, Eclipse, ff VC, USV, a16z, Mach33)
+
+**Source data files** (PII — gitignored, stored in `data/`):
+- `data/DTNY Registration.xlsx` — official attendee list from Lauren Young
+- `data/Swoogo Contacts.xlsx - Pulled 5_15_26.csv` — broader contact DB (no dates/events, limited use)
 
 ### Railway deployment
-Once `DATABASE_URL` is available:
+Railway is already provisioned and live. To re-seed:
 ```bash
 psql $DATABASE_URL -f schema.sql
 psql $DATABASE_URL -f seed.sql
+psql $DATABASE_URL -f seed-dtny-signals.sql
 ```
 
 ### Local development
@@ -183,6 +199,7 @@ The test validates tool selection, response content, and response time (< 5 seco
 - **No field removal.** Adding fields to a DB row type is safe. Removing or renaming breaks other layers.
 - **Type hints on every function.** Return types explicit.
 - **Warmth tier case contract.** DB = lowercase. TypeScript = Title Case. Do not collapse this distinction.
+- **Run and fix tests after every change.** After any code or data change, run `npm run test:run` before committing. If a test fails because the data changed (not a bug), update the test to match the new reality and explain why in a comment.
 
 ### Import conventions
 | Context | Import style |
@@ -201,9 +218,9 @@ The test validates tool selection, response content, and response time (< 5 seco
 
 Target platform: Railway (PostgreSQL + Next.js app).
 
-1. Provision PostgreSQL on Railway (Kabir)
-2. Set all env vars in Railway dashboard
-3. Run `schema.sql` then `seed.sql` against Railway `DATABASE_URL`
+1. ✅ PostgreSQL provisioned on Railway (live as of June 2026)
+2. ✅ Env vars set in Railway dashboard
+3. Re-seed anytime: `schema.sql` → `seed.sql` → `seed-dtny-signals.sql`
 4. Deploy Next.js app — Railway auto-detects Next.js
 5. Run `npm run test:acceptance` against the live Railway DB to confirm
 
@@ -218,7 +235,9 @@ Five prompts, Abe's POV:
 2. "Who are our warmest relationships in deep tech right now?"
 3. "What should I know before our meeting with General Catalyst next week?"
 4. "Are there any top deep tech funds we haven't co-invested with yet?"
-5. "Show me the full picture on Lux Capital."
+5. "Show me the full picture on Trimble Ventures."
+
+⚠️ Prompt 5 was "Lux Capital" in early docs but Lux Capital was removed from the DB (their co-investment was Inductive Bio, which is not on Lauren's confirmed list). Acceptance tests are written for Trimble Ventures. Demo script must match.
 
 All 5 must return correct results from live Railway DB in under 5 seconds. Run `npm run test:acceptance` the morning of Demo Day.
 

@@ -10,8 +10,7 @@ afterAll(async () => {
 // ─────────────────────────────────────────
 // Integration tests — run against Railway DB.
 //
-// Expected alerts (as of 2026-06-04 after recalibration):
-//   Stale (5, ordered oldest signal first):
+// Core stale alerts (always expected, ordered oldest signal first):
 //     1. Trimble Ventures + Civ Robotics     → stale_relationship (high)   2022-09-22
 //     2. Flybridge + Halo Braid              → stale_relationship (high)   2024-06-15
 //     3. Cherubic Ventures + Cargo Robotics  → stale_relationship (high)   2024-10-01
@@ -21,13 +20,15 @@ afterAll(async () => {
 //   NOTE: Flybridge and Cherubic recalibrated Warm → Stale (last signal >180 days ago).
 //   NOTE: SineWave last_signal_date updated to 2026-01-28 (Cycle Capital follow-on found by scraper).
 //   NOTE: BOLD last_signal_date updated to 2026-01-28 (DTNY event attendance signal).
+//   NOTE: June 7 — co-investor discovery added more stale relationships (Koop, Mapless AI,
+//         Dexai Robotics co-investors). Count is now >= 5, not exactly 5.
 // ─────────────────────────────────────────
 
 describe("getAlerts (integration)", () => {
 
-  it("returns exactly 5 alerts from seed data", async () => {
+  it("returns at least 5 alerts from seed data", async () => {
     const alerts = await getAlerts();
-    expect(alerts).toHaveLength(5);
+    expect(alerts.length).toBeGreaterThanOrEqual(5);
   });
 
   it("orders all stale (high severity) before all warm-at-risk (medium severity)", async () => {

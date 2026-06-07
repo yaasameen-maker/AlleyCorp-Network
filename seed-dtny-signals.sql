@@ -100,12 +100,27 @@ VALUES (
   now()
 );
 
+-- Mach33 — Aaron Burnett (CEO) attended DTNY
+INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, value, weight, confidence, created_at)
+VALUES (
+  gen_random_uuid(),
+  (SELECT r.id FROM relationship r JOIN fund f ON f.id = r.fund_id WHERE f.name = 'Mach33' LIMIT 1),
+  'event_attendance',
+  '2026-01-28',
+  'DTNY — Deep Tech New York',
+  'Aaron Burnett (CEO) attended AlleyCorp DTNY event',
+  'medium',
+  'confirmed',
+  now()
+);
+
 -- Update last_signal_date for all affected relationships
+-- NOTE: Riot Ventures is included here — was missing from original seed
 UPDATE relationship SET last_signal_date = '2026-01-28', updated_at = now()
 WHERE fund_id IN (
   SELECT id FROM fund WHERE name IN (
-    'BOLD Capital Partners', 'Eclipse Ventures', 'ff Venture Capital',
-    'Union Square Ventures', 'a16z American Dynamism'
+    'Riot Ventures', 'BOLD Capital Partners', 'Eclipse Ventures', 'ff Venture Capital',
+    'Union Square Ventures', 'a16z American Dynamism', 'Mach33'
   )
 );
 
