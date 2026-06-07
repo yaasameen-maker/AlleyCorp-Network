@@ -1,6 +1,6 @@
 # Sprint Plan v2.0 — AlleyCorp Relationship Intelligence Platform
 
-**Updated:** June 1, 2026 · **Demo Day:** June 24, 2026
+**Updated:** June 3, 2026 · **Demo Day:** June 24, 2026
 **Team:** Luba · Michael · Yaasameen
 
 **Change from v1.1:** Full replan based on current repo state. MCP server, 4-layer security, warmth scoring, and acceptance test suite are complete (Yaasameen, ahead of schedule). Database is now the critical path — everything else is blocked until Neon is provisioned and Luba's schema is live.
@@ -15,31 +15,30 @@
 
 | Component | Status | Owner |
 |---|---|---|
-| MCP server (`mcp/server.ts`) + 4 tool handlers | ✅ Complete | Yaasameen |
-| 4-layer security (allowlist, tokens, network, sandbox) | ✅ Complete | Yaasameen |
-| `lib/types.ts` — all entity + view model types | ✅ Complete | Yaasameen |
-| `lib/scoring.ts` — deterministic warmth engine | ✅ Complete | Yaasameen |
-| `.env.example`, `middleware.ts`, `package.json` | ✅ Complete | Yaasameen |
-| `lib/db.ts` — all 4 SQL query functions (real SQL) | ✅ Complete | Luba |
-| PostgreSQL schema (`seed.sql`) — 5 tables | ✅ Complete | Luba |
-| Data seeding — all 4 warmth tiers, 17 active + 3 alumni companies | ✅ Complete | Luba |
-| Stale examples: SineWave+Aon3D, Trimble+CivRobotics, BOLD+EarthForce | ✅ Complete | Luba |
-| Hot anchors: Riot, Snowpoint, General Catalyst, Mach33, SOSV | ✅ Complete | Luba |
-| Cold targets: a16z American Dynamism, Eclipse, Founders Fund | ✅ Complete | Luba |
-| Acceptance test suite — 5/5 passing (`npm run test:acceptance`) | ✅ Complete | Luba + Yaasameen |
-| Frontend scaffold — investor list, warmth tier pills | ✅ Complete | Michael |
-| `app/data/mockData.ts` + `investors.ts` seam | ✅ Complete | Michael |
+| MCP server (`mcp/server.ts`) + 4 tool handlers | Complete | Yaasameen |
+| 4-layer security (allowlist, tokens, network, sandbox) | Complete | Yaasameen |
+| Acceptance test suite — 5 Demo Day prompts (`scripts/acceptance-test.ts`) | Complete | Yaasameen |
+| `lib/types.ts` — all entity + view model types | Complete | Yaasameen |
+| `lib/scoring.ts` — warmth engine, confidence mapping, Swoogo/Luma/news weights | Complete | Yaasameen |
+| `lib/db.ts` — all 5 SQL query functions, Railway pool config | Complete | Yaasameen |
+| `lib/digest.ts` — generates `DigestItem[]` from stale relationships | Complete | Yaasameen |
+| `lib/mailer.ts` — Resend send, HTML email template, authenticated deep-links | Complete | Yaasameen |
+| `GET /api/alerts` — stale relationships endpoint | Complete | Yaasameen |
+| `GET /api/events` — recent signals endpoint | Complete | Yaasameen |
+| `POST /api/digest` — bearer-gated cron trigger | Complete | Yaasameen |
+| `next.config.ts` — `serverExternalPackages: ["pg"]` Railway build fix | Complete | Yaasameen |
+| `tsconfig.json` — `types: ["node"]` | Complete | Yaasameen |
+| `data/.gitkeep` — MCP Layer 4 sandbox directory | Complete | Yaasameen |
+| `.env.example`, `middleware.ts`, `package.json` | Complete | Yaasameen |
 
-## What Is Not Done (as of June 1)
+## What Is Not Done (as of June 3)
 
 | Component | Status | Blocked By |
 |---|---|---|
-| Neon PostgreSQL provisioning | Not started | Kabir |
-| Frontend wired to real DB (GET /api/investors) | Not started — seam ready in `investors.ts` | Neon DATABASE_URL |
-| `GET /api/alerts` and `GET /api/events` API routes | Not started | Yaasameen + Neon |
-| `lib/digest.ts` + Resend email | Not started | Yaasameen |
-| Full co-investor research (all 17 companies) | In progress | Luba — Week 3 |
-| Final data QA vs acceptance tests | Not started | Luba — Week 3 |
+| PostgreSQL schema + migrations | Not started | Luba |
+| Data seeding (Lux Capital, anchors, 20 companies) | Not started | Luba |
+| Frontend — `app/page.tsx`, `app/layout.tsx`, investor list, profile card | Not started | Michael |
+| Acceptance tests passing (`npm run test:acceptance`) | Blocked | Luba's schema + seed data |
 
 ---
 
@@ -250,7 +249,137 @@ Run: `npm run test:acceptance` — all 5 must pass before Demo Day.
 
 **Building:** Co-investor relationship intelligence · Deterministic warmth scoring · Stale detection · Cold tier targets · Daily email digest with authenticated deep-links · MCP natural language query layer · Full 20-company Deep Tech network · 5-prompt end-to-end acceptance test suite
 
-**Not building:** AI agents · General copilot · Custom NLP pipeline · CRM features · Healthcare/General team views (data model supports it, not built this sprint) · Email inbox enrichment (assess June 1)
+**Not building (this sprint):** General copilot · Custom NLP pipeline · CRM features · Healthcare/General team views (data model supports it, not built this sprint) · Email inbox enrichment (assess June 1)
+
+---
+
+## Proposal — Multi-Agent Orchestration Layer
+
+**Status: Awaiting team approval · Author: Yaasameen · June 3, 2026**
+
+This is an additive layer on top of the current build. It does not change the warmth scoring model, existing MCP tools, DB schema, or Demo Day acceptance tests.
+
+### Architecture
+
+Three specialized agents sit behind a single orchestrator. The orchestrator receives any request and routes it to the right specialist. Agents can be chained.
+
+```
+User / Cron / API
+       │
+  ┌────▼──────────────────────────────────┐
+  │          ORCHESTRATOR AGENT           │
+  │  Determines intent, routes, chains    │
+  └────┬──────────────┬──────────┬────────┘
+       │              │          │
+  ┌────▼─────┐  ┌─────▼────┐  ┌─▼──────────┐
+  │ Agent 1  │  │ Agent 2  │  │  Agent 3   │
+  │ Enrich   │  │  Brief   │  │  Chatbot   │
+  └──────────┘  └──────────┘  └────────────┘
+```
+
+---
+
+### Agent 1 — Data Aggregation + Enrichment (Bronze → Silver → Gold)
+
+Agent 1 owns the full data pipeline. It is the only agent that writes to the database. Agents 2 and 3 consume the output — they never touch raw data directly.
+
+**Three data layers:**
+
+| Layer | What it contains | Who produces it |
+|---|---|---|
+| Bronze | Raw exports as-is — Swoogo CSVs, Luma CSVs, news feeds, LinkedIn exports, Crunchbase data | Source systems |
+| Silver | Normalized, typed signals in the `signals` table — consistent `type`, `source`, `value`, `confidence`, `date` | Agent 1 (ingest + enrich) |
+| Gold | Scored, business-ready relationships — `warmth_tier` updated on every `relationships` row | Agent 1 (triggers `recalibrateAll()`) |
+
+**Pipeline steps:**
+
+1. **Ingest (Bronze → Silver):** Accept raw exports — Swoogo/Luma CSVs, news feeds, LinkedIn exports, Crunchbase dumps. Parse and normalize each row into the `signals` table format.
+2. **Enrich (Silver enrichment):** For sparse contacts (email only), fill in full name, company, job title, LinkedIn so signals can be linked to `funds` and `relationships` records.
+   - Tier 1 — Email domain parsing (free, instant): `wmccreadie@generalcatalyst.com` → General Catalyst
+   - Tier 2 — Notes extraction (Claude, no web search): parses existing contact notes into structured fields
+   - Tier 3 — Claude + web search (Serper.dev, ~$0.001/call): for personal emails only. Returns blank if not found — never fabricates.
+3. **Score (Silver → Gold):** After new signals land, call `recalibrateAll()` from `lib/scoring.ts`. This re-scores every relationship and writes updated `warmth_tier` to the `relationships` table. This is the moment raw data becomes actionable intelligence.
+
+**Output consumed by:**
+- Agent 2 reads gold layer (`relationships` + `signals`) to generate briefs
+- Agent 3 reads gold layer to answer natural language questions
+- Daily digest reads gold layer to surface stale alerts
+
+**New files:** `lib/enrichment.ts`, `scripts/enrich-contacts.ts`, `app/api/ingest/route.ts`
+
+**Reused:** `recalibrateAll()` — `lib/scoring.ts:95` (already written, just needs to be called at end of ingest)
+
+**Can start Tier 1 + Tier 2 immediately — no new API keys or approvals needed.**
+
+---
+
+### Agent 2 — Company Brief Creator
+
+Given any company or fund name, generates a structured intelligence brief combining AlleyCorp DB data and web research.
+
+**Brief includes:** Relationship to AlleyCorp (warmth tier, co-investment history), key people, recent funding, sector context, suggested action.
+
+**Data sources:** Existing MCP tools (`get_investor`, `get_warmth_signals`) + Serper.dev web search
+
+**Exposed as an MCP tool** (`generate_brief`) so Agent 3 can call it mid-conversation.
+
+**New files:** `lib/brief-agent.ts`, `app/api/brief/route.ts`, `mcp/tools/generate-brief.ts`
+
+---
+
+### Agent 3 — Chatbot (Extended)
+
+The existing MCP server and 4 tools are unchanged. This agent gains one new capability: it can call `generate_brief` mid-conversation when a user asks for a full company profile.
+
+**New files:** Update `mcp/tools/`, `mcp/server.ts`, `mcp/security/allowlist.ts` to register `generate_brief`
+
+---
+
+### Orchestrator
+
+Single entry point for all agent requests. Detects intent and routes — or chains agents for multi-step workflows.
+
+| Request | Route |
+|---|---|
+| "Who should we reconnect with?" | → Agent 3 (chatbot) |
+| "Generate a brief on General Catalyst" | → Agent 2 (brief) |
+| "Enrich this contact list" | → Agent 1 (enrichment) |
+| "Enrich these contacts then brief their companies" | → Agent 1 → Agent 2 |
+
+**New files:** `lib/orchestrator.ts`, `app/api/orchestrate/route.ts`
+
+---
+
+### Build Order
+
+1. Agent 1 — no new dependencies, can start Tier 1 + 2 now
+2. Agent 2 — needs DB live (Luba) + Serper.dev key approval
+3. Agent 3 extension — after Agent 2 `generate_brief` tool is built
+4. Orchestrator — after all three agents are individually tested
+
+---
+
+### Estimated Cost Per Run
+
+| Step | Cost |
+|---|---|
+| Tier 1 domain parsing | Free |
+| Tier 2 notes extraction (Claude) | ~$0.01 total |
+| Tier 3 web search (~500 personal emails) | ~$0.60 total |
+| Company briefs (on-demand) | ~$0.02 per brief |
+
+---
+
+### Open Questions — Team Must Approve Before Build
+
+| # | Question | Owner |
+|---|---|---|
+| 1 | Is web searching personal email addresses within AlleyCorp's data use policy? | Kabir |
+| 2 | Serper.dev API key — shared Railway variable or Yaasameen provisions independently? | Kabir |
+| 3 | Who reviews enriched contacts before they enter the DB? | Lauren |
+| 4 | Does Abe or Brannon have a fund brief template to mirror for Agent 2? | Abe / Brannon |
+| 5 | Should generated briefs be stored in the DB or produced on-demand each time? | Team |
+| 6 | Does the orchestrator become the new front door, or does the MCP server stay standalone? | Kabir |
 
 ---
 

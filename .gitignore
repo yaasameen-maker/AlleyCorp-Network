@@ -1,4 +1,17 @@
+# Environment
 .env
+.env.local
+.env.*.local
+
+# Node
+node_modules/
+*.tsbuildinfo
+
+# Next.js
+.next/
+out/
+
+# Python (legacy)
 __pycache__/
 *.pyc
 *.pyo
@@ -6,8 +19,7 @@ __pycache__/
 venv/
 *.egg-info/
 dist/
+
+# OS
 .DS_Store
-node_modules/
-.next/
-next-env.d.ts
-*.tsbuildinfo
+Thumbs.db

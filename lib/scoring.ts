@@ -13,16 +13,29 @@ export type { WarmthTier };
 export type ScoringSignalType =
   | "co_investment"
   | "event_attendance"
-  | "email_thread"       // Phase 2 — Kabir ~Jun 1
-  | "linkedin_activity"
+  | "press_mention"
+  | "email_thread"        // Phase 2 — Kabir ~Jun 1
+  | "linkedin_connection"
   | "manual_override";
+
+export type ConfidenceLabel = "high" | "medium" | "low";
+
+const CONFIDENCE_MAP: Record<ConfidenceLabel, number> = {
+  high:   1.0,
+  medium: 0.66,
+  low:    0.33,
+};
+
+export function toConfidenceScore(label: ConfidenceLabel): number {
+  return CONFIDENCE_MAP[label];
+}
 
 export interface ScoringSignal {
   type: ScoringSignalType;
   date: Date;
   source?: string;
   value?: string;
-  confidence: number;    // 0.0–1.0
+  confidence: number; // 0.0–1.0 — use toConfidenceScore() to convert from DB label
 }
 
 export interface ScoringRelationship {
@@ -59,11 +72,12 @@ const STALE_DAYS = 180; // 6 months without signal → Stale (weighted scorer)
 const COLD_DAYS  = 365; // 12 months → Cold (weighted scorer)
 
 const SIGNAL_WEIGHTS: Record<ScoringSignalType, number> = {
-  co_investment:    10,
-  event_attendance:  3,
-  email_thread:      2,
-  linkedin_activity: 1,
-  manual_override:   0,
+  co_investment:      10,
+  event_attendance:    4,  // Swoogo/Luma attendance is meaningful
+  press_mention:       2,  // news signal — same tier as email_thread
+  email_thread:        2,  // Kabir enrichment, Jun 1
+  linkedin_connection: 1,
+  manual_override:     0,
 };
 
 // Lauren-confirmed Hot calibration anchors — always Hot regardless of score
@@ -162,10 +176,13 @@ export function computeWarmthTier(rel: ScoringRelationship): WarmthTier {
   if (hasCoInvestment && daysSinceLastSignal > STALE_DAYS) return "Stale";
   if (daysSinceLastSignal > COLD_DAYS) return "Cold";
 
-  const score = rel.signals.reduce(
-    (sum, s) => sum + SIGNAL_WEIGHTS[s.type] * s.confidence,
-    0
-  );
+  const score = rel.signals.reduce((sum, s) => {
+    const conf =
+      typeof s.confidence === "string"
+        ? (CONFIDENCE_MAP[s.confidence as ConfidenceLabel] ?? 0.5)
+        : s.confidence;
+    return sum + SIGNAL_WEIGHTS[s.type] * conf;
+  }, 0);
 
   if (score >= 15) return "Hot";
   if (score >= 6) return "Warm";

@@ -1,4 +1,6 @@
-// TODO: implement events route
+import { getRecentSignals } from "@/lib/db";
+
 export async function GET() {
-  return Response.json({ error: "Not implemented" }, { status: 501 });
+  const events = await getRecentSignals(20);
+  return Response.json(events);
 }
