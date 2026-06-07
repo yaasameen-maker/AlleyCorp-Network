@@ -4,9 +4,9 @@
  * (numeric confidence 0.0–1.0) that lib/scoring.ts expects.
  */
 
-import { pool } from "./db.js";
-import type { RelationshipRepository, ScoringRelationship, ScoringSignal, ScoringSignalType } from "./scoring.js";
-import type { WarmthTier } from "./types.js";
+import { pool } from "./db";
+import type { RelationshipRepository, ScoringRelationship, ScoringSignal, ScoringSignalType } from "./scoring";
+import type { WarmthTier } from "./types";
 
 // ── Mappers ───────────────────────────────────────────────────────────────────
 
@@ -25,7 +25,7 @@ function signalTypeToScoring(t: string): ScoringSignalType | null {
     case "co_investment_recency": return "co_investment";
     case "event_attendance":      return "event_attendance";
     case "email_contact":         return "email_thread";
-    case "linkedin_connection":   return "linkedin_activity";
+    case "linkedin_connection":   return "linkedin_connection";
     case "press_mention":         return null; // press mentions don't contribute to score
     default:                      return null;
   }
@@ -53,7 +53,7 @@ async function loadRelationships(where?: string, params?: unknown[]): Promise<Sc
 
   if (relRows.length === 0) return [];
 
-  const ids = relRows.map((r) => r.id as string);
+  const ids = relRows.map((r: Record<string, unknown>) => r.id as string);
   const { rows: sigRows } = await pool.query(
     `SELECT relationship_id, signal_type, signal_date, confidence
      FROM signal
@@ -77,7 +77,7 @@ async function loadRelationships(where?: string, params?: unknown[]): Promise<Sc
     });
   }
 
-  return relRows.map((r) => ({
+  return relRows.map((r: Record<string, unknown>) => ({
     id: r.id as string,
     fundName: r.fund_name as string,
     warmthTier: toWarmthTier(r.warmth_tier as string),
