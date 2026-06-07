@@ -9,6 +9,14 @@
   --color-navy: #243352;
   --color-signal-green: #34d399;
   --color-signal-amber: #fbbf24;
+  /* Ask-the-network field: medium gray input, light gray submit (brand Mid Gray #666666) */
+  --color-field: #666666;
+  --color-field-text: #f0f2f5;
+  --color-field-placeholder: #b0bcc9;
+  --color-field-action: #e2e8f0;
+  --color-field-action-text: #111827;
+  /* Ask input — same family as active Dashboard (mist), slightly lighter */
+  --color-field-input: #2a3f62;
 }
 
 /* Dimmed page behind dialog sheets — adjust opacity/color here */
@@ -31,6 +39,27 @@
   background: var(--dialog-backdrop);
   backdrop-filter: blur(var(--dialog-backdrop-blur));
   -webkit-backdrop-filter: blur(var(--dialog-backdrop-blur));
+}
+
+/* Desktop: dim main content only — leave left nav undimmed */
+.dialog-scrim-main {
+  position: absolute;
+  inset: 0;
+  background: var(--dialog-backdrop);
+  backdrop-filter: blur(var(--dialog-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--dialog-backdrop-blur));
+}
+
+@media (min-width: 1024px) {
+  .dialog-scrim-main {
+    left: 14rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .dialog-scrim-main {
+    left: 16rem;
+  }
 }
 
 .dialog-panel {
@@ -58,9 +87,25 @@
   animation: dialog-in 0.28s cubic-bezier(0.32, 0.72, 0, 1) both;
 }
 
+@keyframes ask-pulldown {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-ask-pulldown {
+  animation: ask-pulldown 0.32s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
 html {
   color-scheme: dark;
   -webkit-tap-highlight-color: transparent;
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -274,6 +319,7 @@ body {
   .animate-sheet-up,
   .animate-backdrop-in,
   .animate-dialog-in,
+  .animate-ask-pulldown,
   .dialog-overlay,
   .animate-fade-in-up,
   .animate-scale-in,

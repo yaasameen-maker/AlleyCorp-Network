@@ -1,10 +1,24 @@
 "use client";
 
+import type { Investor, WarmthTier } from "@/app/data/mockData";
+import { AskNetworkNavPanel } from "./AskNetworkNavPanel";
+import { RelationshipsNavItem } from "./RelationshipsNavItem";
+
 export type AppView = "dashboard" | "digest" | "portfolio";
 
 interface AppSidebarProps {
   activeView: AppView;
   onNavigate: (view: AppView) => void;
+  investors: Investor[];
+  onSelectInvestor: (investor: Investor) => void;
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
+  filterTier: WarmthTier | "All";
+  onFilterTierChange: (tier: WarmthTier | "All") => void;
+  tierCounts: Record<WarmthTier | "All", number>;
+  filteredInvestors: Investor[];
+  totalCount: number;
+  selectedInvestorId?: string;
 }
 
 const NAV_ITEMS: { id: AppView; label: string; icon: React.ReactNode }[] = [
@@ -52,38 +66,74 @@ const NAV_ITEMS: { id: AppView; label: string; icon: React.ReactNode }[] = [
   },
 ];
 
-export function AppSidebar({ activeView, onNavigate }: AppSidebarProps) {
+export function AppSidebar({
+  activeView,
+  onNavigate,
+  investors,
+  onSelectInvestor,
+  searchQuery,
+  onSearchChange,
+  filterTier,
+  onFilterTierChange,
+  tierCounts,
+  filteredInvestors,
+  totalCount,
+  selectedInvestorId,
+}: AppSidebarProps) {
   return (
-    <aside className="hidden lg:flex lg:flex-col lg:w-56 xl:w-60 shrink-0 border-r border-line bg-paper min-h-[100dvh] sticky top-0">
-      <div className="px-5 py-6 border-b border-line">
+    <aside className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 shrink-0 border-r border-line bg-paper min-h-[100dvh] sticky top-0 relative z-[170]">
+      <div className="px-5 py-6 border-b border-line shrink-0">
         <p className="text-[11px] uppercase tracking-wider text-muted font-semibold">AlleyCorp</p>
         <h1 className="text-lg font-semibold tracking-tight text-ink mt-0.5">Investor Intelligence</h1>
       </div>
 
-      <nav className="flex-1 p-3 space-y-1" aria-label="Main navigation">
+      <nav className="flex-1 p-3 space-y-1 overflow-y-auto" aria-label="Main navigation">
         {NAV_ITEMS.map((item) => {
           const active = activeView === item.id;
           return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => onNavigate(item.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                active
-                  ? "bg-mist text-ink border border-line"
-                  : "text-muted hover:text-ink hover:bg-mist/50"
-              }`}
-            >
-              {item.icon}
-              {item.label}
-            </button>
+            <div key={item.id}>
+              <button
+                type="button"
+                onClick={() => onNavigate(item.id)}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                  active
+                    ? "bg-mist text-ink border border-line"
+                    : "text-muted hover:text-ink hover:bg-mist/50"
+                }`}
+              >
+                {item.icon}
+                {item.label}
+              </button>
+
+              {item.id === "portfolio" && (
+                <AskNetworkNavPanel
+                  investors={investors}
+                  onSelectInvestor={onSelectInvestor}
+                />
+              )}
+            </div>
           );
         })}
+
+        <div className="pt-1">
+          <RelationshipsNavItem
+            variant="sidebar"
+            filteredInvestors={filteredInvestors}
+            totalCount={totalCount}
+            searchQuery={searchQuery}
+            onSearchChange={onSearchChange}
+            filterTier={filterTier}
+            onFilterTierChange={onFilterTierChange}
+            tierCounts={tierCounts}
+            onSelectInvestor={onSelectInvestor}
+            selectedInvestorId={selectedInvestorId}
+          />
+        </div>
       </nav>
 
-      <div className="p-4 border-t border-line">
+      <div className="p-4 border-t border-line shrink-0">
         <p className="text-[11px] text-muted leading-relaxed">
-          Mobile · tablet · desktop — one experience
+          Open Relationships to browse the full investor list
         </p>
       </div>
     </aside>

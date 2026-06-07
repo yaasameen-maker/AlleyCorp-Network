@@ -7,22 +7,35 @@ interface DialogShellProps {
   onClose: () => void;
   children: ReactNode;
   ariaLabelledBy: string;
+  /** Use "above" when stacking on another dialog (e.g. profile over relationships list) */
+  stackLevel?: "default" | "above";
 }
 
 const DISMISS_THRESHOLD = 120;
+
+const STACK_Z = { default: "z-[200]", above: "z-[210]" } as const;
 
 /**
  * Full-screen dialog shell with dimmed page behind.
  * Rendered via portal on document.body so the scrim is not clipped by .app-shell.
  * Tune scrim darkness in globals.css → --dialog-backdrop
  */
-export function DialogShell({ onClose, children, ariaLabelledBy }: DialogShellProps) {
+export function DialogShell({
+  onClose,
+  children,
+  ariaLabelledBy,
+  stackLevel = "default",
+}: DialogShellProps) {
   const [ready, setReady] = useState(false);
   const [visible, setVisible] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
   const touchStartY = useRef<number | null>(null);
 
   useEffect(() => {
+    // Client-mount gate: portal targets document.body (absent during SSR), so we
+    // only render after mount. The synchronous setState is the intentional,
+    // canonical mount pattern here.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setReady(true);
     const frame = requestAnimationFrame(() => setVisible(true));
     document.body.style.overflow = "hidden";
@@ -52,12 +65,11 @@ export function DialogShell({ onClose, children, ariaLabelledBy }: DialogShellPr
 
   return createPortal(
     <div
-      className={`dialog-overlay fixed inset-0 z-[200] flex flex-col max-md:justify-end md:justify-center md:items-center ${
+      className={`dialog-overlay fixed inset-0 ${STACK_Z[stackLevel]} flex flex-col max-md:justify-end md:justify-center md:items-center ${
         visible ? "dialog-overlay--visible" : ""
       }`}
-      onClick={onClose}
     >
-      <div className="dialog-scrim absolute inset-0 z-0" aria-hidden />
+      <div className="dialog-scrim-main absolute inset-0 z-0" aria-hidden />
 
       <div
         role="dialog"
