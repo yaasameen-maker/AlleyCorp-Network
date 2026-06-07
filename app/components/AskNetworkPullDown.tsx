@@ -76,7 +76,7 @@ export function AskNetworkPullDown({
                 onFocus={clearResults}
                 placeholder="Ask about investors…"
                 autoFocus
-                className="w-full pl-4 pr-12 py-3.5 bg-mist border border-line rounded-2xl text-base text-ink placeholder-muted focus:outline-none focus:ring-2 focus:ring-ink/20"
+                className="w-full pl-4 pr-12 py-3.5 bg-field-input text-ink border-0 rounded-2xl text-base placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-ink/10"
               />
               {query ? (
                 <button
@@ -93,7 +93,7 @@ export function AskNetworkPullDown({
               <button
                 type="submit"
                 aria-label="Submit question"
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center justify-center w-9 h-9 rounded-xl bg-ink text-paper"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center justify-center w-9 h-9 rounded-xl bg-field-action text-field-action-text hover:bg-field-action/90"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />

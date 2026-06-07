@@ -65,6 +65,7 @@ export default function DashboardPage() {
   };
 
   const handleNavigate = (view: AppView) => {
+    setSelectedInvestor(null);
     setActiveView(view);
     if (view !== "dashboard") {
       setDigestOpen(false);
@@ -74,16 +75,18 @@ export default function DashboardPage() {
 
   const openDigest = () => {
     if (isDesktop) {
-      setActiveView("digest");
+      handleNavigate("digest");
     } else {
+      setSelectedInvestor(null);
       setDigestOpen(true);
     }
   };
 
   const openPortfolio = () => {
     if (isDesktop) {
-      setActiveView("portfolio");
+      handleNavigate("portfolio");
     } else {
+      setSelectedInvestor(null);
       setPortfolioOpen(true);
     }
   };
@@ -117,16 +120,16 @@ export default function DashboardPage() {
             ref={scrollRef}
             className="mobile-scroll flex-1 min-h-0 safe-x safe-bottom max-md:pb-[max(1rem,env(safe-area-inset-bottom))] lg:overflow-hidden lg:flex lg:flex-col"
           >
-            <div className="flex-1 lg:flex lg:min-h-0 lg:overflow-hidden">
-              <div className="flex-1 flex flex-col min-w-0 lg:overflow-hidden">
+            <div className="flex-1 lg:relative lg:min-h-0 lg:overflow-hidden">
+              <div className="flex-1 flex flex-col min-w-0 w-full h-full lg:overflow-hidden">
                 {activeView === "dashboard" && (
-                  <div className="flex-1 flex flex-col max-md:min-h-0 lg:overflow-y-auto">
+                  <div className="flex-1 flex flex-col max-md:min-h-0 lg:min-h-full lg:overflow-y-auto">
                     {loading ? (
                       <div className="flex-1 flex items-center justify-center px-4 py-12">
                         <p className="text-sm text-muted">Loading investors…</p>
                       </div>
                     ) : (
-                      <div className="flex-1 flex max-md:items-center max-md:justify-center max-md:py-8 max-md:pb-12 items-start lg:items-center justify-center px-4 py-6 md:px-6 md:py-8 lg:px-10 lg:py-10">
+                      <div className="flex-1 flex max-md:items-center max-md:justify-center max-md:py-8 max-md:pb-12 lg:min-h-full items-start lg:items-center justify-center px-4 py-6 md:px-6 md:py-8 lg:px-10 lg:py-10">
                         <div className="w-full max-w-4xl mx-auto max-md:shrink-0">
                           <StaleAlertsBanner
                             variant="hero"
@@ -157,7 +160,7 @@ export default function DashboardPage() {
               </div>
 
               {isDesktop && selectedInvestor && (
-                <aside className="hidden lg:flex lg:w-[min(28rem,32vw)] xl:w-[32rem] shrink-0 flex-col border-l border-line bg-mist min-h-0 relative z-[160]">
+                <aside className="hidden lg:flex lg:absolute lg:top-0 lg:right-0 lg:bottom-0 lg:w-[min(28rem,32vw)] xl:w-[32rem] flex-col border-l border-line bg-mist z-[160] shadow-2xl">
                   <InvestorProfileTransparency
                     investor={selectedInvestor}
                     initialTab={profileInitialTab}
