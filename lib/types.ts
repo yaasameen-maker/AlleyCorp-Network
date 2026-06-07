@@ -2,9 +2,11 @@ export type WarmthTier = "Hot" | "Warm" | "Stale" | "Cold";
 
 export type SignalType =
   | "co_investment"
+  | "co_investment_recency"
   | "event_attendance"
   | "linkedin_connection"
   | "press_mention"
+  | "email_contact"
   | "email_thread";
 
 export interface Fund {

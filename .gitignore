@@ -10,6 +10,7 @@ node_modules/
 # Next.js
 .next/
 out/
+next-env.d.ts
 
 # Raw data files from Lauren — contain PII (emails, names), never commit
 data/
