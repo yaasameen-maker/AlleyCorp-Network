@@ -1,4 +1,4 @@
-import type { WeeklyDigest } from "@/lib/digest";
+import type { WeeklyDigest } from "@/lib/digest-client";
 import { formatDataFreshness } from "@/lib/dates";
 
 interface DigestEmailHeaderProps {
@@ -16,7 +16,7 @@ export function DigestEmailHeader({ digest }: DigestEmailHeaderProps) {
       </h2>
       <p className="text-xs text-muted mt-2">{digest.preheader}</p>
       <p className="text-[11px] text-muted mt-1">
-        Generated {formatDataFreshness(digest.generatedAt)} · Read-only preview
+        Generated {formatDataFreshness(new Date(digest.generatedAt))} · Read-only preview
       </p>
     </header>
   );

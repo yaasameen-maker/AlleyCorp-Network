@@ -1,4 +1,4 @@
-import type { DigestItem } from "@/lib/digest";
+import type { DigestItem } from "@/lib/digest-client";
 
 interface DigestItemRowProps {
   item: DigestItem;

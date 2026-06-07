@@ -99,29 +99,13 @@ export async function searchRelationships(query: string): Promise<Relationship[]
 // Used by GET /api/investors to power the dashboard list view.
 export async function getAllRelationships(): Promise<Relationship[]> {
   const { rows } = await pool.query(
-    `${RELATIONSHIP_SELECT}
+    `${REL_SELECT}
+     GROUP BY r.id, f.id, pc.id
      ORDER BY
        CASE r.warmth_tier WHEN 'hot' THEN 1 WHEN 'warm' THEN 2 WHEN 'stale' THEN 3 WHEN 'cold' THEN 4 END,
        r.last_signal_date DESC NULLS LAST`
   );
-
-  if (rows.length === 0) return [];
-
-  // Load all signals in one query and attach to relationships
-  const ids = rows.map((r) => r.id as string);
-  const { rows: signalRows } = await pool.query(
-    `SELECT * FROM signal WHERE relationship_id = ANY($1) ORDER BY signal_date DESC`,
-    [ids]
-  );
-
-  const signalsByRelId = new Map<string, Signal[]>();
-  for (const s of signalRows) {
-    const rel = s.relationship_id as string;
-    if (!signalsByRelId.has(rel)) signalsByRelId.set(rel, []);
-    signalsByRelId.get(rel)!.push(toSignal(s));
-  }
-
-  return rows.map((row) => toRelationship(row, signalsByRelId.get(row.id as string) ?? []));
+  return rows as Relationship[];
 }
 
 // Return all stale relationships ordered oldest signal first (most at-risk first).

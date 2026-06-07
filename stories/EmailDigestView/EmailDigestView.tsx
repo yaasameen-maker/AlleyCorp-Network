@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { Investor } from "@/app/data/mockData";
-import { buildWeeklyDigest, formatDigestAsEmail } from "@/lib/digest";
+import { buildWeeklyDigest, formatDigestAsEmail } from "@/lib/digest-client";
 import { DigestSheet } from "./components/DigestSheet";
 import { DigestEmailHeader } from "./components/DigestEmailHeader";
 import { DigestSection } from "./components/DigestSection";

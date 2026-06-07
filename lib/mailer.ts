@@ -2,7 +2,15 @@ import { Resend } from "resend";
 import { generateDigest } from "./digest-server";
 import type { DigestItem } from "./types";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy init — Resend throws at construction if key is missing, which crashes
+// the Next.js build when it collects /api/digest page data. Initialise inside
+// sendDigest() so the key is only required at runtime, not build time.
+// (Yaasameen owns this file — touching only this line to unblock Railway build.)
+function getResend(): Resend {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) throw new Error("RESEND_API_KEY is not set");
+  return new Resend(key);
+}
 
 const FROM = process.env.DIGEST_FROM_EMAIL ?? "digest@alleycorp.vc";
 const TO   = process.env.DIGEST_RECIPIENT_EMAIL ?? "";
@@ -93,7 +101,7 @@ export async function sendDigest(): Promise<SendDigestResult> {
     day: "numeric",
   });
 
-  const { data, error } = await resend.emails.send({
+  const { data, error } = await getResend().emails.send({
     from: FROM,
     to: TO,
     subject: `${items.length} co-investor${items.length === 1 ? "" : "s"} need attention — ${date}`,
