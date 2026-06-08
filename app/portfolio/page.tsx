@@ -6,6 +6,7 @@
 import Link from "next/link";
 import { getAllRelationships, pool } from "../../lib/db";
 import { WarmthBadge } from "../components/InvestorRow";
+import { AskFAB } from "../components/AskFAB";
 import type { WarmthTier } from "../data/mockData";
 
 interface CoInvestorRow {
@@ -201,6 +202,7 @@ export default async function PortfolioPage() {
           );
         })}
       </div>
+      <AskFAB />
     </main>
   );
 }

@@ -111,19 +111,22 @@ export async function POST(req: Request): Promise<NextResponse<AskResponse>> {
       return NextResponse.json({ tool: null, query: "", answer: "Query required", cards: [] }, { status: 400 });
     }
 
-    // Turn 1 — Claude picks a tool
+    // Turn 1 — Claude decides whether to use a tool (auto) or answer directly
     const turn1 = await client.messages.create({
       model: "claude-sonnet-4-6",
       max_tokens: 512,
       tools: TOOLS,
-      tool_choice: { type: "any" },
+      tool_choice: { type: "auto" },
       system: SYSTEM,
       messages: [{ role: "user", content: query }],
     });
 
+    // If Claude answered directly (no tool needed — e.g. greetings, off-topic), return as-is
     const toolUse = turn1.content.find((b) => b.type === "tool_use");
     if (!toolUse || toolUse.type !== "tool_use") {
-      return NextResponse.json({ tool: null, query, answer: "Couldn't route that question — try rephrasing.", cards: [] });
+      const directAnswer = turn1.content.find((b) => b.type === "text");
+      const answer = directAnswer?.type === "text" ? directAnswer.text : "I can help with questions about AlleyCorp's co-investor network. Try asking about a specific fund or relationship.";
+      return NextResponse.json({ tool: null, query, answer, cards: [] });
     }
 
     const toolName = toolUse.name;
@@ -200,7 +203,7 @@ export async function POST(req: Request): Promise<NextResponse<AskResponse>> {
   } catch (err) {
     console.error("[POST /api/ask]", err);
     return NextResponse.json(
-      { tool: null, query: "", answer: "Something went wrong — check API key and DB connection.", cards: [], error: String(err) },
+      { tool: null, query: "", answer: "Something went wrong on our end — please try again.", cards: [], error: String(err) },
       { status: 500 }
     );
   }
