@@ -8,9 +8,14 @@ import { AlertCard } from "./components/AlertCard";
 export interface StaleAlertsBannerProps {
   investors: Investor[];
   onSelectInvestor: (investor: Investor) => void;
+  variant?: "default" | "hero";
 }
 
-export function StaleAlertsBanner({ investors, onSelectInvestor }: StaleAlertsBannerProps) {
+export function StaleAlertsBanner({
+  investors,
+  onSelectInvestor,
+  variant = "default",
+}: StaleAlertsBannerProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -57,21 +62,34 @@ export function StaleAlertsBanner({ investors, onSelectInvestor }: StaleAlertsBa
     );
   });
 
+  const isHero = variant === "hero";
+
   return (
     <section
-      className="mb-5 -mx-4 px-4 py-4 bg-navy/40 border-y border-line safe-x md:mx-0 md:rounded-2xl md:border lg:px-6 lg:mb-0 lg:mt-0"
+      className={`${
+        isHero
+          ? "w-full px-4 py-6 md:px-8 md:py-10 lg:px-10 lg:py-12 bg-gradient-to-b from-navy/50 to-paper/20 border border-line rounded-3xl"
+          : "mb-5 -mx-4 px-4 py-4 bg-navy/40 border-y border-line safe-x md:mx-0 md:rounded-2xl md:border lg:px-6 lg:mb-0 lg:mt-0"
+      }`}
       aria-label="Relationships needing attention"
     >
-      <div className="flex items-center justify-between mb-1">
+      <div className={`flex items-center justify-between ${isHero ? "mb-4" : "mb-1"}`}>
         <div>
-          <h2 className="text-sm font-semibold text-ink">Needs attention</h2>
-          <p className="text-xs text-muted mt-0.5">
+          <h2 className={`font-semibold text-ink ${isHero ? "text-xl md:text-2xl lg:text-3xl" : "text-sm"}`}>
+            Needs attention
+          </h2>
+          <p className={`text-muted mt-1 ${isHero ? "text-sm md:text-base" : "text-xs mt-0.5"}`}>
             {staleCount > 0 && `${staleCount} stale`}
             {staleCount > 0 && warmAtRiskCount > 0 && " · "}
             {warmAtRiskCount > 0 && `${warmAtRiskCount} warm at risk`}
+            {isHero && " — relationships that need a touchpoint soon"}
           </p>
         </div>
-        <span className="text-xs font-medium text-muted bg-paper/80 px-2.5 py-1 rounded-full">
+        <span
+          className={`font-medium text-muted bg-paper/80 rounded-full ${
+            isHero ? "text-sm px-3 py-1.5" : "text-xs px-2.5 py-1"
+          }`}
+        >
           {alerts.length}
         </span>
       </div>
@@ -117,7 +135,11 @@ export function StaleAlertsBanner({ investors, onSelectInvestor }: StaleAlertsBa
       </div>
 
       {/* Tablet + desktop: grid */}
-      <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div
+        className={`hidden md:grid gap-3 ${
+          isHero ? "md:grid-cols-2 xl:grid-cols-2" : "md:grid-cols-2 lg:grid-cols-4"
+        }`}
+      >
         {alertCards}
       </div>
     </section>

@@ -14,6 +14,7 @@ interface InvestorListSectionProps {
   tierCounts: Record<WarmthTier | "All", number>;
   selectedInvestorId?: string;
   onSelectInvestor: (investor: Investor) => void;
+  inModal?: boolean;
 }
 
 export function InvestorListSection({
@@ -26,15 +27,21 @@ export function InvestorListSection({
   tierCounts,
   selectedInvestorId,
   onSelectInvestor,
+  inModal = false,
 }: InvestorListSectionProps) {
+  const tableBreakpoint = inModal ? "md" : "lg";
+  const tabletCardsHide = inModal ? "xl:hidden" : "lg:hidden";
+
   return (
-    <section className="px-4 max-md:px-4 md:px-4 lg:px-6 py-4 max-md:py-3 lg:py-6">
-      <div className="mb-4 lg:mb-5">
-        <h2 className="text-sm font-semibold text-ink hidden lg:block">Relationships</h2>
-        <p className="text-xs text-muted mt-0.5 hidden lg:block">
-          Browse co-investor warmth across the network
-        </p>
-      </div>
+    <section className={inModal ? "px-4 py-4" : "px-4 max-md:px-4 md:px-4 lg:px-6 py-4 max-md:py-3 lg:py-6"}>
+      {!inModal && (
+        <div className="mb-4 lg:mb-5">
+          <h2 className="text-sm font-semibold text-ink hidden lg:block">Relationships</h2>
+          <p className="text-xs text-muted mt-0.5 hidden lg:block">
+            Browse co-investor warmth across the network
+          </p>
+        </div>
+      )}
 
       <div className="relative mb-4">
         <svg
@@ -61,7 +68,7 @@ export function InvestorListSection({
         />
       </div>
 
-      <div className="-mx-4 px-4 lg:mx-0 lg:px-0 mb-5 overflow-x-auto scrollbar-hide snap-scroll-x lg:overflow-visible">
+      <div className={`${inModal ? "" : "-mx-4 px-4 lg:mx-0 lg:px-0"} mb-5 overflow-x-auto scrollbar-hide snap-scroll-x lg:overflow-visible`}>
         <div className="flex gap-2 min-w-max lg:flex-wrap lg:min-w-0 pb-1">
           {(["All", "Hot", "Warm", "Cold", "Stale"] as const).map((tier) => (
             <button
@@ -84,7 +91,7 @@ export function InvestorListSection({
         {filteredInvestors.length} of {totalCount} relationships
       </p>
 
-      <div className="hidden lg:block border border-line rounded-2xl overflow-hidden bg-mist/30">
+      <div className={`${tableBreakpoint === "md" ? "hidden md:block" : "hidden lg:block"} border border-line rounded-2xl overflow-hidden bg-mist/30`}>
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-navy text-left text-paper">
@@ -153,7 +160,7 @@ export function InvestorListSection({
       </div>
 
       {/* Tablet: two columns */}
-      <div className="hidden md:grid md:grid-cols-2 md:gap-3 lg:hidden">
+      <div className={`hidden md:grid md:grid-cols-2 md:gap-3 ${tabletCardsHide}`}>
         {filteredInvestors.map((investor) => (
           <InvestorCard
             key={investor.id}

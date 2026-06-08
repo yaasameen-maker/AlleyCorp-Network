@@ -7,6 +7,8 @@
 
 **June 1 update:** Midpoint gate cleared. DB schema live locally, all 4 warmth tiers seeded, 5/5 acceptance tests passing. Critical path now moves to Neon provisioning + frontend wire-up.
 
+**June 6 update:** Railway (not Neon) provisioned and live. Frontend fully wired to real DB. All API routes implemented. 5/5 acceptance tests passing on Railway. Remaining work: co-investor research for all 17 companies + data QA before June 11 office visit.
+
 **⚠️ New constraint:** AlleyCorp office visit June 11. Need working product with real data by June 10. Weeks 3–4 replanned accordingly.
 
 ---
@@ -15,30 +17,38 @@
 
 | Component | Status | Owner |
 |---|---|---|
-| MCP server (`mcp/server.ts`) + 4 tool handlers | Complete | Yaasameen |
-| 4-layer security (allowlist, tokens, network, sandbox) | Complete | Yaasameen |
-| Acceptance test suite — 5 Demo Day prompts (`scripts/acceptance-test.ts`) | Complete | Yaasameen |
-| `lib/types.ts` — all entity + view model types | Complete | Yaasameen |
-| `lib/scoring.ts` — warmth engine, confidence mapping, Swoogo/Luma/news weights | Complete | Yaasameen |
-| `lib/db.ts` — all 5 SQL query functions, Railway pool config | Complete | Yaasameen |
-| `lib/digest.ts` — generates `DigestItem[]` from stale relationships | Complete | Yaasameen |
-| `lib/mailer.ts` — Resend send, HTML email template, authenticated deep-links | Complete | Yaasameen |
-| `GET /api/alerts` — stale relationships endpoint | Complete | Yaasameen |
-| `GET /api/events` — recent signals endpoint | Complete | Yaasameen |
-| `POST /api/digest` — bearer-gated cron trigger | Complete | Yaasameen |
-| `next.config.ts` — `serverExternalPackages: ["pg"]` Railway build fix | Complete | Yaasameen |
-| `tsconfig.json` — `types: ["node"]` | Complete | Yaasameen |
-| `data/.gitkeep` — MCP Layer 4 sandbox directory | Complete | Yaasameen |
-| `.env.example`, `middleware.ts`, `package.json` | Complete | Yaasameen |
+| MCP server (`mcp/server.ts`) + 4 tool handlers | ✅ Complete | Yaasameen |
+| 4-layer security (allowlist, tokens, network, sandbox) | ✅ Complete | Yaasameen |
+| Acceptance test suite — 5 Demo Day prompts (`scripts/acceptance-test.ts`) | ✅ Complete | Yaasameen |
+| `lib/types.ts` — all entity + view model types | ✅ Complete | Yaasameen |
+| `lib/scoring.ts` — warmth engine, confidence mapping | ✅ Complete | Yaasameen |
+| `lib/db.ts` — all SQL query functions, Railway pool config | ✅ Complete | Yaasameen + Luba |
+| `lib/digest.ts` — generates `DigestItem[]` from stale relationships | ✅ Complete | Yaasameen |
+| `lib/mailer.ts` — Resend send, HTML email template | ✅ Complete | Yaasameen |
+| `GET /api/alerts` — stale relationships endpoint | ✅ Complete | Luba / Yaasameen |
+| `GET /api/events` — recent signals endpoint | ✅ Complete | Yaasameen |
+| `POST /api/digest` — bearer-gated cron trigger | ✅ Complete | Yaasameen |
+| `next.config.ts` — `serverExternalPackages: ["pg"]` Railway build fix | ✅ Complete | Luba |
+| `.env.example`, `middleware.ts`, `package.json` | ✅ Complete | Yaasameen |
+| PostgreSQL schema (`seed.sql`) — 5 tables | ✅ Complete | Luba |
+| Data seeding — all 4 warmth tiers, 17 active + 3 alumni companies | ✅ Complete | Luba |
+| Hot anchors: Riot, Snowpoint, General Catalyst, Mach33, SOSV | ✅ Complete | Luba |
+| Cold targets: a16z American Dynamism, Eclipse, Founders Fund | ✅ Complete | Luba |
+| Frontend scaffold — investor list, warmth tier pills | ✅ Complete | Michael |
+| Full frontend integration (all story components wired) | ✅ Complete | Michael + Luba |
+| Desktop scroll, pg build error, profile panel fixes | ✅ Complete | Luba |
 
-## What Is Not Done (as of June 3)
+## Status as of June 6
 
-| Component | Status | Blocked By |
+| Component | Status | Owner |
 |---|---|---|
-| PostgreSQL schema + migrations | Not started | Luba |
-| Data seeding (Lux Capital, anchors, 20 companies) | Not started | Luba |
-| Frontend — `app/page.tsx`, `app/layout.tsx`, investor list, profile card | Not started | Michael |
-| Acceptance tests passing (`npm run test:acceptance`) | Blocked | Luba's schema + seed data |
+| Railway PostgreSQL (replaced Neon) | ✅ Live | Luba |
+| Frontend wired to real DB (`GET /api/investors`) | ✅ Done | Luba |
+| 5/5 acceptance tests passing on Railway | ✅ Done | Luba + Yaasameen |
+| Portfolio companies match Lauren's confirmed list | ✅ Verified June 6 | Luba |
+| Full co-investor research (all 17 companies) | 🔄 In progress | Luba |
+| Final data QA vs acceptance tests | 🔄 In progress | Luba |
+| Resend email (digest send) | ⏳ Not started | Yaasameen |
 
 ---
 
