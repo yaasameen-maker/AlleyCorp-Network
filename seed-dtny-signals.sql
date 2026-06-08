@@ -5,13 +5,14 @@
 
 BEGIN;
 
--- USV has no relationship row yet — create one (cold, no co-investment)
+-- USV has no relationship row yet — create one.
+-- warmth_tier = 'stale': 1 active signal (DTNY event attendance) per scoring rules (1 signal → Stale).
 INSERT INTO relationship (id, fund_id, portfolio_company_id, warmth_tier, last_signal_date, created_at, updated_at)
 VALUES (
   gen_random_uuid(),
   (SELECT id FROM fund WHERE name = 'Union Square Ventures'),
   (SELECT id FROM portfolio_company WHERE name = 'Glacier'),
-  'cold',
+  'stale',
   '2026-01-28',
   now(), now()
 );
@@ -23,7 +24,7 @@ VALUES (
   (SELECT r.id FROM relationship r JOIN fund f ON f.id = r.fund_id WHERE f.name = 'Riot Ventures' LIMIT 1),
   'event_attendance',
   '2026-01-28',
-  'DTNY — Deep Tech New York',
+  'DTNY: Deep Tech New York',
   'Nolan Van Nortwick (Principal) attended AlleyCorp DTNY event',
   'medium',
   'confirmed',
@@ -37,7 +38,7 @@ VALUES (
   (SELECT r.id FROM relationship r JOIN fund f ON f.id = r.fund_id WHERE f.name = 'BOLD Capital Partners' LIMIT 1),
   'event_attendance',
   '2026-01-28',
-  'DTNY — Deep Tech New York',
+  'DTNY: Deep Tech New York',
   'Will Borthwick (Partner) attended AlleyCorp DTNY event',
   'medium',
   'confirmed',
@@ -51,7 +52,7 @@ VALUES (
   (SELECT r.id FROM relationship r JOIN fund f ON f.id = r.fund_id WHERE f.name = 'Eclipse Ventures' LIMIT 1),
   'event_attendance',
   '2026-01-28',
-  'DTNY — Deep Tech New York',
+  'DTNY: Deep Tech New York',
   'Gareth Kaczkowski (Investor) attended AlleyCorp DTNY event',
   'medium',
   'confirmed',
@@ -65,7 +66,7 @@ VALUES (
   (SELECT r.id FROM relationship r JOIN fund f ON f.id = r.fund_id WHERE f.name = 'ff Venture Capital' LIMIT 1),
   'event_attendance',
   '2026-01-28',
-  'DTNY — Deep Tech New York',
+  'DTNY: Deep Tech New York',
   'Oliver Mitchell (Partner) attended AlleyCorp DTNY event',
   'medium',
   'confirmed',
@@ -79,7 +80,7 @@ VALUES (
   (SELECT r.id FROM relationship r JOIN fund f ON f.id = r.fund_id WHERE f.name = 'Union Square Ventures' LIMIT 1),
   'event_attendance',
   '2026-01-28',
-  'DTNY — Deep Tech New York',
+  'DTNY: Deep Tech New York',
   'Nikhil Raman (Investor) attended AlleyCorp DTNY event',
   'medium',
   'confirmed',
@@ -93,7 +94,7 @@ VALUES (
   (SELECT r.id FROM relationship r JOIN fund f ON f.id = r.fund_id WHERE f.name = 'a16z American Dynamism' LIMIT 1),
   'event_attendance',
   '2026-01-28',
-  'DTNY — Deep Tech New York',
+  'DTNY: Deep Tech New York',
   'Will Bitsky (Partner) attended AlleyCorp DTNY event',
   'medium',
   'confirmed',
@@ -107,7 +108,7 @@ VALUES (
   (SELECT r.id FROM relationship r JOIN fund f ON f.id = r.fund_id WHERE f.name = 'Mach33' LIMIT 1),
   'event_attendance',
   '2026-01-28',
-  'DTNY — Deep Tech New York',
+  'DTNY: Deep Tech New York',
   'Aaron Burnett (CEO) attended AlleyCorp DTNY event',
   'medium',
   'confirmed',

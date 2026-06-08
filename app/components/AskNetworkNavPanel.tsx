@@ -87,7 +87,7 @@ export function AskNetworkNavPanel({
             onClick={() => submitQuery(quickQueries.hotspots)}
             className="touch-press w-full text-left px-3 py-2 rounded-lg border border-line bg-paper text-xs text-muted hover:text-ink disabled:opacity-50"
           >
-            Hotspots — warmest co-investors
+            Hotspots: warmest co-investors
           </button>
         </div>
       </form>

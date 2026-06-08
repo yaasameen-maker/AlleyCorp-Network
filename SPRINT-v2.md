@@ -38,7 +38,7 @@
 | Full frontend integration (all story components wired) | ✅ Complete | Michael + Luba |
 | Desktop scroll, pg build error, profile panel fixes | ✅ Complete | Luba |
 
-## Status as of June 6
+## Status as of June 8
 
 | Component | Status | Owner |
 |---|---|---|
@@ -46,9 +46,47 @@
 | Frontend wired to real DB (`GET /api/investors`) | ✅ Done | Luba |
 | 5/5 acceptance tests passing on Railway | ✅ Done | Luba + Yaasameen |
 | Portfolio companies match Lauren's confirmed list | ✅ Verified June 6 | Luba |
+| Full-width dashboard, hero card, filter chips, FAB | ✅ Done | Luba |
+| Brand design pass (brand-line, card-lift, Inter font, aurora) | ✅ Done | Luba |
+| Ask panel (conversation history, quick prompts, tool routing) | ✅ Done | Luba |
+| Light mode / dark mode toggle | ✅ Done | Luba |
+| AlleyCorp logo in header | ✅ Done | Luba |
+| Hero clickability (strongest, reconnect, network health) | ✅ Done | Luba |
+| Co-investment date bug fix (was using event date, now uses co_investment signal date) | ✅ Done | Luba |
+| USV / Eclipse / a16z DTNY data accuracy fixes | ✅ Done | Luba |
 | Full co-investor research (all 17 companies) | 🔄 In progress | Luba |
 | Final data QA vs acceptance tests | 🔄 In progress | Luba |
 | Resend email (digest send) | ⏳ Not started | Yaasameen |
+
+---
+
+## June 9 — Tomorrow's Work (Luba)
+
+### 1. Clearbit Enrichment — Fund websites + logos
+- Sign up for Clearbit (or use the free Logo API at `logo.clearbit.com/{domain}`)
+- Write `scripts/enrich-funds.ts`: query Clearbit Enrichment API by fund name, write `website` + `logo_url` back to the `fund` table
+- Script must be idempotent (skip funds that already have data)
+- Add `logo_url TEXT` column to `fund` table in `schema.sql` if not present
+- Display logo in `ProfileDrawer` header and investor row
+- Re-runnable whenever new funds are added — no manual entry needed
+
+### 2. Portfolio page — clickable co-investor rows
+- Create `PortfolioCoInvestorRow` client component
+- On click: fetch that fund's investor data, open `ProfileDrawer`
+- Same experience as clicking a row on the main dashboard
+- Portfolio page stays a server component — only the row becomes a client island
+
+### 3. Context-aware AI — investor profile
+- Add "Ask AI" button to `ProfileDrawer` (no emoji, brand-consistent label)
+- Pass the open investor as context to `AskPanel` — Claude already knows who Abe is looking at
+- Pre-loaded starter prompts scoped to the investor:
+  - "How should we strengthen this relationship?"
+  - "Why is this relationship considered Stale?" (label adapts to actual tier)
+  - "What is the best next action?"
+  - "What evidence supports this score?"
+  - "How does this investor connect to our portfolio?"
+- Technical shape: `AskPanel` gets optional `context: { type: "investor", entity: Investor, starterPrompts: string[] }` prop — context is prepended into the system prompt, no new API endpoints needed
+- Stretch (if time): same pattern for portfolio company page ("Which investors are connected to this company?", "Who should we introduce?")
 
 ---
 

@@ -108,7 +108,7 @@ export default async function PortfolioPage() {
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Dashboard
+            Home
           </Link>
           <div className="w-px h-5 bg-[#EAECEF]" aria-hidden />
           <div>
@@ -128,7 +128,7 @@ export default async function PortfolioPage() {
       {/* ── Context note ── */}
       <div className="max-w-5xl mx-auto px-8 pt-4 pb-1">
         <p className="text-xs text-[#9CA3AF] leading-relaxed">
-          AlleyCorp Deep Tech portfolio — {companies.length} companies total.
+          AlleyCorp Deep Tech portfolio. {companies.length} companies total.
           Each card shows the funds that co-invested alongside AlleyCorp and the current warmth of that relationship.
           {companies.length - withCoInvestors.length > 0 && (
             <> {companies.length - withCoInvestors.length} companies have no co-investor data recorded yet.</>
@@ -193,7 +193,7 @@ export default async function PortfolioPage() {
                     >
                       <p className="text-sm text-[#374151] group-hover:text-[#0EA5D6] transition-colors duration-150">{ci.fundName}</p>
                       <WarmthBadge tier={ci.warmthTier} />
-                      <p className="text-xs text-[#9CA3AF]">{ci.date || "—"}</p>
+                      <p className="text-xs text-[#9CA3AF]">{ci.date || ""}</p>
                     </div>
                   ))}
                 </>

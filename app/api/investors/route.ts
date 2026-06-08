@@ -77,7 +77,7 @@ function getSuggestedAction(r: Relationship): string {
     case "Warm":
       return `${fund} relationship is warm but cooling. Schedule a touchpoint in the next 30 days.`;
     case "Stale":
-      return `${fund} has gone quiet. Last signal over 18 months ago — reconnect before they lead a round without us.`;
+      return `${fund} has gone quiet. Last signal over 18 months ago. Reconnect before they lead a round without us.`;
     case "Cold":
       return `No co-investment history with ${fund}. Research and explore intro opportunities via existing Hot relationships.`;
   }
@@ -92,22 +92,30 @@ function groupByFund(relationships: Relationship[]): FrontendInvestor[] {
     const fundId = r.fundId;
     const existing = map.get(fundId);
 
-    const coInvestment: FrontendCoInvestment | null = r.portfolioCompany
-      ? {
-          portfolioCompany: {
-            id: r.portfolioCompany.id,
-            name: r.portfolioCompany.name,
-            url: r.portfolioCompany.website ?? "",
-          },
-          round: "Co-investment",
-          date: formatDate(r.lastSignalDate),
-          fundParticipated: r.warmthTier !== "Cold",
-        }
-      : null;
+    // Only show a co-investment if there's an actual co_investment signal.
+    // Using last_signal_date was wrong — it could be an event attendance date.
+    const coInvestSignals = (r.signals ?? [])
+      .filter((s) => s.type === "co_investment" || s.type === "co_investment_recency")
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    const latestCoInvest = coInvestSignals[0];
+
+    const coInvestment: FrontendCoInvestment | null =
+      r.portfolioCompany && latestCoInvest
+        ? {
+            portfolioCompany: {
+              id: r.portfolioCompany.id,
+              name: r.portfolioCompany.name,
+              url: r.portfolioCompany.website ?? "",
+            },
+            round: "Co-investment",
+            date: formatDate(latestCoInvest.date),
+            fundParticipated: true,
+          }
+        : null;
 
     const signals: FrontendSignal[] = (r.signals ?? []).map((s) => ({
       type: mapSignalType(s.type),
-      description: s.value ? `${s.source} — ${s.value}` : s.source,
+      description: s.value ? `${s.source}: ${s.value}` : s.source,
       date: formatDate(s.date),
       weight: capitalize(s.weight),
     }));

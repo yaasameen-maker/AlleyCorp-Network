@@ -66,7 +66,7 @@ function RelationshipSummary({ investor }: { investor: Investor }) {
             <p className="text-sm text-[#374151] leading-relaxed">
               Co-investor relationship established through{" "}
               <span className="font-medium text-[#0D1320]">{companyNames.join(" and ")}</span>
-              {" "}— the foundation is there but contact has lapsed.
+              {", "}the foundation is there but contact has lapsed.
             </p>
           </div>
         )}
@@ -78,7 +78,7 @@ function RelationshipSummary({ investor }: { investor: Investor }) {
               <span className="font-medium text-[#0D1320]">
                 {latestSignal ? `${signalLabel(latestSignal.type).toLowerCase()} (${investor.lastSignalDate})` : investor.lastSignalDate}
               </span>
-              {" "}— no touchpoint since.
+              {". "}No touchpoint since.
             </p>
           </div>
         )}

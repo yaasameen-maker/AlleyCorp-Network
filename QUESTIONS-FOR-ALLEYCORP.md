@@ -37,6 +37,9 @@ We have 3 alumni companies (Aescape, Spaero Bio, Dexai Robotics) in the DB. Shou
 **Q8 — Warmth tier: who decides "stale" threshold?**  
 Currently: <12mo signal → hot, 12-24mo → warm, 24mo+ → stale. Does this match how AlleyCorp thinks about relationship decay? Some deep tech funds move slower — is 24 months too aggressive for "stale"?
 
+**Q8b — Event-only attendance: Cold or Stale?**  
+Example: Union Square Ventures attended DTNY in January 2026 but has no co-investment history with AlleyCorp. The scoring rules say 1 active signal = Stale, but Stale normally implies a relationship that *used to be warm and lapsed*. Should a fund with zero co-investment history that only attended one event be shown as Cold (no real relationship yet) or Stale (they engaged once)? The answer will set the rule for all similar accounts — BOLD Capital Partners, ff Venture Capital, a16z American Dynamism, and others who appear only from DTNY attendance.
+
 ---
 
 ## Demo Day

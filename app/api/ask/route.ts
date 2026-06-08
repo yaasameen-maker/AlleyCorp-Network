@@ -17,7 +17,7 @@ const TOOLS: Anthropic.Tool[] = [
   {
     name: "list_stale_relationships",
     description:
-      "Returns all co-investors currently in the Stale warmth tier — funds that co-invested with AlleyCorp but whose signals have decayed. Use this when asked about relationships that need attention, reconnection, or risk being lost.",
+      "Returns all co-investors currently in the Stale warmth tier. These are funds that co-invested with AlleyCorp but whose signals have decayed. Use this when asked about relationships that need attention, reconnection, or risk being lost.",
     input_schema: { type: "object" as const, properties: {}, required: [] },
   },
   {
@@ -29,7 +29,7 @@ const TOOLS: Anthropic.Tool[] = [
       properties: {
         query: {
           type: "string",
-          description: "Search term — warmth tier (Hot/Warm/Stale/Cold), fund name, or portfolio company",
+          description: "Search term: warmth tier (Hot/Warm/Stale/Cold), fund name, or portfolio company",
         },
       },
       required: ["query"],
@@ -74,8 +74,8 @@ function relToCard(r: Relationship) {
     suggestedAction: {
       Hot: "Active co-investor — prioritize for next round or event invite.",
       Warm: "Warming relationship — schedule a touchpoint in the next 30 days.",
-      Stale: "Relationship has lapsed — reconnect before they lead a round without you.",
-      Cold: "No prior co-investment — identify a warm intro path.",
+      Stale: "Relationship has lapsed. Reconnect before they lead a round without you.",
+      Cold: "No prior co-investment. Identify a warm intro path.",
     }[toWarmthTier(r.warmthTier)],
   };
 }
@@ -100,9 +100,21 @@ export interface AskResponse {
 
 const SYSTEM =
   "You are Abe's AI advisor for AlleyCorp's co-investor relationship intelligence platform. " +
-  "AlleyCorp is a deep tech venture firm. Today is June 2026. " +
-  "Use the provided tools to look up live data, then write a concise, direct answer as if briefing a partner before a meeting. " +
-  "Be specific — name funds, companies, dates. No filler. 2–5 sentences max unless the user asks for more detail.";
+  "AlleyCorp is a deep tech venture firm. Today is June 2026.\n\n" +
+  "FORMATTING RULES - follow exactly, no exceptions:\n" +
+  "- No markdown. No asterisks, no bold (**), no underscores, no hyphens as dividers (---).\n" +
+  "- No em dashes. Use a comma or period instead.\n" +
+  "- Use plain section labels on their own line in ALL CAPS: RECOMMENDATIONS, RATIONALE, SUGGESTED ACTIONS.\n" +
+  "- Bullet points: start each item with a hyphen and space (- ), one item per line.\n" +
+  "- For network and relationship questions use this exact structure:\n" +
+  "  RECOMMENDATIONS\n" +
+  "  - Fund name: reason, evidence (last contact date, signal count, co-investment)\n" +
+  "  RATIONALE\n" +
+  "  One or two sentences on the overall pattern.\n" +
+  "  SUGGESTED ACTIONS\n" +
+  "  - Concrete next step\n\n" +
+  "For non-network questions (greetings, general VC questions): respond conversationally, no sections.\n\n" +
+  "Always be specific: names, dates, signal counts. No filler. Keep it tight.";
 
 export async function POST(req: Request): Promise<NextResponse<AskResponse>> {
   try {
@@ -122,60 +134,72 @@ export async function POST(req: Request): Promise<NextResponse<AskResponse>> {
     });
 
     // If Claude answered directly (no tool needed — e.g. greetings, off-topic), return as-is
-    const toolUse = turn1.content.find((b) => b.type === "tool_use");
-    if (!toolUse || toolUse.type !== "tool_use") {
+    const toolUseBlocks = turn1.content.filter(
+      (b): b is Anthropic.ToolUseBlock => b.type === "tool_use"
+    );
+    if (toolUseBlocks.length === 0) {
       const directAnswer = turn1.content.find((b) => b.type === "text");
       const answer = directAnswer?.type === "text" ? directAnswer.text : "I can help with questions about AlleyCorp's co-investor network. Try asking about a specific fund or relationship.";
       return NextResponse.json({ tool: null, query, answer, cards: [] });
     }
 
-    const toolName = toolUse.name;
-    const toolInput = toolUse.input as Record<string, string>;
+    // Execute every tool Claude called (it may call more than one in parallel)
+    // and collect a tool_result for each so Turn 2 doesn't get a 400.
+    const allRelationships: Relationship[] = [];
+    const toolResults: Anthropic.ToolResultBlockParam[] = [];
+    let primaryToolName = toolUseBlocks[0].name;
 
-    // Execute the tool against the DB
-    let relationships: Relationship[] = [];
-    let toolResultText = "";
+    for (const toolUse of toolUseBlocks) {
+      const toolName = toolUse.name;
+      const toolInput = toolUse.input as Record<string, string>;
+      let relationships: Relationship[] = [];
+      let toolResultText = "";
 
-    if (toolName === "list_stale_relationships") {
-      relationships = await listStaleRelationships();
-      toolResultText = relationships.length === 0
-        ? "No stale relationships found."
-        : relationships.map((r) => {
-            const fund = r.fund?.name ?? "Unknown";
-            const company = r.portfolioCompany?.name ?? "Unknown";
-            const date = r.lastSignalDate ? formatDate(r.lastSignalDate) : "unknown date";
-            const signals = r.signals?.length ?? 0;
-            return `${fund} | last signal: ${date} | co-invested in: ${company} | signals: ${signals}`;
-          }).join("\n");
-    } else if (toolName === "search_relationships") {
-      relationships = await searchRelationships(toolInput.query ?? query);
-      toolResultText = relationships.length === 0
-        ? `No results for "${toolInput.query ?? query}".`
-        : relationships.map((r) => {
-            const fund = r.fund?.name ?? "Unknown";
-            const company = r.portfolioCompany?.name ?? "Unknown";
-            const signals = r.signals?.length ?? 0;
-            return `${fund} | warmth: ${r.warmthTier} | co-invested in: ${company} | signals: ${signals}`;
-          }).join("\n");
-    } else if (toolName === "get_investor") {
-      const rel = await getInvestorByName(toolInput.name ?? query);
-      if (rel) {
-        relationships = [rel];
-        const signals = (rel.signals ?? []).map((s) => `${s.type} — ${s.source} (${s.date})`).join("; ");
-        toolResultText = [
-          `Fund: ${rel.fund?.name}`,
-          `Warmth: ${rel.warmthTier}`,
-          `Co-invested in: ${rel.portfolioCompany?.name ?? "N/A"}`,
-          `Last signal: ${formatDate(rel.lastSignalDate)}`,
-          `Signal history: ${signals || "none"}`,
-        ].join("\n");
-      } else {
-        toolResultText = `No fund found matching "${toolInput.name ?? query}".`;
+      if (toolName === "list_stale_relationships") {
+        relationships = await listStaleRelationships();
+        toolResultText = relationships.length === 0
+          ? "No stale relationships found."
+          : relationships.map((r) => {
+              const fund = r.fund?.name ?? "Unknown";
+              const company = r.portfolioCompany?.name ?? "Unknown";
+              const date = r.lastSignalDate ? formatDate(r.lastSignalDate) : "unknown date";
+              const signals = r.signals?.length ?? 0;
+              return `${fund} | last signal: ${date} | co-invested in: ${company} | signals: ${signals}`;
+            }).join("\n");
+      } else if (toolName === "search_relationships") {
+        relationships = await searchRelationships(toolInput.query ?? query);
+        toolResultText = relationships.length === 0
+          ? `No results for "${toolInput.query ?? query}".`
+          : relationships.map((r) => {
+              const fund = r.fund?.name ?? "Unknown";
+              const company = r.portfolioCompany?.name ?? "Unknown";
+              const signals = r.signals?.length ?? 0;
+              return `${fund} | warmth: ${r.warmthTier} | co-invested in: ${company} | signals: ${signals}`;
+            }).join("\n");
+      } else if (toolName === "get_investor") {
+        const rel = await getInvestorByName(toolInput.name ?? query);
+        if (rel) {
+          relationships = [rel];
+          const signals = (rel.signals ?? []).map((s) => `${s.type}: ${s.source} (${s.date})`).join("; ");
+          toolResultText = [
+            `Fund: ${rel.fund?.name}`,
+            `Warmth: ${rel.warmthTier}`,
+            `Co-invested in: ${rel.portfolioCompany?.name ?? "N/A"}`,
+            `Last signal: ${formatDate(rel.lastSignalDate)}`,
+            `Signal history: ${signals || "none"}`,
+          ].join("\n");
+        } else {
+          toolResultText = `No fund found matching "${toolInput.name ?? query}".`;
+        }
       }
+
+      allRelationships.push(...relationships);
+      toolResults.push({ type: "tool_result", tool_use_id: toolUse.id, content: toolResultText });
     }
 
-    // Turn 2 — Claude reads the tool result and writes the answer
-    // tools must be included in every turn; tool_choice omitted so Claude responds with text
+    primaryToolName = toolUseBlocks[0].name;
+
+    // Turn 2 — provide a tool_result for every tool_use Claude made, then get the answer
     const turn2 = await client.messages.create({
       model: "claude-sonnet-4-6",
       max_tokens: 1024,
@@ -184,10 +208,7 @@ export async function POST(req: Request): Promise<NextResponse<AskResponse>> {
       messages: [
         { role: "user", content: query },
         { role: "assistant", content: turn1.content },
-        {
-          role: "user",
-          content: [{ type: "tool_result", tool_use_id: toolUse.id, content: toolResultText }],
-        },
+        { role: "user", content: toolResults },
       ],
     });
 
@@ -195,15 +216,15 @@ export async function POST(req: Request): Promise<NextResponse<AskResponse>> {
     const answer = answerBlock?.type === "text" ? answerBlock.text : "No answer generated.";
 
     return NextResponse.json({
-      tool: toolName,
+      tool: primaryToolName,
       query,
       answer,
-      cards: relationships.map(relToCard),
+      cards: allRelationships.map(relToCard),
     });
   } catch (err) {
     console.error("[POST /api/ask]", err);
     return NextResponse.json(
-      { tool: null, query: "", answer: "Something went wrong on our end — please try again.", cards: [], error: String(err) },
+      { tool: null, query: "", answer: "Something went wrong. Please try again.", cards: [], error: String(err) },
       { status: 500 }
     );
   }

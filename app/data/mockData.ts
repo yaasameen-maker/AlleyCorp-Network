@@ -130,7 +130,7 @@ export const mockInvestors: Investor[] = [
     warmthTier: "Hot",
     lastSignalDate: "Apr 2025",
     suggestedAction:
-      "Co-led Portal Space Systems Seed (Apr 2025). Top space tech fund — keep warm ahead of Series A.",
+      "Co-led Portal Space Systems Seed (Apr 2025). Top space tech fund. Keep warm ahead of Series A.",
     signals: [
       {
         type: "co-investment",
@@ -186,7 +186,7 @@ export const mockInvestors: Investor[] = [
     warmthTier: "Stale",
     lastSignalDate: "Sep 2022",
     suggestedAction:
-      "Co-invested at Civ Robotics Seed (Sep 2022) but did not return for Series A (Jul 2025). 44 months of silence — relationship at risk. Outreach recommended before Series B.",
+      "Co-invested at Civ Robotics Seed (Sep 2022) but did not return for Series A (Jul 2025). 44 months of silence. Relationship at risk. Outreach recommended before Series B.",
     signals: [
       {
         type: "co-investment",
@@ -226,7 +226,7 @@ export const mockInvestors: Investor[] = [
     warmthTier: "Cold",
     lastSignalDate: undefined,
     suggestedAction:
-      "No co-investment yet. Top defense/manufacturing fund with strong thesis overlap — Cargo Robotics is a natural intro. High-value target.",
+      "No co-investment yet. Top defense/manufacturing fund with strong thesis overlap. Cargo Robotics is a natural intro. High-value target.",
     signals: [],
     coInvestments: [],
   },

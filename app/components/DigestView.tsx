@@ -17,7 +17,7 @@ function composeTemplate(item: DigestItem, investors: Investor[]): string {
   if (item.id.startsWith("stale")) {
     return `Hi [Name],
 
-Hope you're well. It's been a while since we last connected — wanted to reach out and see what you're focused on this year.${company ? `\n\nWe co-invested together in ${company} and I've been following your continued work in deep tech closely.` : ""}
+Hope you're well. It's been a while since we last connected. Wanted to reach out and see what you're focused on this year.${company ? `\n\nWe co-invested together in ${company} and I've been following your continued work in deep tech closely.` : ""}
 
 Would love to find 30 minutes to reconnect and share what we're seeing across our portfolio.
 
@@ -30,7 +30,7 @@ AlleyCorp`;
 
 Great connecting recently. Wanted to stay in touch and make sure we're keeping the momentum going.${company ? `\n\nOur shared investment in ${company} continues to be a strong data point for the relationship.` : ""}
 
-Happy to sync soon — would be great to compare notes on what you're tracking in deep tech.
+Happy to sync soon. Would be great to compare notes on what you're tracking in deep tech.
 
 Best,
 [Your name]

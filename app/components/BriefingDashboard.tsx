@@ -8,6 +8,8 @@ interface BriefingDashboardProps {
   onSelectInvestor: (investor: Investor) => void;
   // When true: render only the hero card (no sections). Parent handles layout padding.
   hideSections?: boolean;
+  // Called when the user clicks "Network health" — parent can filter to Stale tier.
+  onNetworkHealthClick?: () => void;
 }
 
 function todayLabel(): string {
@@ -74,16 +76,37 @@ function networkHealthLabel(attentionCount: number, hotCount: number, total: num
   if (attentionCount === 0 && score >= 0.3) return "Strong";
   if (attentionCount <= 1) return "Healthy";
   if (attentionCount <= 3) return "Needs attention";
-  return "At risk";
+  return "Needs outreach";
 }
 
 /* ── Hero intelligence row ── */
 
-function HeroInsight({ label, value, sub }: { label: string; value: string; sub?: string }) {
+function HeroInsight({
+  label, value, sub, onClick,
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  onClick?: () => void;
+}) {
+  const isClickable = !!onClick;
   return (
-    <div className="flex flex-col gap-0.5 min-w-0">
+    <div
+      className={`flex flex-col gap-0.5 min-w-0 ${isClickable ? "group cursor-pointer" : ""}`}
+      onClick={onClick}
+      role={isClickable ? "button" : undefined}
+      tabIndex={isClickable ? 0 : undefined}
+      onKeyDown={isClickable ? (e) => { if (e.key === "Enter") onClick?.(); } : undefined}
+    >
       <span className="text-[9px] uppercase tracking-widest text-white/35 font-semibold">{label}</span>
-      <span className="text-[12px] font-semibold text-white/90 leading-snug">{value}</span>
+      <span
+        className={[
+          "text-[12px] font-semibold text-white/90 leading-snug transition-opacity duration-150",
+          isClickable ? "group-hover:opacity-70" : "",
+        ].join(" ")}
+      >
+        {value}
+      </span>
       {sub && <span className="text-[10px] text-white/40 leading-snug">{sub}</span>}
     </div>
   );
@@ -91,7 +114,7 @@ function HeroInsight({ label, value, sub }: { label: string; value: string; sub?
 
 /* ── Main component ── */
 
-export function BriefingDashboard({ investors, onSelectInvestor, hideSections = false }: BriefingDashboardProps) {
+export function BriefingDashboard({ investors, onSelectInvestor, hideSections = false, onNetworkHealthClick }: BriefingDashboardProps) {
   const stale = investors.filter((i) => i.warmthTier === "Stale");
   const warmAtRisk = investors.filter(
     (i) =>
@@ -149,20 +172,23 @@ export function BriefingDashboard({ investors, onSelectInvestor, hideSections = 
               sub={mostEngaged
                 ? `${mostEngaged.signals.length} signal${mostEngaged.signals.length !== 1 ? "s" : ""} · ${mostEngaged.lastSignalDate ?? ""}`
                 : undefined}
+              onClick={mostEngaged ? () => onSelectInvestor(mostEngaged) : undefined}
             />
             <HeroInsight
               label="Reconnect urgently"
-              value={urgentStale ? urgentStale.fund.name : "None — all clear"}
+              value={urgentStale ? urgentStale.fund.name : "All clear"}
               sub={urgentStale?.lastSignalDate
                 ? `Last contact ${urgentStale.lastSignalDate} · ${monthsAgo(urgentStale.lastSignalDate)}mo ago`
                 : undefined}
+              onClick={urgentStale ? () => onSelectInvestor(urgentStale) : undefined}
             />
             <HeroInsight
               label="Network health"
               value={healthLabel}
               sub={attentionItems.length === 0
                 ? "All relationships on track"
-                : `${attentionItems.length} need${attentionItems.length === 1 ? "s" : ""} outreach · ${counts.Hot} active`}
+                : `${attentionItems.length} stale or lapsing · ${counts.Hot} hot`}
+              onClick={attentionItems.length > 0 ? onNetworkHealthClick : undefined}
             />
           </div>
         </div>

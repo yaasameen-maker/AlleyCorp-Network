@@ -136,7 +136,7 @@ export function InvestorListSection({
                     {investor.coInvestments.length}
                   </td>
                   <td className="px-4 py-3 text-muted hidden xl:table-cell">
-                    {investor.lastSignalDate ?? "—"}
+                    {investor.lastSignalDate ?? ""}
                   </td>
                   <td className="px-4 py-3 text-muted hidden 2xl:table-cell">
                     {investor.signals.length}

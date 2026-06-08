@@ -5,12 +5,12 @@ import { WarmthBadge } from "./InvestorRow";
 import type { Investor } from "@/app/data/mockData";
 import type { AskCard, AskResponse } from "@/app/api/ask/route";
 
-const QUICK_PROMPTS = [
-  "Who should we reconnect with before they lead a round without us?",
-  "Who are our warmest relationships right now?",
-  "What should I know before our meeting with General Catalyst?",
-  "Are there top deep tech funds we haven't co-invested with yet?",
-  "Show me the full picture on Trimble Ventures.",
+const QUICK_PROMPTS: { label: string; prompt: string }[] = [
+  { label: "Reconnect Opportunities",   prompt: "Who should we reconnect with before they lead a round without us?" },
+  { label: "Warmest Relationships",     prompt: "Who are our warmest relationships right now?" },
+  { label: "Meeting Prep: General Catalyst", prompt: "What should I know before our meeting with General Catalyst?" },
+  { label: "Target Co-Investors",       prompt: "Are there top deep tech funds we haven't co-invested with yet?" },
+  { label: "Full Picture: Trimble Ventures", prompt: "Show me the full picture on Trimble Ventures." },
 ];
 
 interface AskPanelProps {
@@ -23,6 +23,68 @@ interface HistoryItem {
   query: string;
   answer: string;
   cards: AskCard[];
+}
+
+// ── Answer renderer ──────────────────────────────────────────────────────────
+// Parses the plain-text structured format Claude returns (no markdown library needed).
+// Handles: ALL CAPS section labels, "- item" bullets, plain paragraphs.
+
+function renderInline(text: string): React.ReactNode {
+  // Strip residual markdown and replace em dashes regardless of what Claude emits
+  const clean = text
+    .replace(/\*\*/g, "")
+    .replace(/\*/g, "")
+    .replace(/ — /g, ", ")   // em dash with spaces → comma
+    .replace(/—/g, ", ");    // bare em dash → comma
+  return clean;
+}
+
+function renderAnswer(raw: string): React.ReactNode {
+  const lines = raw.split("\n");
+  const nodes: React.ReactNode[] = [];
+  let key = 0;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+
+    // Section divider Claude might still emit
+    if (/^---+$/.test(trimmed)) {
+      nodes.push(<hr key={key++} className="brand-line my-2" />);
+      continue;
+    }
+
+    // ALL CAPS section label (e.g. RECOMMENDATIONS, RATIONALE)
+    if (/^[A-Z][A-Z\s]+$/.test(trimmed) && trimmed.length < 40) {
+      nodes.push(
+        <p key={key++} className="text-[9px] uppercase tracking-widest text-[#9CA3AF] font-semibold mt-4 mb-1 first:mt-0">
+          {trimmed}
+        </p>
+      );
+      continue;
+    }
+
+    // Bullet point
+    if (/^[-•]\s+/.test(trimmed)) {
+      const content = trimmed.replace(/^[-•]\s+/, "");
+      nodes.push(
+        <div key={key++} className="flex gap-2.5 items-start py-0.5">
+          <span className="mt-[7px] shrink-0 w-1 h-1 rounded-full bg-[#0EA5D6]" aria-hidden />
+          <p className="text-sm text-[#6B7280] leading-relaxed">{renderInline(content)}</p>
+        </div>
+      );
+      continue;
+    }
+
+    // Plain paragraph
+    nodes.push(
+      <p key={key++} className="text-sm text-[#6B7280] leading-relaxed">
+        {renderInline(trimmed)}
+      </p>
+    );
+  }
+
+  return <div className="space-y-1">{nodes}</div>;
 }
 
 function SendIcon() {
@@ -69,13 +131,13 @@ export function AskPanel({ investors, onSelectInvestor, onClose }: AskPanelProps
       const data: AskResponse = await res.json();
       setHistory((prev) => [...prev, {
         query: trimmed,
-        answer: data.answer || "Something went wrong on our end — please try again.",
+        answer: data.answer || "Something went wrong. Please try again.",
         cards: data.cards ?? [],
       }]);
     } catch {
       setHistory((prev) => [...prev, {
         query: trimmed,
-        answer: "Couldn't connect — check your internet connection and try again.",
+        answer: "Couldn't connect. Check your internet connection and try again.",
         cards: [],
       }]);
     } finally {
@@ -167,14 +229,14 @@ export function AskPanel({ investors, onSelectInvestor, onClose }: AskPanelProps
                 Start here
               </p>
               <div className="flex flex-col gap-1.5">
-                {QUICK_PROMPTS.map((p) => (
+                {QUICK_PROMPTS.map(({ label, prompt }) => (
                   <button
-                    key={p}
+                    key={label}
                     type="button"
-                    onClick={() => handleQuickPrompt(p)}
-                    className="text-left px-3 py-2.5 rounded-lg border border-[#EAECEF] text-xs text-[#374151] hover:border-[#0EA5D6] hover:text-[#0D1320] hover:bg-[#F0F9FF] transition-all duration-150"
+                    onClick={() => handleQuickPrompt(prompt)}
+                    className="text-left px-3 py-2.5 rounded-lg border border-[#EAECEF] text-xs font-medium text-[#374151] hover:border-[#0EA5D6] hover:text-[#0D1320] hover:bg-[#F0F9FF] transition-all duration-150"
                   >
-                    {p}
+                    {label}
                   </button>
                 ))}
               </div>
@@ -185,17 +247,15 @@ export function AskPanel({ investors, onSelectInvestor, onClose }: AskPanelProps
           {history.map((item, i) => (
             <div key={i} className="px-6 py-4 space-y-3">
 
-              {/* User bubble */}
+              {/* User question — subtle right-side bubble */}
               <div className="flex justify-end">
-                <div className="bg-[#0D1320] text-white text-sm px-4 py-2.5 rounded-2xl rounded-tr-sm max-w-[85%] leading-snug">
+                <div className="max-w-[85%] px-4 py-2.5 rounded-2xl rounded-tr-sm border border-[#D1E9F5] bg-[#F0F9FF] text-sm text-[#0D1320] leading-snug">
                   {item.query}
                 </div>
               </div>
 
               {/* Claude's answer */}
-              <p className="text-sm text-[#1F2937] leading-relaxed whitespace-pre-wrap">
-                {item.answer}
-              </p>
+              {renderAnswer(item.answer)}
 
               {/* Fund cards */}
               {item.cards.length > 0 && (
@@ -263,11 +323,11 @@ export function AskPanel({ investors, onSelectInvestor, onClose }: AskPanelProps
             </div>
           ))}
 
-          {/* In-flight bubble while loading */}
+          {/* In-flight state while loading */}
           {loading && pendingQuery && (
             <div className="px-6 py-4 space-y-3">
               <div className="flex justify-end">
-                <div className="bg-[#0D1320] text-white text-sm px-4 py-2.5 rounded-2xl rounded-tr-sm max-w-[85%] leading-snug">
+                <div className="max-w-[85%] px-4 py-2.5 rounded-2xl rounded-tr-sm border border-[#D1E9F5] bg-[#F0F9FF] text-sm text-[#0D1320] leading-snug">
                   {pendingQuery}
                 </div>
               </div>

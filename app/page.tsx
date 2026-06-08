@@ -30,17 +30,11 @@ function DarkToggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
   return (
     <button
       type="button"
-      role="switch"
-      aria-checked={on}
-      aria-label={on ? "Switch to light mode" : "Switch to dark mode"}
       onClick={onToggle}
-      className="relative shrink-0 w-8 h-[18px] rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0EA5D6]"
-      style={{ backgroundColor: on ? "#0EA5D6" : "#D1D5DB" }}
+      aria-label={on ? "Switch to light mode" : "Switch to dark mode"}
+      className="text-[11px] font-medium text-[#9CA3AF] hover:text-[#0D1320] dark:hover:text-white transition-colors duration-150 tracking-wide"
     >
-      <span
-        className="absolute top-[2px] left-0 w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform duration-200"
-        style={{ transform: on ? "translateX(18px)" : "translateX(2px)" }}
-      />
+      {on ? "Light mode" : "Dark mode"}
     </button>
   );
 }
@@ -161,11 +155,11 @@ export default function DashboardPage() {
                 onClick={() => setActiveView(activeView === "digest" ? "briefing" : "digest")}
                 className={`text-[11px] font-medium transition-colors ${
                   activeView === "digest"
-                    ? "text-[#0EA5D6]"
+                    ? "text-[#0EA5D6] hover:text-[#0891B2]"
                     : "text-[#9CA3AF] hover:text-[#6B7280]"
                 }`}
               >
-                Digest
+                {activeView === "digest" ? "Home" : "Digest"}
               </button>
               <Link
                 href="/portfolio"
@@ -200,6 +194,7 @@ export default function DashboardPage() {
               <BriefingDashboard
                 investors={allInvestors}
                 onSelectInvestor={handleSelectInvestor}
+                onNetworkHealthClick={() => setFilterTier("Stale")}
                 hideSections
               />
             </div>

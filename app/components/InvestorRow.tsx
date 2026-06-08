@@ -56,7 +56,7 @@ export function InvestorRow({ investor, isSelected, onClick }: InvestorRowProps)
           {investor.fund.name}
         </p>
         <p className="text-[11px] text-[#9CA3AF] mt-0.5 truncate leading-snug">
-          {company ?? "—"}
+          {company ?? ""}
           {investor.lastSignalDate ? ` · ${investor.lastSignalDate}` : ""}
         </p>
       </div>
