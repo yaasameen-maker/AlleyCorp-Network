@@ -1,336 +1,202 @@
 @import "tailwindcss";
 
 @theme {
-  --color-ink: #f0f2f5;
-  --color-paper: #0d1320;
-  --color-mist: #1a2744;
-  --color-muted: #8fa3bc;
-  --color-line: #2d4268;
-  --color-navy: #243352;
-  --color-signal-green: #34d399;
-  --color-signal-amber: #fbbf24;
-  /* Ask-the-network field: medium gray input, light gray submit (brand Mid Gray #666666) */
-  --color-field: #666666;
-  --color-field-text: #f0f2f5;
-  --color-field-placeholder: #b0bcc9;
-  --color-field-action: #e2e8f0;
-  --color-field-action-text: #111827;
-  /* Ask input — same family as active Dashboard (mist), slightly lighter */
-  --color-field-input: #2a3f62;
+  /* ── Typography ── */
+  /* Next.js sets --font-sans on <html>; Tailwind v4 reads --font-family-sans for font-sans utility */
+  --font-family-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+
+  /* ── AlleyCorp Light Palette ── */
+  --color-bg:      #F8F7F4;
+  --color-surface: #FFFFFF;
+  --color-navy:    #0D1320;
+  --color-ink:     #1F2937;
+  --color-body:    #374151;
+  --color-muted:   #6B7280;
+  --color-subtle:  #9CA3AF;
+  --color-accent:  #0EA5D6;
+  --color-line:    #E5E7EB;
+  --color-hover:   #F3F4F6;
+
+  /* ── Warmth tier palette ── */
+  --color-hot-bg:    #D1FAE5;
+  --color-hot-text:  #065F46;
+  --color-warm-bg:   #FEF3C7;
+  --color-warm-text: #92400E;
+  --color-stale-bg:  #FEE2E2;
+  --color-stale-text:#991B1B;
+  --color-cold-bg:   #F3F4F6;
+  --color-cold-text: #4B5563;
+
+  /* ── Legacy aliases ── */
+  --color-paper:  #FFFFFF;
+  --color-mist:   #F7F8FA;
+  --color-signal-green:       #10B981;
+  --color-signal-amber:       #F59E0B;
+  --color-field-input:        #F3F4F6;
+  --color-field-action:       #0EA5D6;
+  --color-field-action-text:  #FFFFFF;
+  --color-field-text:         #1F2937;
+  --color-field-placeholder:  #9CA3AF;
 }
 
-/* Dimmed page behind dialog sheets — adjust opacity/color here */
-:root {
-  /* Use black (not navy) so dimming is visible on the dark dashboard */
-  --dialog-backdrop: rgba(0, 0, 0, 0.42);
-  --dialog-backdrop-blur: 1px;
-}
-
-.dialog-overlay {
-  opacity: 0;
-  transition: opacity 0.22s ease-out;
-}
-
-.dialog-overlay--visible {
-  opacity: 1;
-}
-
-.dialog-scrim {
-  background: var(--dialog-backdrop);
-  backdrop-filter: blur(var(--dialog-backdrop-blur));
-  -webkit-backdrop-filter: blur(var(--dialog-backdrop-blur));
-}
-
-/* Desktop: dim main content only — leave left nav undimmed */
-.dialog-scrim-main {
-  position: absolute;
-  inset: 0;
-  background: var(--dialog-backdrop);
-  backdrop-filter: blur(var(--dialog-backdrop-blur));
-  -webkit-backdrop-filter: blur(var(--dialog-backdrop-blur));
-}
-
-@media (min-width: 1024px) {
-  .dialog-scrim-main {
-    left: 14rem;
-  }
-}
-
-@media (min-width: 1280px) {
-  .dialog-scrim-main {
-    left: 16rem;
-  }
-}
-
-.dialog-panel {
-  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.55);
-}
-
-@media (min-width: 768px) {
-  .dialog-panel {
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.65);
-  }
-}
-
-@keyframes dialog-in {
-  from {
-    opacity: 0;
-    transform: scale(0.96) translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-.animate-dialog-in {
-  animation: dialog-in 0.28s cubic-bezier(0.32, 0.72, 0, 1) both;
-}
-
-@keyframes ask-pulldown {
-  from {
-    opacity: 0;
-    transform: translateY(-100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-ask-pulldown {
-  animation: ask-pulldown 0.32s cubic-bezier(0.32, 0.72, 0, 1) both;
-}
-
+/* ── Base ── */
 html {
-  color-scheme: dark;
+  color-scheme: light;
   -webkit-tap-highlight-color: transparent;
   scrollbar-gutter: stable;
 }
 
 body {
+  background-color: var(--color-bg);
+  color: var(--color-ink);
   overscroll-behavior-y: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* ── iPhone Pro Max mobile shell (<768px) ── */
-@media (max-width: 767px) {
-  html,
-  body {
-    height: 100%;
-    overflow: hidden;
-  }
-
-  body {
-    background-color: var(--color-paper);
-  }
-
-  .app-shell {
-    width: 100%;
-    max-width: 430px;
-    margin-inline: auto;
-    height: 100dvh;
-    height: 100svh;
-    max-height: 100dvh;
-    max-height: 100svh;
-    overflow: hidden;
-    flex-direction: column;
-    position: relative;
-    box-shadow: 0 0 0 1px var(--color-line);
-  }
-
-  .mobile-scroll {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    overscroll-behavior-y: contain;
-    -webkit-overflow-scrolling: touch;
-  }
+/* ────────────────────────────────────────────────────────────
+   DARK MODE — html.dark overrides
+   AlleyCorp dark: deep navy base, teal accent stays, warm darks
+   ──────────────────────────────────────────────────────────── */
+html.dark {
+  color-scheme: dark;
 }
 
-/* App shell — tablet centered column; desktop full width */
-.app-shell {
-  min-height: 100dvh;
-  max-width: 100%;
-  width: 100%;
+html.dark body {
+  background-color: #0D1320;
+  color: #E5E9F0;
 }
 
-@media (min-width: 768px) {
-  html,
-  body {
-    height: auto;
-    overflow: auto;
-  }
+/* Surfaces */
+html.dark .bg-white            { background-color: #111927 !important; }
+html.dark .bg-\[\#FFFFFF\]     { background-color: #111927 !important; }
+html.dark .bg-\[\#F8F7F4\]     { background-color: #0D1320 !important; }
+html.dark .bg-\[\#FAFAFA\]     { background-color: #131E2C !important; }
+html.dark .bg-\[\#F3F4F6\]     { background-color: #1a2535 !important; }
+html.dark .bg-\[\#F7F8FA\]     { background-color: #0D1320 !important; }
+html.dark .bg-\[\#F0F9FF\]     { background-color: #0f2035 !important; }
 
-  .app-shell {
-    max-width: 100%;
-    height: auto;
-    max-height: none;
-    overflow: visible;
-    box-shadow: none;
-  }
+/* Borders */
+html.dark .border-\[\#E5E7EB\] { border-color: #1e2d40 !important; }
+html.dark .border-\[\#EAECEF\] { border-color: #1e2d40 !important; }
+html.dark .border-\[\#F3F4F6\] { border-color: #192231 !important; }
+html.dark .border-\[\#EEF2F7\] { border-color: #1e2d40 !important; }
+html.dark .border-r            { border-color: #1e2d40; }
+html.dark .border-b            { border-color: #192231; }
+html.dark .divide-\[\#F3F4F6\] > * { border-color: #192231 !important; }
+
+/* Text */
+html.dark .text-\[\#0D1320\]   { color: #E5E9F0 !important; }
+html.dark .text-\[\#1F2937\]   { color: #D1D8E4 !important; }
+html.dark .text-\[\#374151\]   { color: #A8B4C4 !important; }
+html.dark .text-\[\#6B7280\]   { color: #6B7C93 !important; }
+html.dark .text-\[\#9CA3AF\]   { color: #4D5C6E !important; }
+html.dark .text-\[\#C4C9D4\]   { color: #3a4a5c !important; }
+
+/* Hover states */
+html.dark .hover\:bg-\[\#F8F7F4\]:hover { background-color: #131E2C !important; }
+html.dark .hover\:bg-\[\#FAFAFA\]:hover  { background-color: #131E2C !important; }
+
+/* Search input */
+html.dark input[type="text"] {
+  background-color: #131E2C !important;
+  border-color: #1e2d40 !important;
+  color: #E5E9F0 !important;
+}
+html.dark input[type="text"]::placeholder {
+  color: #3a4a5c !important;
+}
+html.dark input[type="text"]:focus {
+  border-color: #0EA5D6 !important;
+  background-color: #111927 !important;
 }
 
-@media (min-width: 768px) and (max-width: 1023px) {
-  .app-shell {
-    max-width: 768px;
-    margin-left: auto;
-    margin-right: auto;
-    border-left: 1px solid var(--color-line);
-    border-right: 1px solid var(--color-line);
-  }
+/* Badge backgrounds in dark */
+html.dark .bg-\[\#F8FAFC\]     { background-color: #1a2535 !important; }
+
+/* Digest/code blocks */
+html.dark pre                  { color: #A8B4C4 !important; }
+
+
+/* ── Profile drawer slide-in ── */
+@keyframes drawer-in {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);   opacity: 1; }
 }
 
-.safe-top {
-  padding-top: env(safe-area-inset-top, 0px);
+.animate-drawer-in {
+  animation: drawer-in 0.28s cubic-bezier(0.32, 0.72, 0, 1) both;
 }
 
-.safe-bottom {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+/* ── Scrim fade ── */
+@keyframes scrim-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-.safe-x {
-  padding-left: env(safe-area-inset-left, 0px);
-  padding-right: env(safe-area-inset-right, 0px);
+.animate-scrim-in {
+  animation: scrim-in 0.22s ease-out both;
 }
 
-.touch-target {
-  min-height: 44px;
-  min-width: 44px;
+/* ── Hero aurora ── */
+@keyframes aurora-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
-.touch-press {
-  transition: transform 0.15s ease, opacity 0.15s ease;
+.hero-aurora {
+  background: linear-gradient(
+    90deg,
+    #0D1320,
+    #0EA5D6,
+    #1a7fb5,
+    #0EA5D6,
+    #0e5986,
+    #1a4f7a,
+    #0D1320
+  );
+  background-size: 400% 100%;
+  animation: aurora-shift 38s linear infinite;
 }
 
-.touch-press:active {
-  transform: scale(0.97);
-  opacity: 0.92;
+/* ── Brand divider line (AlleyCorp teal rule) ── */
+.brand-line {
+  height: 1px;
+  background: linear-gradient(90deg, #0EA5D6, transparent);
+  border: none;
 }
 
+/* ── Card hover lift ── */
+.card-lift {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.card-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(13, 19, 32, 0.08);
+}
+
+/* ── Teal shimmer ── */
+@keyframes shimmer-drift {
+  0%   { transform: translateX(-30%) translateY(10%) rotate(-8deg); opacity: 0.35; }
+  50%  { transform: translateX(10%)  translateY(-5%) rotate(-2deg); opacity: 0.55; }
+  100% { transform: translateX(-30%) translateY(10%) rotate(-8deg); opacity: 0.35; }
+}
+
+.hero-shimmer {
+  background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(14,165,214,0.55) 0%, transparent 70%);
+  animation: shimmer-drift 18s ease infinite;
+}
+
+/* ── Utilities ── */
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
 
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-.snap-scroll-x {
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-}
-
-.snap-item {
-  scroll-snap-align: start;
-}
-
-@keyframes sheet-up {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.animate-sheet-up {
-  animation: sheet-up 0.38s cubic-bezier(0.32, 0.72, 0, 1) both;
-}
-
-.animate-backdrop-in {
-  animation: fade-in 0.25s ease-out both;
-}
-
-@keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes scale-in {
-  from {
-    opacity: 0;
-    transform: scaleX(0);
-  }
-  to {
-    opacity: 1;
-    transform: scaleX(1);
-  }
-}
-
-@keyframes pulse-dot {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.4;
-  }
-}
-
-@keyframes draw-line {
-  from {
-    stroke-dashoffset: 100;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-.animate-fade-in-up {
-  animation: fade-in-up 0.45s ease-out both;
-}
-
-.animate-scale-in {
-  animation: scale-in 0.8s ease-out both;
-  transform-origin: left center;
-}
-
-.animate-pulse-dot {
-  animation: pulse-dot 2s ease-in-out infinite;
-}
-
-.timeline-draw {
-  stroke-dasharray: 100;
-  animation: draw-line 1.2s ease-out forwards;
-}
+.touch-press { transition: background-color 0.12s ease; }
 
 @media (prefers-reduced-motion: reduce) {
-  .dialog-overlay--visible {
-    opacity: 1;
-  }
-
-  .animate-sheet-up,
-  .animate-backdrop-in,
-  .animate-dialog-in,
-  .animate-ask-pulldown,
-  .dialog-overlay,
-  .animate-fade-in-up,
-  .animate-scale-in,
-  .animate-pulse-dot,
-  .timeline-draw {
-    animation: none;
-    transition: none;
-  }
-
-  .touch-press:active {
-    transform: none;
-    opacity: 1;
-  }
+  .animate-drawer-in,
+  .animate-scrim-in { animation: none; }
 }

@@ -1,11 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { DarkModeInit } from "./components/DarkModeInit";
 
-const inter = Inter({
+const dmSans = Inter({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-sans",
   display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -28,8 +30,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body className="font-sans antialiased bg-paper text-ink">{children}</body>
+    <html lang="en" className={dmSans.variable}>
+      <body className="font-sans antialiased bg-paper text-ink">
+        <DarkModeInit />
+        {children}
+      </body>
     </html>
   );
 }

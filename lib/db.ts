@@ -34,7 +34,7 @@ const REL_SELECT = `
       'name',          pc.name,
       'sector',        pc.sector,
       'stage',         pc.stage,
-      'alleycorpRole', pc.alleycorp_role,
+      'alleycorpRole', pc.alley_role,
       'website',       pc.website
     ) ELSE NULL END AS "portfolioCompany",
     COALESCE(
@@ -42,19 +42,21 @@ const REL_SELECT = `
         json_build_object(
           'id',             s.id,
           'relationshipId', s.relationship_id,
-          'type',           s.type,
-          'date',           to_char(s.date, 'YYYY-MM-DD'),
+          'type',           s.signal_type,
+          'date',           to_char(s.signal_date, 'YYYY-MM-DD'),
           'source',         s.source,
           'value',          s.value,
+          'weight',         s.weight,
           'confidence',     s.confidence
         )
       ) FILTER (WHERE s.id IS NOT NULL),
       '[]'::json
     ) AS signals
-  FROM relationships r
-  JOIN      funds f              ON f.id  = r.fund_id
-  LEFT JOIN portfolio_companies pc ON pc.id = r.portfolio_company_id
-  LEFT JOIN signals s              ON s.relationship_id = r.id
+  -- NOTE: DB uses singular table names (relationship, fund, portfolio_company, signal)
+  FROM relationship r
+  JOIN      fund f               ON f.id  = r.fund_id
+  LEFT JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
+  LEFT JOIN signal s             ON s.relationship_id = r.id
 `;
 
 // Look up the first relationship whose fund name matches the search string.
@@ -112,7 +114,7 @@ export async function getAllRelationships(): Promise<Relationship[]> {
 export async function listStaleRelationships(): Promise<Relationship[]> {
   const { rows } = await pool.query(
     `${REL_SELECT}
-     WHERE r.warmth_tier = 'Stale'
+     WHERE r.warmth_tier = 'stale'
      GROUP BY r.id, f.id, pc.id
      ORDER BY r.last_signal_date ASC NULLS LAST`
   );
@@ -126,15 +128,16 @@ export async function getWarmthSignals(investorId: string): Promise<Signal[]> {
   const { rows } = await pool.query(
     `SELECT
        id,
-       relationship_id             AS "relationshipId",
-       type,
-       to_char(date, 'YYYY-MM-DD') AS date,
+       relationship_id                      AS "relationshipId",
+       signal_type                          AS type,
+       to_char(signal_date, 'YYYY-MM-DD')   AS date,
        source,
        value,
+       weight,
        confidence
-     FROM signals
+     FROM signal
      WHERE relationship_id = $1
-     ORDER BY date DESC`,
+     ORDER BY signal_date DESC`,
     [investorId]
   );
   return rows as Signal[];
@@ -144,14 +147,15 @@ export async function getRecentSignals(limit = 20): Promise<Signal[]> {
   const { rows } = await pool.query(
     `SELECT
        id,
-       relationship_id             AS "relationshipId",
-       type,
-       to_char(date, 'YYYY-MM-DD') AS date,
+       relationship_id                      AS "relationshipId",
+       signal_type                          AS type,
+       to_char(signal_date, 'YYYY-MM-DD')   AS date,
        source,
        value,
+       weight,
        confidence
-     FROM signals
-     ORDER BY date DESC
+     FROM signal
+     ORDER BY signal_date DESC
      LIMIT $1`,
     [limit]
   );

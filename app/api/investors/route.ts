@@ -55,6 +55,13 @@ function capitalize(s: string): "High" | "Medium" | "Low" {
   return (s.charAt(0).toUpperCase() + s.slice(1)) as "High" | "Medium" | "Low";
 }
 
+function toWarmthTier(s: string): "Hot" | "Warm" | "Stale" | "Cold" {
+  const map: Record<string, "Hot" | "Warm" | "Stale" | "Cold"> = {
+    hot: "Hot", warm: "Warm", stale: "Stale", cold: "Cold",
+  };
+  return map[s.toLowerCase()] ?? "Cold";
+}
+
 function formatDate(d: string | undefined): string {
   if (!d) return "";
   const date = new Date(d);
@@ -110,7 +117,7 @@ function groupByFund(relationships: Relationship[]): FrontendInvestor[] {
         id: r.id,
         name: r.fund?.name ?? "",
         fund: { id: fundId, name: r.fund?.name ?? "" },
-        warmthTier: r.warmthTier,
+        warmthTier: toWarmthTier(r.warmthTier),
         lastSignalDate: r.lastSignalDate ? formatDate(r.lastSignalDate) : undefined,
         suggestedAction: getSuggestedAction(r),
         signals,
@@ -129,7 +136,7 @@ function groupByFund(relationships: Relationship[]): FrontendInvestor[] {
         const new_date = new Date(r.lastSignalDate);
         if (new_date > existing_date) {
           existing.lastSignalDate = formatDate(r.lastSignalDate);
-          existing.warmthTier = r.warmthTier;
+          existing.warmthTier = toWarmthTier(r.warmthTier);
           existing.suggestedAction = getSuggestedAction(r);
         }
       }

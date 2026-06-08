@@ -5,7 +5,7 @@ const config = [
   ...nextConfig,
   prettierConfig,
   {
-    ignores: ["node_modules/**", ".next/**", "*.tsbuildinfo"],
+    ignores: ["node_modules/**", ".next/**", "*.tsbuildinfo", "stories/**"],
   },
 ];
 
