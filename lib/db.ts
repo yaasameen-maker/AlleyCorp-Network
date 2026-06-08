@@ -82,10 +82,10 @@ export async function searchRelationships(query: string): Promise<Relationship[]
      GROUP BY r.id, f.id, pc.id
      ORDER BY
        CASE r.warmth_tier
-         WHEN 'Hot'   THEN 1
-         WHEN 'Warm'  THEN 2
-         WHEN 'Stale' THEN 3
-         WHEN 'Cold'  THEN 4
+         WHEN 'hot'   THEN 1
+         WHEN 'warm'  THEN 2
+         WHEN 'stale' THEN 3
+         WHEN 'cold'  THEN 4
          ELSE 5
        END,
        f.name`,
@@ -101,7 +101,7 @@ export async function getAllRelationships(): Promise<Relationship[]> {
     `${REL_SELECT}
      GROUP BY r.id, f.id, pc.id
      ORDER BY
-       CASE r.warmth_tier WHEN 'Hot' THEN 1 WHEN 'Warm' THEN 2 WHEN 'Stale' THEN 3 WHEN 'Cold' THEN 4 ELSE 5 END,
+       CASE r.warmth_tier WHEN 'hot' THEN 1 WHEN 'warm' THEN 2 WHEN 'stale' THEN 3 WHEN 'cold' THEN 4 ELSE 5 END,
        r.last_signal_date DESC NULLS LAST`
   );
   return rows as Relationship[];
@@ -111,7 +111,7 @@ export async function getAllRelationships(): Promise<Relationship[]> {
 export async function listStaleRelationships(): Promise<Relationship[]> {
   const { rows } = await pool.query(
     `${REL_SELECT}
-     WHERE r.warmth_tier = 'Stale'
+     WHERE r.warmth_tier = 'stale'
      GROUP BY r.id, f.id, pc.id
      ORDER BY r.last_signal_date ASC NULLS LAST`
   );
