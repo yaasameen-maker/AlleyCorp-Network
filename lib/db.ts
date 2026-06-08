@@ -1,6 +1,5 @@
 import { Pool } from "pg";
-import type { QueryConfig, QueryResult, QueryResultRow } from "pg";
-import type { Relationship, Signal, WarmthTier } from "./types";
+import type { Relationship, Signal } from "./types";
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -104,7 +103,7 @@ export async function getAllRelationships(): Promise<Relationship[]> {
     `${REL_SELECT}
      GROUP BY r.id, f.id, pc.id
      ORDER BY
-       CASE r.warmth_tier WHEN 'hot' THEN 1 WHEN 'warm' THEN 2 WHEN 'stale' THEN 3 WHEN 'cold' THEN 4 END,
+       CASE r.warmth_tier WHEN 'hot' THEN 1 WHEN 'warm' THEN 2 WHEN 'stale' THEN 3 WHEN 'cold' THEN 4 ELSE 5 END,
        r.last_signal_date DESC NULLS LAST`
   );
   return rows as Relationship[];

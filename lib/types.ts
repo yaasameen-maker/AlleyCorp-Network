@@ -6,8 +6,8 @@ export type SignalType =
   | "event_attendance"
   | "linkedin_connection"
   | "press_mention"
-  | "email_contact"
-  | "email_thread";
+  | "email_thread"
+  | "email_contact";
 
 export interface Fund {
   id: string;
