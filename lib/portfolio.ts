@@ -23,7 +23,8 @@ const TIER_ORDER: Record<WarmthTier, number> = { Hot: 0, Warm: 1, Cold: 2, Stale
 
 function relationshipStatus(investor: Investor): string {
   if (investor.warmthTier === "Stale") return "Stale";
-  if (investor.warmthTier === "Warm" && isWarmAtRisk(investor.lastSignalDate)) return "Warm at risk";
+  if (investor.warmthTier === "Warm" && isWarmAtRisk(investor.lastSignalDate))
+    return "Warm at risk";
   if (investor.warmthTier === "Cold") return "No recent activity";
   return investor.warmthTier;
 }

@@ -14,13 +14,22 @@ interface BriefingDashboardProps {
 
 function todayLabel(): string {
   return new Date().toLocaleDateString("en-US", {
-    weekday: "long", month: "long", day: "numeric", year: "numeric",
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
   });
 }
 
 function ChevronIcon() {
   return (
-    <svg className="w-3.5 h-3.5 text-[#9CA3AF]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+    <svg
+      className="w-3.5 h-3.5 text-[#9CA3AF]"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      aria-hidden
+    >
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
     </svg>
   );
@@ -30,7 +39,9 @@ function StatBlock({ label, count }: { label: string; count: number }) {
   return (
     <div className="flex flex-col gap-0.5">
       <span className="text-xl font-bold tabular-nums leading-none text-white">{count}</span>
-      <span className="text-[9px] uppercase tracking-widest text-white/40 font-semibold">{label}</span>
+      <span className="text-[9px] uppercase tracking-widest text-white/40 font-semibold">
+        {label}
+      </span>
     </div>
   );
 }
@@ -65,8 +76,8 @@ function mostEngagedInvestor(investors: Investor[]): Investor | undefined {
 function mostUrgentStale(investors: Investor[]): Investor | undefined {
   return investors
     .filter((i) => i.warmthTier === "Stale" && i.lastSignalDate)
-    .sort((a, b) =>
-      new Date(a.lastSignalDate!).getTime() - new Date(b.lastSignalDate!).getTime()
+    .sort(
+      (a, b) => new Date(a.lastSignalDate!).getTime() - new Date(b.lastSignalDate!).getTime()
     )[0];
 }
 
@@ -82,7 +93,10 @@ function networkHealthLabel(attentionCount: number, hotCount: number, total: num
 /* ── Hero intelligence row ── */
 
 function HeroInsight({
-  label, value, sub, onClick,
+  label,
+  value,
+  sub,
+  onClick,
 }: {
   label: string;
   value: string;
@@ -96,9 +110,17 @@ function HeroInsight({
       onClick={onClick}
       role={isClickable ? "button" : undefined}
       tabIndex={isClickable ? 0 : undefined}
-      onKeyDown={isClickable ? (e) => { if (e.key === "Enter") onClick?.(); } : undefined}
+      onKeyDown={
+        isClickable
+          ? (e) => {
+              if (e.key === "Enter") onClick?.();
+            }
+          : undefined
+      }
     >
-      <span className="text-[9px] uppercase tracking-widest text-white/35 font-semibold">{label}</span>
+      <span className="text-[9px] uppercase tracking-widest text-white/35 font-semibold">
+        {label}
+      </span>
       <span
         className={[
           "text-[12px] font-semibold text-white/90 leading-snug transition-opacity duration-150",
@@ -114,30 +136,31 @@ function HeroInsight({
 
 /* ── Main component ── */
 
-export function BriefingDashboard({ investors, onSelectInvestor, hideSections = false, onNetworkHealthClick }: BriefingDashboardProps) {
+export function BriefingDashboard({
+  investors,
+  onSelectInvestor,
+  hideSections = false,
+  onNetworkHealthClick,
+}: BriefingDashboardProps) {
   const stale = investors.filter((i) => i.warmthTier === "Stale");
   const warmAtRisk = investors.filter(
-    (i) =>
-      i.warmthTier === "Warm" &&
-      i.lastSignalDate &&
-      monthsAgo(i.lastSignalDate) >= 12
+    (i) => i.warmthTier === "Warm" && i.lastSignalDate && monthsAgo(i.lastSignalDate) >= 12
   );
   const attentionItems = [...stale, ...warmAtRisk].slice(0, 5);
 
   const counts = {
-    Hot:   investors.filter((i) => i.warmthTier === "Hot").length,
-    Warm:  investors.filter((i) => i.warmthTier === "Warm").length,
+    Hot: investors.filter((i) => i.warmthTier === "Hot").length,
+    Warm: investors.filter((i) => i.warmthTier === "Warm").length,
     Stale: investors.filter((i) => i.warmthTier === "Stale").length,
-    Cold:  investors.filter((i) => i.warmthTier === "Cold").length,
+    Cold: investors.filter((i) => i.warmthTier === "Cold").length,
   };
 
-  const mostEngaged  = mostEngagedInvestor(investors);
-  const urgentStale  = mostUrgentStale(investors);
-  const healthLabel  = networkHealthLabel(attentionItems.length, counts.Hot, investors.length);
+  const mostEngaged = mostEngagedInvestor(investors);
+  const urgentStale = mostUrgentStale(investors);
+  const healthLabel = networkHealthLabel(attentionItems.length, counts.Hot, investors.length);
 
   return (
     <div className={hideSections ? "" : "max-w-2xl px-8 py-10 space-y-8"}>
-
       {/* ── Hero card ── */}
       <div className="relative overflow-hidden rounded-xl hero-aurora px-7 py-6 shadow-md">
         <div className="hero-shimmer absolute -inset-12" aria-hidden />
@@ -157,10 +180,10 @@ export function BriefingDashboard({ investors, onSelectInvestor, hideSections = 
             <div className="flex items-center gap-5 shrink-0">
               <StatBlock label="Total" count={investors.length} />
               <div className="w-px h-6 bg-white/10" aria-hidden />
-              <StatBlock label="Hot"   count={counts.Hot} />
-              <StatBlock label="Warm"  count={counts.Warm} />
+              <StatBlock label="Hot" count={counts.Hot} />
+              <StatBlock label="Warm" count={counts.Warm} />
               <StatBlock label="Stale" count={counts.Stale} />
-              <StatBlock label="Cold"  count={counts.Cold} />
+              <StatBlock label="Cold" count={counts.Cold} />
             </div>
           </div>
 
@@ -169,25 +192,31 @@ export function BriefingDashboard({ investors, onSelectInvestor, hideSections = 
             <HeroInsight
               label="Strongest relationship"
               value={mostEngaged ? mostEngaged.fund.name : "No hot relationships"}
-              sub={mostEngaged
-                ? `${mostEngaged.signals.length} signal${mostEngaged.signals.length !== 1 ? "s" : ""} · ${mostEngaged.lastSignalDate ?? ""}`
-                : undefined}
+              sub={
+                mostEngaged
+                  ? `${mostEngaged.signals.length} signal${mostEngaged.signals.length !== 1 ? "s" : ""} · ${mostEngaged.lastSignalDate ?? ""}`
+                  : undefined
+              }
               onClick={mostEngaged ? () => onSelectInvestor(mostEngaged) : undefined}
             />
             <HeroInsight
               label="Reconnect urgently"
               value={urgentStale ? urgentStale.fund.name : "All clear"}
-              sub={urgentStale?.lastSignalDate
-                ? `Last contact ${urgentStale.lastSignalDate} · ${monthsAgo(urgentStale.lastSignalDate)}mo ago`
-                : undefined}
+              sub={
+                urgentStale?.lastSignalDate
+                  ? `Last contact ${urgentStale.lastSignalDate} · ${monthsAgo(urgentStale.lastSignalDate)}mo ago`
+                  : undefined
+              }
               onClick={urgentStale ? () => onSelectInvestor(urgentStale) : undefined}
             />
             <HeroInsight
               label="Network health"
               value={healthLabel}
-              sub={attentionItems.length === 0
-                ? "All relationships on track"
-                : `${attentionItems.length} stale or lapsing · ${counts.Hot} hot`}
+              sub={
+                attentionItems.length === 0
+                  ? "All relationships on track"
+                  : `${attentionItems.length} stale or lapsing · ${counts.Hot} hot`
+              }
               onClick={attentionItems.length > 0 ? onNetworkHealthClick : undefined}
             />
           </div>
@@ -265,7 +294,6 @@ export function BriefingDashboard({ investors, onSelectInvestor, hideSections = 
           </div>
         </section>
       )}
-
     </div>
   );
 }

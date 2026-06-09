@@ -33,7 +33,11 @@ export function InvestorListSection({
   const tabletCardsHide = inModal ? "xl:hidden" : "lg:hidden";
 
   return (
-    <section className={inModal ? "px-4 py-4" : "px-4 max-md:px-4 md:px-4 lg:px-6 py-4 max-md:py-3 lg:py-6"}>
+    <section
+      className={
+        inModal ? "px-4 py-4" : "px-4 max-md:px-4 md:px-4 lg:px-6 py-4 max-md:py-3 lg:py-6"
+      }
+    >
       {!inModal && (
         <div className="mb-4 lg:mb-5">
           <h2 className="text-sm font-semibold text-ink hidden lg:block">Relationships</h2>
@@ -68,7 +72,9 @@ export function InvestorListSection({
         />
       </div>
 
-      <div className={`${inModal ? "" : "-mx-4 px-4 lg:mx-0 lg:px-0"} mb-5 overflow-x-auto scrollbar-hide snap-scroll-x lg:overflow-visible`}>
+      <div
+        className={`${inModal ? "" : "-mx-4 px-4 lg:mx-0 lg:px-0"} mb-5 overflow-x-auto scrollbar-hide snap-scroll-x lg:overflow-visible`}
+      >
         <div className="flex gap-2 min-w-max lg:flex-wrap lg:min-w-0 pb-1">
           {(["All", "Hot", "Warm", "Cold", "Stale"] as const).map((tier) => (
             <button
@@ -76,9 +82,7 @@ export function InvestorListSection({
               type="button"
               onClick={() => onFilterTierChange(tier)}
               className={`touch-press snap-item px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap ${
-                filterTier === tier
-                  ? "bg-ink text-paper"
-                  : "bg-mist text-muted border border-line"
+                filterTier === tier ? "bg-ink text-paper" : "bg-mist text-muted border border-line"
               }`}
             >
               {tier} · {tierCounts[tier]}
@@ -91,7 +95,9 @@ export function InvestorListSection({
         {filteredInvestors.length} of {totalCount} relationships
       </p>
 
-      <div className={`${tableBreakpoint === "md" ? "hidden md:block" : "hidden lg:block"} border border-line rounded-2xl overflow-hidden bg-mist/30`}>
+      <div
+        className={`${tableBreakpoint === "md" ? "hidden md:block" : "hidden lg:block"} border border-line rounded-2xl overflow-hidden bg-mist/30`}
+      >
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-navy text-left text-paper">

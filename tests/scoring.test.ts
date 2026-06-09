@@ -30,7 +30,7 @@ function makeSignal(overrides: Partial<Signal> = {}): Signal {
     id: crypto.randomUUID(),
     relationshipId: "rel-1",
     type: "co_investment",
-    date: "2025-06-01",   // active by default (within 24 months)
+    date: "2025-06-01", // active by default (within 24 months)
     source: "Crunchbase",
     value: "",
     weight: "high",
@@ -42,7 +42,6 @@ function makeSignal(overrides: Partial<Signal> = {}): Signal {
 // calculateWarmthTier
 // ─────────────────────────────────────────
 describe("calculateWarmthTier", () => {
-
   describe("Cold", () => {
     it("returns Cold when there are no signals", () => {
       expect(calculateWarmthTier([])).toBe("Cold");
@@ -52,7 +51,7 @@ describe("calculateWarmthTier", () => {
   describe("Stale", () => {
     it("returns Stale when all signals are older than 24 months", () => {
       const signals = [
-        makeSignal({ date: "2024-05-25" }),  // one day before cutoff
+        makeSignal({ date: "2024-05-25" }), // one day before cutoff
         makeSignal({ date: "2023-01-01" }),
       ];
       expect(calculateWarmthTier(signals)).toBe("Stale");
@@ -60,16 +59,16 @@ describe("calculateWarmthTier", () => {
 
     it("returns Stale when there is only one active signal", () => {
       const signals = [
-        makeSignal({ date: "2025-01-01" }),  // active
+        makeSignal({ date: "2025-01-01" }), // active
       ];
       expect(calculateWarmthTier(signals)).toBe("Stale");
     });
 
     it("returns Stale when active signal count is exactly 1 despite older signals", () => {
       const signals = [
-        makeSignal({ date: "2025-03-01" }),  // active
-        makeSignal({ date: "2023-06-01" }),  // decayed
-        makeSignal({ date: "2022-01-01" }),  // decayed
+        makeSignal({ date: "2025-03-01" }), // active
+        makeSignal({ date: "2023-06-01" }), // decayed
+        makeSignal({ date: "2022-01-01" }), // decayed
       ];
       expect(calculateWarmthTier(signals)).toBe("Stale");
     });
@@ -86,7 +85,7 @@ describe("calculateWarmthTier", () => {
 
     it("returns Warm when there are 2 active signals including a co_investment outside 18 months", () => {
       const signals = [
-        makeSignal({ date: "2024-08-01", type: "co_investment" }),  // active but outside 18-month hot window
+        makeSignal({ date: "2024-08-01", type: "co_investment" }), // active but outside 18-month hot window
         makeSignal({ date: "2025-06-01", type: "event_attendance" }),
       ];
       expect(calculateWarmthTier(signals)).toBe("Warm");
@@ -103,7 +102,7 @@ describe("calculateWarmthTier", () => {
 
     it("returns Warm when there are 3+ active signals but co_investment is older than 18 months", () => {
       const signals = [
-        makeSignal({ date: "2024-06-01", type: "co_investment" }),  // active but > 18 months ago
+        makeSignal({ date: "2024-06-01", type: "co_investment" }), // active but > 18 months ago
         makeSignal({ date: "2025-01-01", type: "event_attendance" }),
         makeSignal({ date: "2025-06-01", type: "press_mention" }),
       ];
@@ -114,7 +113,7 @@ describe("calculateWarmthTier", () => {
   describe("Hot", () => {
     it("returns Hot with 3 active signals and a co_investment within 18 months", () => {
       const signals = [
-        makeSignal({ date: "2025-06-01", type: "co_investment" }),  // within 18 months
+        makeSignal({ date: "2025-06-01", type: "co_investment" }), // within 18 months
         makeSignal({ date: "2025-01-01", type: "event_attendance" }),
         makeSignal({ date: "2025-03-01", type: "linkedin_connection" }),
       ];
@@ -134,10 +133,10 @@ describe("calculateWarmthTier", () => {
     it("counts only active signals toward the Hot threshold", () => {
       // 4 total signals but only 3 are active — should still be Hot
       const signals = [
-        makeSignal({ date: "2025-06-01", type: "co_investment" }),  // active, within 18m
-        makeSignal({ date: "2025-01-01", type: "event_attendance" }),  // active
-        makeSignal({ date: "2025-03-01", type: "linkedin_connection" }),  // active
-        makeSignal({ date: "2023-01-01", type: "press_mention" }),  // decayed
+        makeSignal({ date: "2025-06-01", type: "co_investment" }), // active, within 18m
+        makeSignal({ date: "2025-01-01", type: "event_attendance" }), // active
+        makeSignal({ date: "2025-03-01", type: "linkedin_connection" }), // active
+        makeSignal({ date: "2023-01-01", type: "press_mention" }), // decayed
       ];
       expect(calculateWarmthTier(signals)).toBe("Hot");
     });
@@ -152,10 +151,7 @@ describe("calculateWarmthTier", () => {
 
     it("treats a signal one day inside the 24-month window as active", () => {
       // one day after the cutoff = 2024-05-27
-      const signals = [
-        makeSignal({ date: "2024-05-27" }),
-        makeSignal({ date: "2025-01-01" }),
-      ];
+      const signals = [makeSignal({ date: "2024-05-27" }), makeSignal({ date: "2025-01-01" })];
       expect(calculateWarmthTier(signals)).toBe("Warm");
     });
 
@@ -195,15 +191,15 @@ describe("isWarmAtRisk", () => {
   });
 
   it("returns true when last signal was more than 90 days ago", () => {
-    expect(isWarmAtRisk("2026-02-24")).toBe(true);  // 91 days before 2026-05-26
+    expect(isWarmAtRisk("2026-02-24")).toBe(true); // 91 days before 2026-05-26
   });
 
   it("returns true when last signal was exactly 90 days ago", () => {
-    expect(isWarmAtRisk("2026-02-25")).toBe(true);  // exactly 90 days before 2026-05-26
+    expect(isWarmAtRisk("2026-02-25")).toBe(true); // exactly 90 days before 2026-05-26
   });
 
   it("returns false when last signal was within the last 90 days", () => {
-    expect(isWarmAtRisk("2026-03-01")).toBe(false);  // 86 days before 2026-05-26
+    expect(isWarmAtRisk("2026-03-01")).toBe(false); // 86 days before 2026-05-26
   });
 
   it("returns false when last signal was yesterday", () => {

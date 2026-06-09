@@ -10,7 +10,8 @@ export const tool: Tool = {
     properties: {
       name: {
         type: "string",
-        description: "The fund or investor name to look up (e.g. 'Lux Capital', 'General Catalyst')",
+        description:
+          "The fund or investor name to look up (e.g. 'Lux Capital', 'General Catalyst')",
       },
     },
     required: ["name"],

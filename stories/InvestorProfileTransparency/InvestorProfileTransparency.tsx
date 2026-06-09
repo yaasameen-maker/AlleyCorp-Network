@@ -80,9 +80,7 @@ export function InvestorProfileTransparency({
       <div className="flex-1 overflow-y-auto overscroll-contain">
         <div className="p-4 sm:p-5 space-y-5 pb-6">
           <ProfileJourneySteps
-            activeStep={
-              highlightedFactor ? "why" : activeTab === "journey" ? "score" : journeyStep
-            }
+            activeStep={highlightedFactor ? "why" : activeTab === "journey" ? "score" : journeyStep}
           />
 
           <ProfileSummaryStats
@@ -98,9 +96,7 @@ export function InvestorProfileTransparency({
             onFactorHover={setHighlightedFactor}
           />
 
-          {investor.suggestedAction && (
-            <SuggestedActionCard action={investor.suggestedAction} />
-          )}
+          {investor.suggestedAction && <SuggestedActionCard action={investor.suggestedAction} />}
 
           <InvestorProfileEmailDraft investor={investor} />
 
@@ -132,7 +128,10 @@ export function InvestorProfileTransparency({
           )}
 
           <p className="flex items-center gap-2 text-[11px] text-muted pt-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-signal-green animate-pulse-dot" aria-hidden />
+            <span
+              className="w-1.5 h-1.5 rounded-full bg-signal-green animate-pulse-dot"
+              aria-hidden
+            />
             Data refreshed {formatDataFreshness(DATA_REFRESHED_AT)}
           </p>
         </div>

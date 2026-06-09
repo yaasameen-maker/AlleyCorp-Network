@@ -1,6 +1,11 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
-import { getInvestorByName, searchRelationships, listStaleRelationships, getWarmthSignals } from "@/lib/db";
+import {
+  getInvestorByName,
+  searchRelationships,
+  listStaleRelationships,
+  getWarmthSignals,
+} from "@/lib/db";
 import type { Signal } from "@/lib/types";
 
 const anthropic = new Anthropic();
@@ -15,7 +20,8 @@ const TOOLS: Anthropic.Tool[] = [
       properties: {
         name: {
           type: "string",
-          description: "The fund or investor name to look up (e.g. 'Lux Capital', 'General Catalyst')",
+          description:
+            "The fund or investor name to look up (e.g. 'Lux Capital', 'General Catalyst')",
         },
       },
       required: ["name"],
@@ -158,7 +164,8 @@ async function runTool(name: string, input: Record<string, unknown>): Promise<st
 
       const entries = signals.map((s: Signal) => {
         const weightDots = s.weight
-          ? ({ high: "●●●", medium: "●●○", low: "●○○" } as Record<string, string>)[s.weight] ?? "○○○"
+          ? (({ high: "●●●", medium: "●●○", low: "●○○" } as Record<string, string>)[s.weight] ??
+            "○○○")
           : "○○○";
         return `• [${formatDate(s.date)}] ${s.type.replace(/_/g, " ")} — ${s.source} — ${s.value} ${weightDots}`;
       });
@@ -196,7 +203,8 @@ export async function POST(request: NextRequest) {
       });
 
       if (response.stop_reason === "end_turn") {
-        const text = response.content.find((b): b is Anthropic.TextBlock => b.type === "text")?.text ?? "";
+        const text =
+          response.content.find((b): b is Anthropic.TextBlock => b.type === "text")?.text ?? "";
         return Response.json({ response: text });
       }
 

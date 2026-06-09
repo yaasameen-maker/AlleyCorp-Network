@@ -54,7 +54,9 @@ export function RelationshipTimeline({
                           : "bg-mist border-ink/60"
                     }`}
                   />
-                  <span className="text-xs font-semibold text-ink mt-2.5 text-center">{event.date}</span>
+                  <span className="text-xs font-semibold text-ink mt-2.5 text-center">
+                    {event.date}
+                  </span>
                   <span
                     className={`text-xs mt-1 text-center line-clamp-2 leading-snug px-1 ${
                       isActive ? "text-ink font-medium" : "text-muted"

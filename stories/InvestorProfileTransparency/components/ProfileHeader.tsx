@@ -8,7 +8,12 @@ interface ProfileHeaderProps {
   layout?: "modal" | "panel";
 }
 
-export function ProfileHeader({ fundName, warmthTier, onClose, layout = "modal" }: ProfileHeaderProps) {
+export function ProfileHeader({
+  fundName,
+  warmthTier,
+  onClose,
+  layout = "modal",
+}: ProfileHeaderProps) {
   return (
     <header className="shrink-0 bg-mist/95 backdrop-blur border-b border-line px-4 sm:px-5 pb-3">
       <div className="flex items-center gap-2">
@@ -19,12 +24,34 @@ export function ProfileHeader({ fundName, warmthTier, onClose, layout = "modal" 
           className="touch-target touch-press -ml-2 flex items-center justify-center rounded-full text-ink"
         >
           {layout === "panel" ? (
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           ) : (
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           )}
         </button>

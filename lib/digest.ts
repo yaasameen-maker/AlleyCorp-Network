@@ -44,8 +44,8 @@ function headlineFor(investor: Investor): string {
     months === null
       ? "no contact on record"
       : months <= 1
-      ? "active recently"
-      : `${months} month${months === 1 ? "" : "s"} since last contact`;
+        ? "active recently"
+        : `${months} month${months === 1 ? "" : "s"} since last contact`;
   return `${investor.fund.name} · ${investor.warmthTier} · ${time}`;
 }
 
@@ -70,9 +70,7 @@ function toDigestItem(investor: Investor): DigestItem {
 export function buildWeeklyDigest(investors: Investor[]): WeeklyDigest {
   const stale = investors.filter((i) => i.warmthTier === "Stale");
   const warmAtRisk = investors.filter(
-    (i) =>
-      i.warmthTier === "Warm" &&
-      (!i.lastSignalDate || monthsSince(i.lastSignalDate) >= 2),
+    (i) => i.warmthTier === "Warm" && (!i.lastSignalDate || monthsSince(i.lastSignalDate) >= 2)
   );
 
   const sections: DigestSection[] = [];
@@ -126,9 +124,7 @@ export function formatDigestAsEmail(digest: WeeklyDigest): string {
     lines.push(`── ${section.title} (${section.items.length}) ──`);
     for (const item of section.items) {
       lines.push(`  ${item.headline}`);
-      lines.push(
-        `  ${item.timestamp}${item.signalSource ? ` · ${item.signalSource}` : ""}`,
-      );
+      lines.push(`  ${item.timestamp}${item.signalSource ? ` · ${item.signalSource}` : ""}`);
     }
     lines.push("");
   }

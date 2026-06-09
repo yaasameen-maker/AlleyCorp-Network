@@ -14,8 +14,8 @@ export type BindMode = "localhost" | "unix-socket";
 
 export interface ServerBindConfig {
   mode: BindMode;
-  port?: number;           // used when mode = 'localhost'
-  socketPath?: string;     // used when mode = 'unix-socket'
+  port?: number; // used when mode = 'localhost'
+  socketPath?: string; // used when mode = 'unix-socket'
   allowedOrigins?: string[];
 }
 

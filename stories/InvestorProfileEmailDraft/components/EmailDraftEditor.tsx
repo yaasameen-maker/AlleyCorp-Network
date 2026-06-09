@@ -2,11 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Investor } from "@/app/data/mockData";
-import {
-  buildEmailDraft,
-  formatEmailForCopy,
-  type EmailDraftContent,
-} from "@/lib/emailDraft";
+import { buildEmailDraft, formatEmailForCopy, type EmailDraftContent } from "@/lib/emailDraft";
 
 interface EmailDraftEditorProps {
   draft: EmailDraftContent;
@@ -74,14 +70,31 @@ export function EmailDraftEditor({
           >
             {copied ? (
               <>
-                <svg className="w-3.5 h-3.5 text-signal-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <svg
+                  className="w-3.5 h-3.5 text-signal-green"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
                 <span className="text-signal-green">Copied</span>
               </>
             ) : (
               <>
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                <svg
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"

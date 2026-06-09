@@ -8,10 +8,7 @@ interface CoInvestmentsPanelProps {
   activeTimelineId: string | null;
 }
 
-export function CoInvestmentsPanel({
-  coInvestments,
-  activeTimelineId,
-}: CoInvestmentsPanelProps) {
+export function CoInvestmentsPanel({ coInvestments, activeTimelineId }: CoInvestmentsPanelProps) {
   if (coInvestments.length === 0) {
     return (
       <p className="text-sm text-muted py-6 text-center border border-line rounded-xl bg-paper">

@@ -14,6 +14,7 @@ fact-check every fund name, every warmth score, every relationship claim.
 will undermine trust instantly.
 
 Everything in this sprint serves one of three things:
+
 1. Accurate warmth tiers for funds AlleyCorp actually knows
 2. Evidence behind each tier (real signals, real contact names)
 3. AI that answers the 5 Demo Day prompts cleanly, every time
@@ -34,22 +35,17 @@ Everything in this sprint serves one of three things:
 ### 12 Priority Funds (in this order)
 
 **Hot/Warm — do these first:**
+
 1. Riot Ventures
 2. Snowpoint Ventures
 3. General Catalyst
 4. Mach33
 5. SOSV
 
-**Stale reconnect targets — do these second:**
-6. Trimble Ventures
-7. BOLD Capital Partners
-8. SineWave Ventures
-9. Flybridge
-10. Cherubic Ventures
-11. Eclipse Ventures
-12. Union Square Ventures
+**Stale reconnect targets — do these second:** 6. Trimble Ventures 7. BOLD Capital Partners 8. SineWave Ventures 9. Flybridge 10. Cherubic Ventures 11. Eclipse Ventures 12. Union Square Ventures
 
 ### For each fund, find:
+
 - The managing partner OR the partner most likely to co-invest in deep tech
 - 1 person per fund minimum, 2 is better
 - Their exact title (Managing Partner / General Partner / Partner)
@@ -57,6 +53,7 @@ Everything in this sprint serves one of three things:
 - Fund website domain (e.g. `riotvc.com`)
 
 ### Sources
+
 Crunchbase, fund website team page, LinkedIn, Pitchbook if you have access.
 No scraping needed — manual copy-paste research only.
 
@@ -72,11 +69,13 @@ the cell blank. Wrong data is worse than no data.
 **1. Add logo_url to fund table**
 
 Run against Railway immediately:
+
 ```sql
 ALTER TABLE fund ADD COLUMN IF NOT EXISTS logo_url TEXT;
 ```
 
 Update `schema.sql` so it stays idempotent:
+
 ```sql
 -- in the fund table CREATE TABLE IF NOT EXISTS block:
 logo_url         TEXT,
@@ -85,12 +84,14 @@ logo_url         TEXT,
 **2. Create `scripts/enrich-funds.ts`**
 
 For each fund in the DB:
+
 - Read `fund.website`
 - Construct Clearbit URL: `https://logo.clearbit.com/{domain}`
 - Write `logo_url` back to the fund row
 - No API key needed — Clearbit Logo API is free
 
 Example:
+
 ```ts
 const logoUrl = `https://logo.clearbit.com/${domain}`;
 await pool.query(`UPDATE fund SET logo_url = $1 WHERE id = $2`, [logoUrl, fund.id]);
@@ -101,26 +102,26 @@ await pool.query(`UPDATE fund SET logo_url = $1 WHERE id = $2`, [logoUrl, fund.i
 Update `seed.sql` fund INSERT blocks to include `website` values.
 Research the domain for each fund (quick Google per fund — all public):
 
-| Fund | Website |
-|---|---|
-| Riot Ventures | riotvc.com |
-| Snowpoint Ventures | snowpoint.vc |
-| General Catalyst | generalcatalyst.com |
-| Mach33 | mach33.vc |
-| SOSV | sosv.com |
-| Trimble Ventures | trimbleventures.com |
-| BOLD Capital Partners | boldcap.com |
-| SineWave Ventures | sinewaveventures.com |
-| Flybridge | flybridge.com |
-| Cherubic Ventures | cherubic.com |
-| Eclipse Ventures | eclipse.vc |
-| Union Square Ventures | usv.com |
-| a16z American Dynamism | a16z.com |
-| Founders Fund | foundersfund.com |
-| NEA | nea.com |
-| ff Venture Capital | ffvc.com |
-| Geodesic Capital | geodesiccap.com |
-| Ubiquity Ventures | ubiquity.vc |
+| Fund                       | Website              |
+| -------------------------- | -------------------- |
+| Riot Ventures              | riotvc.com           |
+| Snowpoint Ventures         | snowpoint.vc         |
+| General Catalyst           | generalcatalyst.com  |
+| Mach33                     | mach33.vc            |
+| SOSV                       | sosv.com             |
+| Trimble Ventures           | trimbleventures.com  |
+| BOLD Capital Partners      | boldcap.com          |
+| SineWave Ventures          | sinewaveventures.com |
+| Flybridge                  | flybridge.com        |
+| Cherubic Ventures          | cherubic.com         |
+| Eclipse Ventures           | eclipse.vc           |
+| Union Square Ventures      | usv.com              |
+| a16z American Dynamism     | a16z.com             |
+| Founders Fund              | foundersfund.com     |
+| NEA                        | nea.com              |
+| ff Venture Capital         | ffvc.com             |
+| Geodesic Capital           | geodesiccap.com      |
+| Ubiquity Ventures          | ubiquity.vc          |
 | Amazon Climate Pledge Fund | (skip — no Clearbit) |
 
 Then run enrich script against Railway to populate `logo_url`.
@@ -160,11 +161,13 @@ Run against Railway: `psql $DATABASE_URL -f seed-contacts.sql`
 **File:** `lib/db.ts`
 
 Add investor JOIN to `REL_SELECT`:
+
 ```sql
 LEFT JOIN investor i ON i.fund_id = f.id
 ```
 
 Add investor JSON to the SELECT:
+
 ```sql
 'investor', CASE WHEN i.id IS NOT NULL THEN json_build_object(
   'id',          i.id,
@@ -175,6 +178,7 @@ Add investor JSON to the SELECT:
 ```
 
 Add `logo_url` to the fund JSON:
+
 ```sql
 'logoUrl', f.logo_url,
 ```
@@ -182,11 +186,13 @@ Add `logo_url` to the fund JSON:
 **File:** `lib/types.ts`
 
 Add to the `Fund` interface:
+
 ```ts
 logoUrl?: string;
 ```
 
 Add to the `Relationship` interface:
+
 ```ts
 investor?: {
   id: string;
@@ -204,6 +210,7 @@ frontend can consume them.
 ### Wednesday Morning — Signal Enrichment (2 hours)
 
 Audit signal counts per fund:
+
 ```sql
 SELECT f.name, r.warmth_tier, COUNT(s.id) AS signal_count
 FROM relationship r
@@ -215,6 +222,7 @@ ORDER BY r.warmth_tier, signal_count;
 
 Any Hot or Warm fund with fewer than 3 signals needs more. Add real,
 verifiable signals to `seed.sql`:
+
 - Co-investment dates: verify on Crunchbase
 - Event attendance: verify from public event records
 - Press mentions: link to actual articles
@@ -261,12 +269,12 @@ Add a 2-sentence computed summary at the very top of the drawer content,
 above the warmth badge. No AI, no new API calls — pure string interpolation
 from existing data:
 
-| Tier | Template |
-|---|---|
-| Hot | `"Active co-investor since [earliest co_investment year]. [N] signals over the past [X] months."` |
-| Warm | `"Co-invested in [Company] in [year]. [N] signals — last contact [month year]."` |
-| Stale | `"Last co-invested in [Company] in [year]. No contact in [N] months — relationship at risk."` |
-| Cold | `"No prior co-investment with AlleyCorp. Identified as a target deep tech fund."` |
+| Tier  | Template                                                                                          |
+| ----- | ------------------------------------------------------------------------------------------------- |
+| Hot   | `"Active co-investor since [earliest co_investment year]. [N] signals over the past [X] months."` |
+| Warm  | `"Co-invested in [Company] in [year]. [N] signals — last contact [month year]."`                  |
+| Stale | `"Last co-invested in [Company] in [year]. No contact in [N] months — relationship at risk."`     |
+| Cold  | `"No prior co-investment with AlleyCorp. Identified as a target deep tech fund."`                 |
 
 Style: `text-sm text-[#6B7280] leading-relaxed` — same as body text elsewhere.
 
@@ -277,11 +285,13 @@ Style: `text-sm text-[#6B7280] leading-relaxed` — same as body text elsewhere.
 Once Luba seeds `logo_url`, show it:
 
 In `ProfileDrawer` header:
+
 - 36×36 rounded logo next to fund name
 - Use Next.js `<Image unoptimized>` for external Clearbit URLs
 - Fallback: first letter of fund name in a teal circle (`bg-[#0EA5D6] text-white`)
 
 In `InvestorRow`:
+
 - 24×24 logo at the start of the row
 - Same fallback pattern
 
@@ -290,6 +300,7 @@ In `InvestorRow`:
 Run all 5 Demo Day prompts 10 times each. Screenshot every output.
 
 **Prompts to test:**
+
 1. "Who should we reconnect with before they lead a round without us?"
 2. "Who are our warmest relationships right now?"
 3. "What should I know before our meeting with General Catalyst?"
@@ -297,6 +308,7 @@ Run all 5 Demo Day prompts 10 times each. Screenshot every output.
 5. "Show me the full picture on Trimble Ventures."
 
 **Fix if any of these happen:**
+
 - Em dashes appear in output (`renderInline` should catch them — verify)
 - Response takes >4 seconds
 - Fund cards don't match the answer text
@@ -335,30 +347,30 @@ After rehearsal: fix top 3 issues only. Nothing else.
 
 ## Wednesday Schedule (Both)
 
-| Time | Activity |
-|---|---|
+| Time    | Activity                                                              |
+| ------- | --------------------------------------------------------------------- |
 | Morning | Luba: signal enrichment + deploy. Yaasameen: signal evidence display. |
-| 12pm | Deploy latest to Railway. Run `npm run test:run`. |
-| 2pm | Full demo rehearsal — one person plays Abe, two people watch. |
-| 3pm | Fix top 3 issues from rehearsal only. |
-| 6pm | **Code freeze.** No new features. Bug fixes only. |
+| 12pm    | Deploy latest to Railway. Run `npm run test:run`.                     |
+| 2pm     | Full demo rehearsal — one person plays Abe, two people watch.         |
+| 3pm     | Fix top 3 issues from rehearsal only.                                 |
+| 6pm     | **Code freeze.** No new features. Bug fixes only.                     |
 
 ---
 
 ## Files Being Created / Modified
 
-| File | Owner | What |
-|---|---|---|
-| `schema.sql` | Luba | Add `logo_url` to fund table |
-| `seed.sql` | Luba | Add `website` values to fund inserts |
-| `seed-contacts.sql` | Luba | New — investor contacts (not gitignored) |
-| `scripts/enrich-funds.ts` | Luba | Clearbit logo fetch + write to DB |
-| `lib/db.ts` | Luba | Join investor table, add logo_url to fund JSON |
-| `lib/types.ts` | Luba | Add investor + logoUrl fields |
-| `app/api/investors/route.ts` | Luba | Pass investor + logoUrl through to response |
+| File                               | Owner     | What                                                    |
+| ---------------------------------- | --------- | ------------------------------------------------------- |
+| `schema.sql`                       | Luba      | Add `logo_url` to fund table                            |
+| `seed.sql`                         | Luba      | Add `website` values to fund inserts                    |
+| `seed-contacts.sql`                | Luba      | New — investor contacts (not gitignored)                |
+| `scripts/enrich-funds.ts`          | Luba      | Clearbit logo fetch + write to DB                       |
+| `lib/db.ts`                        | Luba      | Join investor table, add logo_url to fund JSON          |
+| `lib/types.ts`                     | Luba      | Add investor + logoUrl fields                           |
+| `app/api/investors/route.ts`       | Luba      | Pass investor + logoUrl through to response             |
 | `app/components/ProfileDrawer.tsx` | Yaasameen | Contact section, narrative summary, logo, signal labels |
-| `app/components/InvestorRow.tsx` | Yaasameen | Fund logo |
-| `data/fund-contacts.csv` | Michael | Research deliverable — **gitignored (PII)** |
+| `app/components/InvestorRow.tsx`   | Yaasameen | Fund logo                                               |
+| `data/fund-contacts.csv`           | Michael   | Research deliverable — **gitignored (PII)**             |
 
 ---
 
@@ -378,6 +390,7 @@ After rehearsal: fix top 3 issues only. Nothing else.
 
 **Opening (1 min)**
 Don't start with the UI. Start with the problem:
+
 > "AlleyCorp co-invests with dozens of funds. The problem is relationship
 > decay — a fund that was a great partner two years ago might be cold today,
 > and you don't find out until they lead a round without you. We built a
@@ -387,17 +400,20 @@ Don't start with the UI. Start with the problem:
 **Scene 1 — Network Health (2 min)**
 Open the dashboard. Show the hero card. Point to the warmth breakdown.
 Click "Needs outreach" to filter to Stale funds.
+
 > "These are the relationships that need a call this week."
 
 **Scene 2 — Profile Deep Dive (3 min)**
 Click into a Stale fund. Show the profile card: warmth tier, relationship
 narrative, contact name, specific signals with dates, suggested action.
 Then click into a Hot fund. Show the contrast.
+
 > "The system knows the difference between a fund you saw last month and
 > one you haven't heard from in two years."
 
 **Scene 3 — AI Assistant (4 min)**
 Open Ask the Network. Run these three prompts live:
+
 1. "Who should we reconnect with before they lead a round without us?"
 2. "What should I know before our meeting with General Catalyst?"
 3. "Show me the full picture on Trimble Ventures."
@@ -406,10 +422,12 @@ Have prompts 4 and 5 ready if Lauren asks to see more. Don't volunteer them.
 
 **Scene 4 — Daily Digest (1 min)**
 Switch to Digest view briefly.
+
 > "Every morning, Abe gets a digest of which relationships moved and
 > what needs attention."
 
 **Closing (1 min)**
+
 > "Everything you just saw runs on your actual co-investor data. The warmth
 > scores are deterministic — no AI hallucination in the scoring layer. The
 > AI only touches the natural language interface. We can add new signals,
@@ -421,14 +439,14 @@ Leave 10 minutes for questions.
 
 ## Risks
 
-| Risk | Mitigation |
-|---|---|
-| AI prompt slow or unreliable | Rehearse all 3 demo prompts 10x Wednesday. Have screenshot backup. |
-| Lauren corrects data live | Get the warmth tier breakdown in front of her before Thursday if possible. |
-| Railway outage during demo | Screenshot key screens Tuesday after enrichment. Keep as backup. |
-| Michael's research incomplete | 5 Hot/Warm funds are enough. Stale funds are bonus. |
-| Logo URLs broken / slow | Test Clearbit for all 12 priority funds before demo. Remove `logo_url` render if flaky. |
+| Risk                          | Mitigation                                                                              |
+| ----------------------------- | --------------------------------------------------------------------------------------- |
+| AI prompt slow or unreliable  | Rehearse all 3 demo prompts 10x Wednesday. Have screenshot backup.                      |
+| Lauren corrects data live     | Get the warmth tier breakdown in front of her before Thursday if possible.              |
+| Railway outage during demo    | Screenshot key screens Tuesday after enrichment. Keep as backup.                        |
+| Michael's research incomplete | 5 Hot/Warm funds are enough. Stale funds are bonus.                                     |
+| Logo URLs broken / slow       | Test Clearbit for all 12 priority funds before demo. Remove `logo_url` render if flaky. |
 
 ---
 
-*Plan written June 8 2026 · Demo Day target June 24 2026*
+_Plan written June 8 2026 · Demo Day target June 24 2026_

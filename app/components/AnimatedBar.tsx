@@ -64,9 +64,7 @@ export function AnimatedBar({
           width: `${displayWidth}%`,
           backgroundColor: color,
           transition:
-            displayWidth === 0
-              ? "none"
-              : `width ${duration}ms cubic-bezier(0.32, 0.72, 0, 1)`,
+            displayWidth === 0 ? "none" : `width ${duration}ms cubic-bezier(0.32, 0.72, 0, 1)`,
         }}
       />
     </div>

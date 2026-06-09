@@ -14,16 +14,16 @@ export type ScoringSignalType =
   | "co_investment"
   | "event_attendance"
   | "press_mention"
-  | "email_thread"        // Phase 2 — Kabir ~Jun 1
+  | "email_thread" // Phase 2 — Kabir ~Jun 1
   | "linkedin_connection"
   | "manual_override";
 
 export type ConfidenceLabel = "high" | "medium" | "low";
 
 const CONFIDENCE_MAP: Record<ConfidenceLabel, number> = {
-  high:   1.0,
+  high: 1.0,
   medium: 0.66,
-  low:    0.33,
+  low: 0.33,
 };
 
 export function toConfidenceScore(label: ConfidenceLabel): number {
@@ -62,22 +62,22 @@ export interface RelationshipRepository {
 // Thresholds — change here, not inline
 // ─────────────────────────────────────────
 
-const ACTIVE_WINDOW_MONTHS = 24;  // signals older than this are considered decayed
-const HOT_CO_INVEST_MONTHS = 18;  // co-investment must be within this window to qualify for Hot
-const HOT_SIGNAL_THRESHOLD = 3;   // minimum active signals for Hot
-const WARM_SIGNAL_THRESHOLD = 2;  // minimum active signals for Warm
-const WARM_AT_RISK_DAYS     = 90; // days without a signal before a Warm is flagged at-risk
+const ACTIVE_WINDOW_MONTHS = 24; // signals older than this are considered decayed
+const HOT_CO_INVEST_MONTHS = 18; // co-investment must be within this window to qualify for Hot
+const HOT_SIGNAL_THRESHOLD = 3; // minimum active signals for Hot
+const WARM_SIGNAL_THRESHOLD = 2; // minimum active signals for Warm
+const WARM_AT_RISK_DAYS = 90; // days without a signal before a Warm is flagged at-risk
 
 const STALE_DAYS = 180; // 6 months without signal → Stale (weighted scorer)
-const COLD_DAYS  = 365; // 12 months → Cold (weighted scorer)
+const COLD_DAYS = 365; // 12 months → Cold (weighted scorer)
 
 const SIGNAL_WEIGHTS: Record<ScoringSignalType, number> = {
-  co_investment:      10,
-  event_attendance:    4,  // Swoogo/Luma attendance is meaningful
-  press_mention:       2,  // news signal — same tier as email_thread
-  email_thread:        2,  // Kabir enrichment, Jun 1
+  co_investment: 10,
+  event_attendance: 4, // Swoogo/Luma attendance is meaningful
+  press_mention: 2, // news signal — same tier as email_thread
+  email_thread: 2, // Kabir enrichment, Jun 1
   linkedin_connection: 1,
-  manual_override:     0,
+  manual_override: 0,
 };
 
 // Lauren-confirmed Hot calibration anchors — always Hot regardless of score
@@ -130,15 +130,15 @@ function daysAgo(n: number): Date {
 export function calculateWarmthTier(signals: Signal[]): WarmthTier {
   if (signals.length === 0) return "Cold";
 
-  const activeWindow   = monthsAgo(ACTIVE_WINDOW_MONTHS);
+  const activeWindow = monthsAgo(ACTIVE_WINDOW_MONTHS);
   const coInvestWindow = monthsAgo(HOT_CO_INVEST_MONTHS);
 
-  const activeSignals = signals.filter(s => new Date(s.date) >= activeWindow);
+  const activeSignals = signals.filter((s) => new Date(s.date) >= activeWindow);
 
   if (activeSignals.length === 0) return "Stale";
 
   const hasRecentCoInvestment = activeSignals.some(
-    s => s.type === "co_investment" && new Date(s.date) >= coInvestWindow
+    (s) => s.type === "co_investment" && new Date(s.date) >= coInvestWindow
   );
 
   if (activeSignals.length >= HOT_SIGNAL_THRESHOLD && hasRecentCoInvestment) return "Hot";
@@ -172,7 +172,7 @@ export function computeWarmthTier(rel: ScoringRelationship): WarmthTier {
     ? (now.getTime() - rel.lastSignalDate.getTime()) / 86_400_000
     : Infinity;
 
-  const hasCoInvestment = rel.signals.some(s => s.type === "co_investment");
+  const hasCoInvestment = rel.signals.some((s) => s.type === "co_investment");
   if (hasCoInvestment && daysSinceLastSignal > STALE_DAYS) return "Stale";
   if (daysSinceLastSignal > COLD_DAYS) return "Cold";
 

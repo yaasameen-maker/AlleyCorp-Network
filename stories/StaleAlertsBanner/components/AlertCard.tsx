@@ -17,9 +17,7 @@ export function AlertCard({ alert, onSelect }: AlertCardProps) {
       type="button"
       onClick={onSelect}
       className={`touch-press snap-item snap-start shrink-0 max-md:w-[82%] max-md:max-w-[18rem] md:w-full md:max-w-none lg:w-full lg:max-w-none text-left rounded-2xl border p-4 ${
-        alert.severity === "high"
-          ? "border-signal-amber/40 bg-navy"
-          : "border-line bg-mist"
+        alert.severity === "high" ? "border-signal-amber/40 bg-navy" : "border-line bg-mist"
       }`}
     >
       <div className="flex items-start justify-between gap-2 mb-2">
@@ -40,7 +38,13 @@ export function AlertCard({ alert, onSelect }: AlertCardProps) {
 
       <p className="mt-3 text-[11px] text-muted flex items-center gap-1">
         Tap to view profile
-        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+        <svg
+          className="w-3.5 h-3.5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden
+        >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       </p>

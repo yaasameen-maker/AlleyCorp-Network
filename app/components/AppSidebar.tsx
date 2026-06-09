@@ -21,11 +21,11 @@ interface AppSidebarProps {
 const TIERS: (WarmthTier | "All")[] = ["All", "Hot", "Warm", "Stale", "Cold"];
 
 const TIER_COLORS: Record<WarmthTier | "All", string> = {
-  All:   "bg-[#0D1320] text-white",
-  Hot:   "bg-[#D1FAE5] text-[#065F46]",
-  Warm:  "bg-[#FEF3C7] text-[#92400E]",
+  All: "bg-[#0D1320] text-white",
+  Hot: "bg-[#D1FAE5] text-[#065F46]",
+  Warm: "bg-[#FEF3C7] text-[#92400E]",
   Stale: "bg-[#FEE2E2] text-[#991B1B]",
-  Cold:  "bg-[#F3F4F6] text-[#4B5563]",
+  Cold: "bg-[#F3F4F6] text-[#4B5563]",
 };
 
 function SearchIcon() {
@@ -74,19 +74,16 @@ export function AppSidebar({
 
   return (
     <aside className="w-[272px] shrink-0 h-[100dvh] flex flex-col bg-white border-r border-[#EAECEF] z-10">
-
       {/* ── Header — wordmark + dark toggle ── */}
       <div className="px-5 pt-6 pb-4 shrink-0">
         <div className="flex items-center justify-between mb-3">
-          <img
-            src="/logo.png"
-            alt="AlleyCorp"
-            className="h-8 w-8 object-contain rounded-md"
-          />
+          <img src="/logo.png" alt="AlleyCorp" className="h-8 w-8 object-contain rounded-md" />
           <DarkToggle on={dark} onToggle={toggleDark} />
         </div>
         <p className="text-[11px] text-[#9CA3AF] leading-tight">
-          Co-investor network<br />Deep Tech · 2026
+          Co-investor network
+          <br />
+          Deep Tech · 2026
         </p>
       </div>
 
@@ -126,17 +123,15 @@ export function AppSidebar({
               onClick={() => onFilterTierChange(tier)}
               className={`
                 px-2.5 py-1 rounded-md text-[10px] font-semibold tracking-wide transition-all
-                ${active
-                  ? TIER_COLORS[tier] + " shadow-sm"
-                  : "bg-transparent text-[#9CA3AF] hover:text-[#4B5563] hover:bg-[#F3F4F6]"
+                ${
+                  active
+                    ? TIER_COLORS[tier] + " shadow-sm"
+                    : "bg-transparent text-[#9CA3AF] hover:text-[#4B5563] hover:bg-[#F3F4F6]"
                 }
               `}
             >
-              {tier}
-              {" "}
-              <span className={active ? "opacity-60" : "opacity-70"}>
-                {tierCounts[tier]}
-              </span>
+              {tier}{" "}
+              <span className={active ? "opacity-60" : "opacity-70"}>{tierCounts[tier]}</span>
             </button>
           );
         })}
@@ -169,15 +164,25 @@ export function AppSidebar({
 
       {/* ── Footer nav ── */}
       <div className="shrink-0 border-t border-[#F3F4F6] px-4 py-3 space-y-1">
-
         {/* Ask button — primary action */}
         <button
           type="button"
           onClick={onAskOpen}
           className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-[#0D1320] text-white text-[11px] font-semibold hover:bg-[#1a2535] transition-colors"
         >
-          <svg className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+          <svg
+            className="w-3 h-3 shrink-0"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+            />
           </svg>
           Ask the network
         </button>
@@ -200,7 +205,6 @@ export function AppSidebar({
           Portfolio
         </a>
       </div>
-
     </aside>
   );
 }

@@ -2,10 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { Investor } from "@/app/data/mockData";
-import {
-  activePortfolioCompanies,
-  alumniPortfolioCompanies,
-} from "@/app/data/portfolioCompanies";
+import { activePortfolioCompanies, alumniPortfolioCompanies } from "@/app/data/portfolioCompanies";
 import { buildPortfolioIndex, getPortfolioSectors } from "@/lib/portfolio";
 import { AlumniSection } from "./components/AlumniSection";
 import { CompanyCard } from "./components/CompanyCard";
@@ -83,8 +80,19 @@ export function PortfolioExplorer({
             aria-label="Close portfolio"
             className="touch-target touch-press flex items-center justify-center rounded-full text-ink -ml-2"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </button>
           <span className="text-xs text-muted">Portfolio</span>
@@ -97,7 +105,10 @@ export function PortfolioExplorer({
           variant === "inline" ? "lg:px-8 lg:py-5" : ""
         }`}
       >
-        <h2 id="portfolio-title" className={`font-semibold text-ink ${variant === "inline" ? "text-xl" : "text-lg"}`}>
+        <h2
+          id="portfolio-title"
+          className={`font-semibold text-ink ${variant === "inline" ? "text-xl" : "text-lg"}`}
+        >
           Portfolio Companies
         </h2>
         <p className="text-xs text-muted mt-1">
@@ -105,7 +116,9 @@ export function PortfolioExplorer({
         </p>
       </div>
 
-      <div className={`shrink-0 px-4 py-3 border-b border-line ${variant === "inline" ? "lg:px-8" : ""}`}>
+      <div
+        className={`shrink-0 px-4 py-3 border-b border-line ${variant === "inline" ? "lg:px-8" : ""}`}
+      >
         <SectorFilter sectors={sectors} selected={sector} onSelect={setSector} />
       </div>
 
@@ -150,9 +163,7 @@ export function PortfolioExplorer({
   );
 
   if (variant === "inline") {
-    return (
-      <div className="flex flex-col min-w-0">{listContent}</div>
-    );
+    return <div className="flex flex-col min-w-0">{listContent}</div>;
   }
 
   return <ExplorerSheet onClose={handleClose}>{listContent}</ExplorerSheet>;

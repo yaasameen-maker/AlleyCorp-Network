@@ -53,13 +53,7 @@ export function StaleAlertsBanner({
   const alertCards = alerts.map((alert) => {
     const investor = investors.find((i) => i.id === alert.investorId);
     if (!investor) return null;
-    return (
-      <AlertCard
-        key={alert.id}
-        alert={alert}
-        onSelect={() => onSelectInvestor(investor)}
-      />
-    );
+    return <AlertCard key={alert.id} alert={alert} onSelect={() => onSelectInvestor(investor)} />;
   });
 
   const isHero = variant === "hero";
@@ -75,7 +69,9 @@ export function StaleAlertsBanner({
     >
       <div className={`flex items-center justify-between ${isHero ? "mb-4" : "mb-1"}`}>
         <div>
-          <h2 className={`font-semibold text-ink ${isHero ? "text-xl md:text-2xl lg:text-3xl" : "text-sm"}`}>
+          <h2
+            className={`font-semibold text-ink ${isHero ? "text-xl md:text-2xl lg:text-3xl" : "text-sm"}`}
+          >
             Needs attention
           </h2>
           <p className={`text-muted mt-1 ${isHero ? "text-sm md:text-base" : "text-xs mt-0.5"}`}>
@@ -96,8 +92,19 @@ export function StaleAlertsBanner({
 
       {alerts.length > 1 && (
         <p className="text-[11px] text-muted mb-2 flex items-center gap-1.5 max-md:flex md:hidden">
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16l-4-4m0 0l4-4m-4 4h18" />
+          <svg
+            className="w-3.5 h-3.5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M7 16l-4-4m0 0l4-4m-4 4h18"
+            />
           </svg>
           Swipe to see all {alerts.length} alerts
         </p>

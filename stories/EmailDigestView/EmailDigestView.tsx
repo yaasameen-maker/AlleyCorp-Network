@@ -57,8 +57,19 @@ export function EmailDigestView({
             aria-label="Close digest"
             className="touch-target touch-press flex items-center justify-center rounded-full text-ink -ml-2"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </button>
           <span className="text-xs text-muted">Email Digest</span>
@@ -69,7 +80,9 @@ export function EmailDigestView({
       {variant === "inline" && (
         <div className="shrink-0 px-6 py-5 border-b border-line bg-paper/50">
           <h2 className="text-xl font-semibold text-ink">Weekly Email Digest</h2>
-          <p className="text-sm text-muted mt-1">Read-only preview · copy to send via email client</p>
+          <p className="text-sm text-muted mt-1">
+            Read-only preview · copy to send via email client
+          </p>
         </div>
       )}
 
@@ -77,7 +90,9 @@ export function EmailDigestView({
 
       <div
         className={`p-4 space-y-4 ${
-          variant === "inline" ? "lg:px-8 lg:py-6 max-w-4xl" : "flex-1 overflow-y-auto overscroll-contain"
+          variant === "inline"
+            ? "lg:px-8 lg:py-6 max-w-4xl"
+            : "flex-1 overflow-y-auto overscroll-contain"
         }`}
       >
         {digest.sections.length === 0 ? (
@@ -86,11 +101,7 @@ export function EmailDigestView({
           </p>
         ) : (
           digest.sections.map((section) => (
-            <DigestSection
-              key={section.id}
-              section={section}
-              onSelectItem={handleSelectItem}
-            />
+            <DigestSection key={section.id} section={section} onSelectItem={handleSelectItem} />
           ))
         )}
 
@@ -106,9 +117,7 @@ export function EmailDigestView({
   );
 
   if (variant === "inline") {
-    return (
-      <div className="flex flex-col min-w-0">{content}</div>
-    );
+    return <div className="flex flex-col min-w-0">{content}</div>;
   }
 
   return <DigestSheet onClose={onClose!}>{content}</DigestSheet>;

@@ -1,14 +1,20 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from "@modelcontextprotocol/sdk/types.js";
+import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 
 import { tool as getInvestorTool, handler as getInvestor } from "./tools/get-investor.js";
-import { tool as searchRelationshipsTool, handler as searchRelationships } from "./tools/search-relationships.js";
-import { tool as listStaleTool, handler as listStaleRelationships } from "./tools/list-stale-relationships.js";
-import { tool as getWarmthSignalsTool, handler as getWarmthSignals } from "./tools/get-warmth-signals.js";
+import {
+  tool as searchRelationshipsTool,
+  handler as searchRelationships,
+} from "./tools/search-relationships.js";
+import {
+  tool as listStaleTool,
+  handler as listStaleRelationships,
+} from "./tools/list-stale-relationships.js";
+import {
+  tool as getWarmthSignalsTool,
+  handler as getWarmthSignals,
+} from "./tools/get-warmth-signals.js";
 import { checkAllowlist } from "./security/allowlist.js";
 import type { ToolName } from "./security/tokens.js";
 
