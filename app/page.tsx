@@ -118,7 +118,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-[#F8F7F4]">
+    <div className="min-h-[100dvh] bg-transparent">
 
       {/* ── Teal aurora strip — top edge ── */}
       <div
