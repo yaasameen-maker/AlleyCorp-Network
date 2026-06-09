@@ -47,12 +47,19 @@ html {
 }
 
 body {
-  background-color: var(--color-bg);
+  background-color: transparent;
   color: var(--color-ink);
   overscroll-behavior-y: none;
   transition:
     background-color 0.2s ease,
     color 0.2s ease;
+}
+
+#app-bg {
+  background-color: var(--color-bg);
+}
+html.dark #app-bg {
+  background-color: #0d1320;
 }
 
 /* ────────────────────────────────────────────────────────────
@@ -64,7 +71,7 @@ html.dark {
 }
 
 html.dark body {
-  background-color: #0d1320;
+  background-color: transparent;
   color: #e5e9f0;
 }
 

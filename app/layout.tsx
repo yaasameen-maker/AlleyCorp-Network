@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { DarkModeInit } from "./components/DarkModeInit";
+import NetworkBackground from "./components/NetworkBackground";
 
 const dmSans = Inter({
   subsets: ["latin"],
@@ -31,7 +32,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={dmSans.variable}>
-      <body className="font-sans antialiased bg-paper text-ink">
+      <body className="font-sans antialiased text-ink">
+        <div id="app-bg" className="fixed inset-0 -z-20" aria-hidden />
+        <NetworkBackground />
         <DarkModeInit />
         {children}
       </body>
