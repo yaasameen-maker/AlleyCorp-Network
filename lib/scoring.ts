@@ -152,7 +152,7 @@ export function calculateWarmthTier(signals: Signal[]): WarmthTier {
  */
 export function isWarmAtRisk(lastSignalDate: string | null | undefined): boolean {
   if (!lastSignalDate) return true;
-  return new Date(lastSignalDate) < daysAgo(WARM_AT_RISK_DAYS);
+  return new Date(lastSignalDate) <= daysAgo(WARM_AT_RISK_DAYS);
 }
 
 // ─────────────────────────────────────────
