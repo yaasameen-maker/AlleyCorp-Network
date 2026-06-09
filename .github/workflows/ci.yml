@@ -1,0 +1,54 @@
+# CI — runs on every push and pull request
+# Checks: lint, type check, unit + integration tests
+#
+# Required secrets (GitHub repo → Settings → Secrets and variables → Actions):
+#   DATABASE_URL  — Railway PostgreSQL connection string
+#
+# Optional secrets (only needed for acceptance tests, not run in CI):
+#   ANTHROPIC_API_KEY — needed for npm run test:acceptance (run manually before Demo Day)
+
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - 'luba/**'
+      - 'feat/**'
+      - 'fix/**'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ci:
+    name: Lint, typecheck, test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Tests
+        run: npm run test:run
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
