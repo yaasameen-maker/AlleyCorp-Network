@@ -57,7 +57,10 @@ function capitalize(s: string): "High" | "Medium" | "Low" {
 
 function toWarmthTier(s: string): "Hot" | "Warm" | "Stale" | "Cold" {
   const map: Record<string, "Hot" | "Warm" | "Stale" | "Cold"> = {
-    hot: "Hot", warm: "Warm", stale: "Stale", cold: "Cold",
+    hot: "Hot",
+    warm: "Warm",
+    stale: "Stale",
+    cold: "Cold",
   };
   return map[s.toLowerCase()] ?? "Cold";
 }

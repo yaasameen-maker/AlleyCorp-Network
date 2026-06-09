@@ -5,10 +5,10 @@ import type { Investor, WarmthTier } from "@/app/data/mockData";
 /* ── Warmth badge ── */
 
 const BADGE_DOT: Record<WarmthTier, string> = {
-  Hot:   "bg-[#0EA5D6]",
-  Warm:  "bg-[#94A3B8]",
+  Hot: "bg-[#0EA5D6]",
+  Warm: "bg-[#94A3B8]",
   Stale: "bg-[#CBD5E1]",
-  Cold:  "bg-[#E2E8F0]",
+  Cold: "bg-[#E2E8F0]",
 };
 
 export function WarmthBadge({ tier }: { tier: WarmthTier }) {
@@ -47,12 +47,14 @@ export function InvestorRow({ investor, isSelected, onClick }: InvestorRowProps)
       ].join(" ")}
     >
       <div className="min-w-0 flex-1">
-        <p className={[
-          "text-[12px] truncate leading-snug transition-colors duration-150",
-          isSelected
-            ? "font-bold text-[#0D1320]"
-            : "font-semibold text-[#1F2937] group-hover:text-[#0EA5D6]",
-        ].join(" ")}>
+        <p
+          className={[
+            "text-[12px] truncate leading-snug transition-colors duration-150",
+            isSelected
+              ? "font-bold text-[#0D1320]"
+              : "font-semibold text-[#1F2937] group-hover:text-[#0EA5D6]",
+          ].join(" ")}
+        >
           {investor.fund.name}
         </p>
         <p className="text-[11px] text-[#9CA3AF] mt-0.5 truncate leading-snug">

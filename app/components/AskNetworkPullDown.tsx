@@ -50,7 +50,9 @@ export function AskNetworkPullDown({
       >
         <div className="px-4 py-3 border-b border-line flex items-center justify-between gap-3">
           <div>
-            <p className="text-[10px] uppercase tracking-wider text-muted font-semibold">AlleyCorp</p>
+            <p className="text-[10px] uppercase tracking-wider text-muted font-semibold">
+              AlleyCorp
+            </p>
             <h2 className="text-base font-semibold text-ink">Ask the network</h2>
           </div>
           <button
@@ -59,8 +61,19 @@ export function AskNetworkPullDown({
             aria-label="Close"
             className="touch-press flex items-center justify-center w-9 h-9 rounded-xl border border-line bg-mist text-muted hover:text-ink"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -85,8 +98,19 @@ export function AskNetworkPullDown({
                   aria-label="Clear question and results"
                   className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center justify-center w-7 h-7 rounded-lg text-muted hover:text-ink"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               ) : null}
@@ -95,8 +119,19 @@ export function AskNetworkPullDown({
                 aria-label="Submit question"
                 className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center justify-center w-9 h-9 rounded-xl bg-field-action text-field-action-text hover:bg-field-action/90"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 12h14M12 5l7 7-7 7"
+                  />
                 </svg>
               </button>
             </div>
@@ -129,15 +164,22 @@ export function AskNetworkPullDown({
                 aria-label="Dismiss results"
                 className="absolute top-2 right-2 z-10 flex items-center justify-center w-7 h-7 rounded-lg border border-line bg-paper/95 text-muted hover:text-ink shadow-sm"
               >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
-              <QueryResults
-                result={result}
-                isLoading={isLoading}
-                onSelectInvestor={handleSelect}
-              />
+              <QueryResults result={result} isLoading={isLoading} onSelectInvestor={handleSelect} />
             </div>
           )}
         </div>

@@ -79,7 +79,6 @@ interface CandidateSignal {
 // Queries use exact quoted company names to prevent false positives.
 
 const TARGETS: SearchTarget[] = [
-
   // ── STALE ────────────────────────────────────────────────────────────────
 
   {
@@ -263,7 +262,8 @@ const TARGETS: SearchTarget[] = [
 
 const EXTRACT_TOOL: Anthropic.Tool = {
   name: "extract_signals",
-  description: "Extract co-investment signals found in the search results. Only include signals explicitly mentioning both the fund and the company.",
+  description:
+    "Extract co-investment signals found in the search results. Only include signals explicitly mentioning both the fund and the company.",
   input_schema: {
     type: "object" as const,
     properties: {
@@ -276,7 +276,8 @@ const EXTRACT_TOOL: Anthropic.Tool = {
             signalType: {
               type: "string",
               enum: ["co_investment", "press_mention"],
-              description: "co_investment = fund invested in company. press_mention = article confirms relationship.",
+              description:
+                "co_investment = fund invested in company. press_mention = article confirms relationship.",
             },
             signalDate: {
               type: "string",
@@ -290,15 +291,25 @@ const EXTRACT_TOOL: Anthropic.Tool = {
             },
             value: {
               type: "string",
-              description: "Human-readable description, e.g. 'Trimble Ventures co-invested in Civ Robotics $5M Seed round (Sep 2022)'.",
+              description:
+                "Human-readable description, e.g. 'Trimble Ventures co-invested in Civ Robotics $5M Seed round (Sep 2022)'.",
             },
             weight: {
               type: "string",
               enum: ["high", "medium", "low"],
-              description: "high = direct co-investment confirmed. medium = participation mentioned. low = inferred or indirect.",
+              description:
+                "high = direct co-investment confirmed. medium = participation mentioned. low = inferred or indirect.",
             },
           },
-          required: ["signalType", "signalDate", "sourceTitle", "sourceUrl", "rawSnippet", "value", "weight"],
+          required: [
+            "signalType",
+            "signalDate",
+            "sourceTitle",
+            "sourceUrl",
+            "rawSnippet",
+            "value",
+            "weight",
+          ],
         },
       },
     },
@@ -310,12 +321,21 @@ const EXTRACT_TOOL: Anthropic.Tool = {
 // Derived automatically from URL — not left to Claude's judgment.
 
 const HIGH_CONFIDENCE_DOMAINS = [
-  "techcrunch.com", "bloomberg.com", "prnewswire.com",
-  "businesswire.com", "axios.com", "reuters.com", "venturebeat.com",
+  "techcrunch.com",
+  "bloomberg.com",
+  "prnewswire.com",
+  "businesswire.com",
+  "axios.com",
+  "reuters.com",
+  "venturebeat.com",
 ];
 const MEDIUM_CONFIDENCE_DOMAINS = [
-  "crunchbase.com", "news.crunchbase.com", "forbes.com",
-  "wsj.com", "ft.com", "cnbc.com",
+  "crunchbase.com",
+  "news.crunchbase.com",
+  "forbes.com",
+  "wsj.com",
+  "ft.com",
+  "cnbc.com",
 ];
 
 function confidenceFromUrl(url: string): "confirmed" | "inferred" | "pending" {
@@ -340,15 +360,20 @@ async function searchForSignals(
         numResults: 5,
         contents: { highlights: true },
         includeDomains: [
-          "techcrunch.com", "prnewswire.com", "businesswire.com",
-          "axios.com", "reuters.com", "bloomberg.com", "crunchbase.com",
-          "forbes.com", "venturebeat.com",
+          "techcrunch.com",
+          "prnewswire.com",
+          "businesswire.com",
+          "axios.com",
+          "reuters.com",
+          "bloomberg.com",
+          "crunchbase.com",
+          "forbes.com",
+          "venturebeat.com",
         ],
       });
 
       for (const r of results.results) {
-        const snippet =
-          (r as unknown as { highlights?: string[] }).highlights?.join(" ") ?? "";
+        const snippet = (r as unknown as { highlights?: string[] }).highlights?.join(" ") ?? "";
         if (snippet || r.title) {
           found.push({ url: r.url, title: r.title ?? "", snippet });
           console.log(`   ✓ ${r.title}`);
@@ -404,7 +429,12 @@ ${pages.map((p, i) => `[${i + 1}] ${p.title}\n${p.url}\n${p.snippet}`).join("\n\
       return [];
     }
 
-    const input = toolUse.input as { signals: Omit<CandidateSignal, "relationshipId" | "fundName" | "companyName" | "confidence">[] };
+    const input = toolUse.input as {
+      signals: Omit<
+        CandidateSignal,
+        "relationshipId" | "fundName" | "companyName" | "confidence"
+      >[];
+    };
     const signals = input.signals ?? [];
 
     if (signals.length === 0) {
@@ -435,9 +465,7 @@ function makeHash(s: CandidateSignal): string {
 
 // ── Step 4: Write to DB ───────────────────────────────────────────────────────
 
-async function writeSignal(
-  s: CandidateSignal
-): Promise<"inserted" | "duplicate" | "error"> {
+async function writeSignal(s: CandidateSignal): Promise<"inserted" | "duplicate" | "error"> {
   const hash = makeHash(s);
 
   try {

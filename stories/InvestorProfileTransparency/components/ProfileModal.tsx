@@ -12,11 +12,7 @@ interface ProfileModalProps {
 
 export function ProfileModal({ onClose, children, layout = "modal" }: ProfileModalProps) {
   if (layout === "panel") {
-    return (
-      <div className="flex flex-col h-full bg-mist text-ink overflow-hidden">
-        {children}
-      </div>
-    );
+    return <div className="flex flex-col h-full bg-mist text-ink overflow-hidden">{children}</div>;
   }
 
   return (

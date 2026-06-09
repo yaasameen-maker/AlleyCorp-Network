@@ -25,12 +25,12 @@ export type ToolName =
   | "get_warmth_signals";
 
 export interface TokenClaims {
-  callerId: string;         // who requested the token (e.g. 'abe@alleycorp.vc')
+  callerId: string; // who requested the token (e.g. 'abe@alleycorp.vc')
   allowedTools: ToolName[]; // which tools this token may call
-  issuedAt: number;         // unix ms
-  expiresAt: number;        // unix ms
-  singleUse: boolean;       // revoke after first successful call
-  tokenId: string;          // unique — used for revocation
+  issuedAt: number; // unix ms
+  expiresAt: number; // unix ms
+  singleUse: boolean; // revoke after first successful call
+  tokenId: string; // unique — used for revocation
 }
 
 export interface TokenValidationResult {
@@ -83,10 +83,7 @@ export function issueToken(
  * Validates a token and checks it has permission for the requested tool.
  * Revokes single-use tokens after successful validation.
  */
-export function validateToken(
-  token: string,
-  requestedTool: ToolName
-): TokenValidationResult {
+export function validateToken(token: string, requestedTool: ToolName): TokenValidationResult {
   const parts = token.split(".");
   if (parts.length !== 2) {
     return { valid: false, reason: "Malformed token" };

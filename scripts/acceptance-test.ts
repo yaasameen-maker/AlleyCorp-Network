@@ -36,9 +36,11 @@ interface TestCase {
 const TEST_CASES: TestCase[] = [
   {
     id: 1,
-    prompt: "Which co-investors should we reconnect with before they lead another round without us?",
+    prompt:
+      "Which co-investors should we reconnect with before they lead another round without us?",
     expectedTool: "list_stale_relationships()",
-    passCriteria: "Returns stale funds (SineWave Ventures, Trimble Ventures, BOLD Capital Partners) with portfolio company and suggested action.",
+    passCriteria:
+      "Returns stale funds (SineWave Ventures, Trimble Ventures, BOLD Capital Partners) with portfolio company and suggested action.",
     validate: (r) =>
       r.toLowerCase().includes("stale") &&
       (r.toLowerCase().includes("trimble") ||
@@ -49,7 +51,8 @@ const TEST_CASES: TestCase[] = [
     id: 2,
     prompt: "Who are our warmest relationships in deep tech right now?",
     expectedTool: "search_relationships()",
-    passCriteria: "Returns Hot anchors including Riot Ventures, General Catalyst, Mach33. No hallucinated funds.",
+    passCriteria:
+      "Returns Hot anchors including Riot Ventures, General Catalyst, Mach33. No hallucinated funds.",
     validate: (r) =>
       r.toLowerCase().includes("hot") &&
       (r.toLowerCase().includes("riot ventures") ||
@@ -60,7 +63,8 @@ const TEST_CASES: TestCase[] = [
     id: 3,
     prompt: "What should I know before our meeting with General Catalyst next week?",
     expectedTool: "get_investor() + get_warmth_signals()",
-    passCriteria: "Returns co-investment history, Hot tier, recent signals. Readable, not a raw dump.",
+    passCriteria:
+      "Returns co-investment history, Hot tier, recent signals. Readable, not a raw dump.",
     validate: (r) =>
       r.toLowerCase().includes("general catalyst") && r.toLowerCase().includes("hot"),
   },
@@ -80,8 +84,7 @@ const TEST_CASES: TestCase[] = [
     expectedTool: "get_investor() + get_warmth_signals()",
     passCriteria:
       "Returns Stale tier, Civ Robotics co-investment history, reason for going stale, suggested action.",
-    validate: (r) =>
-      r.toLowerCase().includes("trimble") && r.toLowerCase().includes("stale"),
+    validate: (r) => r.toLowerCase().includes("trimble") && r.toLowerCase().includes("stale"),
   },
 ];
 
@@ -110,7 +113,9 @@ async function callTool(name: string, input: unknown): Promise<string> {
     default:
       result = { content: [{ type: "text", text: `Unknown tool: ${name}` }] };
   }
-  const textBlock = result.content.find((b) => b.type === "text") as { type: "text"; text: string } | undefined;
+  const textBlock = result.content.find((b) => b.type === "text") as
+    | { type: "text"; text: string }
+    | undefined;
   return textBlock?.text ?? "";
 }
 

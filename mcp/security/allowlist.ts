@@ -39,9 +39,7 @@ export const TOOL_ALLOWLIST: AllowedTool[] = [
 
 // Fast lookup set for O(1) checks
 const ALLOWED_NAMES = new Set(TOOL_ALLOWLIST.map((t) => t.name));
-const ALLOWED_KEYS = new Map(
-  TOOL_ALLOWLIST.map((t) => [t.name, new Set(t.allowedInputKeys)])
-);
+const ALLOWED_KEYS = new Map(TOOL_ALLOWLIST.map((t) => [t.name, new Set(t.allowedInputKeys)]));
 
 export interface AllowlistResult {
   allowed: boolean;

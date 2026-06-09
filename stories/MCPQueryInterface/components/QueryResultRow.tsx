@@ -23,7 +23,13 @@ export function QueryResultRow({ item, onSelect }: QueryResultRowProps) {
       <p className="text-xs text-muted line-clamp-2 leading-relaxed">{detail}</p>
       <p className="mt-2 text-[11px] text-muted flex items-center gap-1">
         Open profile
-        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+        <svg
+          className="w-3.5 h-3.5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden
+        >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       </p>

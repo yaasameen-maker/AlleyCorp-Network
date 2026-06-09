@@ -23,12 +23,12 @@ export interface RelationshipAlert {
   type: AlertType;
   severity: AlertSeverity;
   fund: string;
-  fundName: string;          // alias for fund — used by AlertCard
+  fundName: string; // alias for fund — used by AlertCard
   portfolioCompany: string;
   warmthTier: WarmthTier;
   lastSignalDate: string | null;
   message: string;
-  suggestedAction: string;   // alias for message — used by AlertCard
+  suggestedAction: string; // alias for message — used by AlertCard
 }
 
 // Frontend version — derives alerts from already-loaded Investor[] (no DB call).
@@ -50,8 +50,12 @@ export function getRelationshipAlerts(investors: Investor[]): RelationshipAlert[
         portfolioCompany: investor.coInvestments[0]?.portfolioCompany.name ?? "",
         warmthTier: investor.warmthTier,
         lastSignalDate: investor.lastSignalDate ?? null,
-        message: investor.suggestedAction ?? `${investor.fund.name} has gone stale. Reconnect before their next round.`,
-        suggestedAction: investor.suggestedAction ?? `${investor.fund.name} has gone stale. Reconnect before their next round.`,
+        message:
+          investor.suggestedAction ??
+          `${investor.fund.name} has gone stale. Reconnect before their next round.`,
+        suggestedAction:
+          investor.suggestedAction ??
+          `${investor.fund.name} has gone stale. Reconnect before their next round.`,
       });
     } else if (investor.warmthTier === "Warm" && isWarmAtRisk(investor.lastSignalDate)) {
       alerts.push({
@@ -64,8 +68,12 @@ export function getRelationshipAlerts(investors: Investor[]): RelationshipAlert[
         portfolioCompany: investor.coInvestments[0]?.portfolioCompany.name ?? "",
         warmthTier: investor.warmthTier,
         lastSignalDate: investor.lastSignalDate ?? null,
-        message: investor.suggestedAction ?? `${investor.fund.name} is warm but cooling. Schedule a touchpoint soon.`,
-        suggestedAction: investor.suggestedAction ?? `${investor.fund.name} is warm but cooling. Schedule a touchpoint soon.`,
+        message:
+          investor.suggestedAction ??
+          `${investor.fund.name} is warm but cooling. Schedule a touchpoint soon.`,
+        suggestedAction:
+          investor.suggestedAction ??
+          `${investor.fund.name} is warm but cooling. Schedule a touchpoint soon.`,
       });
     }
   }

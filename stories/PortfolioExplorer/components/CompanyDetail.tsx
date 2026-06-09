@@ -21,8 +21,19 @@ export function CompanyDetail({ row, onBack, onSelectInvestor }: CompanyDetailPr
           aria-label="Back to portfolio list"
           className="touch-target touch-press flex items-center justify-center rounded-full text-ink -ml-2"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
         </button>
         <div className="min-w-0 flex-1">

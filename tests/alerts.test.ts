@@ -24,7 +24,6 @@ afterAll(async () => {
 // ─────────────────────────────────────────
 
 describe("getAlerts (integration)", () => {
-
   it("returns at least 5 alerts from seed data", async () => {
     const alerts = await getAlerts();
     expect(alerts.length).toBeGreaterThanOrEqual(5);

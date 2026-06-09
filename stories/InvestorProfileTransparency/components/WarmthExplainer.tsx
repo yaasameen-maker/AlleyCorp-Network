@@ -75,7 +75,11 @@ export function WarmthExplainer({
                     <p className="text-xs text-muted mt-1">{factor.detail}</p>
                   </div>
                   <span className="text-sm font-medium text-ink shrink-0 tabular-nums">
-                    <AnimatedNumber value={Math.round(factor.weight)} suffix="%" delay={200 + index * 120} />
+                    <AnimatedNumber
+                      value={Math.round(factor.weight)}
+                      suffix="%"
+                      delay={200 + index * 120}
+                    />
                   </span>
                 </div>
                 <div className="mt-2">

@@ -50,11 +50,7 @@ export function InvestorCard({ investor, onClick }: InvestorCardProps) {
               <span className="text-ink tabular-nums opacity-40">0%</span>
             )}
           </div>
-          <AnimatedBar
-            value={analysis.scorePercent}
-            active={inView}
-            heightClass="h-1.5"
-          />
+          <AnimatedBar value={analysis.scorePercent} active={inView} heightClass="h-1.5" />
         </div>
 
         <div className="grid grid-cols-2 gap-3">

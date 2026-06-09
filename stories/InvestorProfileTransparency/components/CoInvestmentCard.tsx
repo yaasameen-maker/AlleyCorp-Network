@@ -10,12 +10,7 @@ interface CoInvestmentCardProps {
   isHighlighted: boolean;
 }
 
-export function CoInvestmentCard({
-  investment,
-  id,
-  index,
-  isHighlighted,
-}: CoInvestmentCardProps) {
+export function CoInvestmentCard({ investment, id, index, isHighlighted }: CoInvestmentCardProps) {
   return (
     <article
       id={id}

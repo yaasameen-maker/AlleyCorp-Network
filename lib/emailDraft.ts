@@ -31,9 +31,7 @@ function greeting(investor: Investor): { text: string; hasName: boolean } {
 function buildByTier(investor: Investor, tier: WarmthTier, greet: string): EmailDraftContent {
   const company = primaryCompany(investor);
   const companyPhrase = company ? ` on ${company}` : "";
-  const recency = investor.lastSignalDate
-    ? formatMonthsAgo(investor.lastSignalDate)
-    : "some time";
+  const recency = investor.lastSignalDate ? formatMonthsAgo(investor.lastSignalDate) : "some time";
 
   switch (tier) {
     case "Stale":

@@ -29,15 +29,15 @@ const claude = new Anthropic();
 // ── Companies to research ─────────────────────────────────────────────────────
 
 const COMPANIES = [
-  { name: "Appetronix",        url: "appetronix.com",        sector: "Food Tech" },
-  { name: "Koop Technologies", url: "koop.ai",               sector: "Logistics" },
-  { name: "Mapless AI",        url: "mapless.ai",            sector: "Autonomy" },
-  { name: "Avatar",            url: "avatarsystems.com",     sector: "Robotics" },
-  { name: "Root Access",       url: "rootaccess.ai",         sector: "AI / ML" },
-  { name: "dolaGon",           url: "dolagon.com",           sector: "Agriculture" },
-  { name: "ARIX Technologies", url: "arix-tech.com",         sector: "Industrial" },
-  { name: "Spaero Bio",        url: "spaero.bio",            sector: "Life Sciences" },
-  { name: "Dexai Robotics",    url: "dexai.com",             sector: "Robotics" },
+  { name: "Appetronix", url: "appetronix.com", sector: "Food Tech" },
+  { name: "Koop Technologies", url: "koop.ai", sector: "Logistics" },
+  { name: "Mapless AI", url: "mapless.ai", sector: "Autonomy" },
+  { name: "Avatar", url: "avatarsystems.com", sector: "Robotics" },
+  { name: "Root Access", url: "rootaccess.ai", sector: "AI / ML" },
+  { name: "dolaGon", url: "dolagon.com", sector: "Agriculture" },
+  { name: "ARIX Technologies", url: "arix-tech.com", sector: "Industrial" },
+  { name: "Spaero Bio", url: "spaero.bio", sector: "Life Sciences" },
+  { name: "Dexai Robotics", url: "dexai.com", sector: "Robotics" },
 ];
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -56,7 +56,7 @@ interface DiscoveredInvestor {
 }
 
 interface CompanyResult {
-  company: typeof COMPANIES[number];
+  company: (typeof COMPANIES)[number];
   investors: DiscoveredInvestor[];
   gaps: string[];
 }
@@ -64,12 +64,21 @@ interface CompanyResult {
 // ── Confidence from source URL ────────────────────────────────────────────────
 
 const HIGH_CONFIDENCE = [
-  "techcrunch.com", "prnewswire.com", "businesswire.com",
-  "axios.com", "reuters.com", "bloomberg.com", "venturebeat.com",
+  "techcrunch.com",
+  "prnewswire.com",
+  "businesswire.com",
+  "axios.com",
+  "reuters.com",
+  "bloomberg.com",
+  "venturebeat.com",
 ];
 const MEDIUM_CONFIDENCE = [
-  "crunchbase.com", "forbes.com", "wsj.com", "ft.com",
-  "cnbc.com", "pitchbook.com",
+  "crunchbase.com",
+  "forbes.com",
+  "wsj.com",
+  "ft.com",
+  "cnbc.com",
+  "pitchbook.com",
 ];
 
 function confidenceFromUrl(url: string): "high" | "medium" | "low" {
@@ -80,7 +89,10 @@ function confidenceFromUrl(url: string): "high" | "medium" | "low" {
 
 // ── Warmth tier from signal date ──────────────────────────────────────────────
 
-function warmthFromDate(dateStr: string): { tier: "hot" | "warm" | "stale" | "cold"; reason: string } {
+function warmthFromDate(dateStr: string): {
+  tier: "hot" | "warm" | "stale" | "cold";
+  reason: string;
+} {
   if (!dateStr || dateStr === "unknown") {
     return { tier: "cold", reason: "No date found — cannot determine recency" };
   }
@@ -93,16 +105,19 @@ function warmthFromDate(dateStr: string): { tier: "hot" | "warm" | "stale" | "co
   const now = new Date("2026-06-06");
   const monthsAgo = (now.getTime() - signalDate.getTime()) / (1000 * 60 * 60 * 24 * 30.5);
 
-  if (monthsAgo <= 12) return { tier: "hot",   reason: `Signal ${Math.round(monthsAgo)}mo ago — active relationship` };
-  if (monthsAgo <= 24) return { tier: "warm",  reason: `Signal ${Math.round(monthsAgo)}mo ago — warm but monitor` };
-  return              { tier: "stale", reason: `Signal ${Math.round(monthsAgo)}mo ago — relationship cooling` };
+  if (monthsAgo <= 12)
+    return { tier: "hot", reason: `Signal ${Math.round(monthsAgo)}mo ago — active relationship` };
+  if (monthsAgo <= 24)
+    return { tier: "warm", reason: `Signal ${Math.round(monthsAgo)}mo ago — warm but monitor` };
+  return { tier: "stale", reason: `Signal ${Math.round(monthsAgo)}mo ago — relationship cooling` };
 }
 
 // ── Claude extraction tool ────────────────────────────────────────────────────
 
 const EXTRACT_TOOL: Anthropic.Tool = {
   name: "extract_investors",
-  description: "Extract all investors/funds found in the search results for this company's funding rounds.",
+  description:
+    "Extract all investors/funds found in the search results for this company's funding rounds.",
   input_schema: {
     type: "object" as const,
     properties: {
@@ -112,13 +127,29 @@ const EXTRACT_TOOL: Anthropic.Tool = {
         items: {
           type: "object",
           properties: {
-            fundName:    { type: "string", description: "Exact fund/investor name as written in the source." },
-            round:       { type: "string", description: "Round type: Seed, Series A, Series B, Pre-Seed, etc." },
-            date:        { type: "string", description: "Date in YYYY-MM-DD. Use YYYY-01-01 if only year known. 'unknown' if not found." },
-            amount:      { type: "string", description: "Funding amount e.g. '$5M'. Omit if not mentioned." },
+            fundName: {
+              type: "string",
+              description: "Exact fund/investor name as written in the source.",
+            },
+            round: {
+              type: "string",
+              description: "Round type: Seed, Series A, Series B, Pre-Seed, etc.",
+            },
+            date: {
+              type: "string",
+              description:
+                "Date in YYYY-MM-DD. Use YYYY-01-01 if only year known. 'unknown' if not found.",
+            },
+            amount: {
+              type: "string",
+              description: "Funding amount e.g. '$5M'. Omit if not mentioned.",
+            },
             sourceTitle: { type: "string", description: "Title of the article or page." },
-            sourceUrl:   { type: "string", description: "Full URL of the source." },
-            rawSnippet:  { type: "string", description: "Exact quote (max 200 chars) confirming this investor." },
+            sourceUrl: { type: "string", description: "Full URL of the source." },
+            rawSnippet: {
+              type: "string",
+              description: "Exact quote (max 200 chars) confirming this investor.",
+            },
           },
           required: ["fundName", "round", "date", "sourceTitle", "sourceUrl", "rawSnippet"],
         },
@@ -135,7 +166,7 @@ const EXTRACT_TOOL: Anthropic.Tool = {
 
 // ── Search ────────────────────────────────────────────────────────────────────
 
-async function searchCompany(company: typeof COMPANIES[number]) {
+async function searchCompany(company: (typeof COMPANIES)[number]) {
   const queries = [
     `"${company.name}" funding round investors venture capital`,
     `"${company.name}" seed series investment announcement`,
@@ -151,9 +182,16 @@ async function searchCompany(company: typeof COMPANIES[number]) {
         numResults: 5,
         contents: { highlights: true },
         includeDomains: [
-          "techcrunch.com", "prnewswire.com", "businesswire.com",
-          "axios.com", "reuters.com", "bloomberg.com", "crunchbase.com",
-          "forbes.com", "venturebeat.com", "wsj.com",
+          "techcrunch.com",
+          "prnewswire.com",
+          "businesswire.com",
+          "axios.com",
+          "reuters.com",
+          "bloomberg.com",
+          "crunchbase.com",
+          "forbes.com",
+          "venturebeat.com",
+          "wsj.com",
         ],
       });
 
@@ -174,7 +212,7 @@ async function searchCompany(company: typeof COMPANIES[number]) {
 // ── Extract ───────────────────────────────────────────────────────────────────
 
 async function extractInvestors(
-  company: typeof COMPANIES[number],
+  company: (typeof COMPANIES)[number],
   pages: { url: string; title: string; snippet: string }[]
 ): Promise<{ investors: DiscoveredInvestor[]; gaps: string[] }> {
   if (pages.length === 0) {
@@ -201,10 +239,15 @@ ${pages.map((p, i) => `[${i + 1}] ${p.title}\n${p.url}\n${p.snippet}`).join("\n\
       messages: [{ role: "user", content: prompt }],
     });
 
-    const toolUse = response.content.find((b) => b.type === "tool_use") as Anthropic.ToolUseBlock | undefined;
+    const toolUse = response.content.find((b) => b.type === "tool_use") as
+      | Anthropic.ToolUseBlock
+      | undefined;
     if (!toolUse) return { investors: [], gaps: ["Claude did not return structured output"] };
 
-    const input = toolUse.input as { investors: Omit<DiscoveredInvestor, "confidence" | "warmthTier" | "warmthReason">[]; gaps: string[] };
+    const input = toolUse.input as {
+      investors: Omit<DiscoveredInvestor, "confidence" | "warmthTier" | "warmthReason">[];
+      gaps: string[];
+    };
 
     const investors: DiscoveredInvestor[] = (input.investors ?? []).map((inv) => {
       const confidence = confidenceFromUrl(inv.sourceUrl);
@@ -235,7 +278,9 @@ function generateSQL(results: CompanyResult[]): string {
   let hasAny = false;
 
   for (const result of results) {
-    const highConfidence = result.investors.filter((i) => i.confidence === "high" || i.confidence === "medium");
+    const highConfidence = result.investors.filter(
+      (i) => i.confidence === "high" || i.confidence === "medium"
+    );
     if (highConfidence.length === 0) continue;
 
     hasAny = true;
@@ -251,13 +296,19 @@ function generateSQL(results: CompanyResult[]): string {
 
     for (const inv of byFund.values()) {
       const fundVar = inv.fundName.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase();
-      lines.push(`-- ${inv.fundName} + ${result.company.name} · ${inv.warmthTier} (${inv.round}, ${inv.date})`);
+      lines.push(
+        `-- ${inv.fundName} + ${result.company.name} · ${inv.warmthTier} (${inv.round}, ${inv.date})`
+      );
       lines.push(`-- Source: ${inv.sourceUrl}`);
       lines.push(`INSERT INTO fund (id, name, focus, stage, created_at, updated_at)`);
-      lines.push(`  VALUES (gen_random_uuid(), '${inv.fundName.replace(/'/g, "''")}', '${result.company.sector}', '${inv.round}', now(), now())`);
+      lines.push(
+        `  VALUES (gen_random_uuid(), '${inv.fundName.replace(/'/g, "''")}', '${result.company.sector}', '${inv.round}', now(), now())`
+      );
       lines.push(`  ON CONFLICT (name) DO NOTHING;`);
       lines.push("");
-      lines.push(`INSERT INTO relationship (id, fund_id, portfolio_company_id, warmth_tier, last_signal_date, created_at, updated_at)`);
+      lines.push(
+        `INSERT INTO relationship (id, fund_id, portfolio_company_id, warmth_tier, last_signal_date, created_at, updated_at)`
+      );
       lines.push(`SELECT`);
       lines.push(`  gen_random_uuid(),`);
       lines.push(`  (SELECT id FROM fund WHERE name = '${inv.fundName.replace(/'/g, "''")}'),`);
@@ -269,7 +320,9 @@ function generateSQL(results: CompanyResult[]): string {
       lines.push(`  SELECT 1 FROM relationship r`);
       lines.push(`  JOIN fund f ON f.id = r.fund_id`);
       lines.push(`  JOIN portfolio_company pc ON pc.id = r.portfolio_company_id`);
-      lines.push(`  WHERE f.name = '${inv.fundName.replace(/'/g, "''")}' AND pc.name = '${result.company.name}'`);
+      lines.push(
+        `  WHERE f.name = '${inv.fundName.replace(/'/g, "''")}' AND pc.name = '${result.company.name}'`
+      );
       lines.push(`);`);
       lines.push("");
       void fundVar;
@@ -317,14 +370,16 @@ function generateReport(results: CompanyResult[], sql: string): string {
     }
 
     // Group by confidence
-    const high   = result.investors.filter((i) => i.confidence === "high");
+    const high = result.investors.filter((i) => i.confidence === "high");
     const medium = result.investors.filter((i) => i.confidence === "medium");
-    const low    = result.investors.filter((i) => i.confidence === "low");
+    const low = result.investors.filter((i) => i.confidence === "low");
 
     if (high.length > 0) {
       lines.push("### ✅ High confidence (will generate SQL)");
       for (const inv of high) {
-        lines.push(`- **${inv.fundName}** — ${inv.round}, ${inv.date}${inv.amount ? `, ${inv.amount}` : ""}`);
+        lines.push(
+          `- **${inv.fundName}** — ${inv.round}, ${inv.date}${inv.amount ? `, ${inv.amount}` : ""}`
+        );
         lines.push(`  - Warmth: \`${inv.warmthTier}\` — ${inv.warmthReason}`);
         lines.push(`  - Source: [${inv.sourceTitle}](${inv.sourceUrl})`);
         lines.push(`  - *"${inv.rawSnippet.slice(0, 150)}"*`);
@@ -335,7 +390,9 @@ function generateReport(results: CompanyResult[], sql: string): string {
     if (medium.length > 0) {
       lines.push("### ⚠️ Medium confidence (will generate SQL — verify before applying)");
       for (const inv of medium) {
-        lines.push(`- **${inv.fundName}** — ${inv.round}, ${inv.date}${inv.amount ? `, ${inv.amount}` : ""}`);
+        lines.push(
+          `- **${inv.fundName}** — ${inv.round}, ${inv.date}${inv.amount ? `, ${inv.amount}` : ""}`
+        );
         lines.push(`  - Warmth: \`${inv.warmthTier}\` — ${inv.warmthReason}`);
         lines.push(`  - Source: [${inv.sourceTitle}](${inv.sourceUrl})`);
         lines.push(`  - *"${inv.rawSnippet.slice(0, 150)}"*`);
@@ -372,7 +429,9 @@ function generateReport(results: CompanyResult[], sql: string): string {
   lines.push("1. Review all source URLs above — click through and confirm they're real");
   lines.push("2. Adjust any warmth tiers you disagree with");
   lines.push("3. Apply SQL: `psql $DATABASE_URL -f <this-file-sql-block>` or copy into seed.sql");
-  lines.push("4. Run scraper: `npm run ingest:signals -- --write` to add signals for new relationships");
+  lines.push(
+    "4. Run scraper: `npm run ingest:signals -- --write` to add signals for new relationships"
+  );
   lines.push("5. Run acceptance tests: `npm run test:acceptance`");
 
   return lines.join("\n");
@@ -394,13 +453,15 @@ async function run() {
 
     const { investors, gaps } = await extractInvestors(company, pages);
 
-    const high   = investors.filter((i) => i.confidence === "high").length;
+    const high = investors.filter((i) => i.confidence === "high").length;
     const medium = investors.filter((i) => i.confidence === "medium").length;
-    const low    = investors.filter((i) => i.confidence === "low").length;
+    const low = investors.filter((i) => i.confidence === "low").length;
 
     console.log(`   Extracted: ${high} high, ${medium} medium, ${low} low confidence`);
     for (const inv of investors.filter((i) => i.confidence !== "low")) {
-      console.log(`   ✓ ${inv.fundName} (${inv.round}, ${inv.date}) [${inv.confidence}] → ${inv.warmthTier}`);
+      console.log(
+        `   ✓ ${inv.fundName} (${inv.round}, ${inv.date}) [${inv.confidence}] → ${inv.warmthTier}`
+      );
     }
 
     results.push({ company, investors, gaps });
@@ -415,10 +476,14 @@ async function run() {
   mkdirSync(join(process.cwd(), "data"), { recursive: true });
   writeFileSync(outPath, report, "utf-8");
 
-  const totalHigh   = results.flatMap((r) => r.investors).filter((i) => i.confidence === "high").length;
-  const totalMedium = results.flatMap((r) => r.investors).filter((i) => i.confidence === "medium").length;
-  const totalLow    = results.flatMap((r) => r.investors).filter((i) => i.confidence === "low").length;
-  const noData      = results.filter((r) => r.investors.length === 0).length;
+  const totalHigh = results
+    .flatMap((r) => r.investors)
+    .filter((i) => i.confidence === "high").length;
+  const totalMedium = results
+    .flatMap((r) => r.investors)
+    .filter((i) => i.confidence === "medium").length;
+  const totalLow = results.flatMap((r) => r.investors).filter((i) => i.confidence === "low").length;
+  const noData = results.filter((r) => r.investors.length === 0).length;
 
   console.log("\n=== Summary ===");
   console.log(`High confidence:   ${totalHigh}`);

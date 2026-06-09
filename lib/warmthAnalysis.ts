@@ -99,7 +99,8 @@ export function analyzeWarmth(investor: Investor, now: Date = new Date()): Warmt
 
   if (totalCount === 0) {
     tier = "Cold";
-    summary = "No relationship signals yet. AlleyCorp has not co-invested or engaged with this fund.";
+    summary =
+      "No relationship signals yet. AlleyCorp has not co-invested or engaged with this fund.";
   } else if (activeCount === 0) {
     tier = "Stale";
     summary = `Signals exist but all have decayed. Last activity was ${investor.lastSignalDate ? monthsSince(investor.lastSignalDate, now) + " months ago" : "unknown"}.`;
@@ -108,10 +109,12 @@ export function analyzeWarmth(investor: Investor, now: Date = new Date()): Warmt
     summary = `${activeCount} active signals with a recent co-investment. This is a high-priority relationship.`;
   } else if (activeCount >= WARM_SIGNAL_THRESHOLD) {
     tier = "Warm";
-    summary = `${activeCount} active signals maintain this relationship at Warm. ${recentCoInvest ? "" : "No recent co-investment keeps it below Hot."}`.trim();
+    summary =
+      `${activeCount} active signals maintain this relationship at Warm. ${recentCoInvest ? "" : "No recent co-investment keeps it below Hot."}`.trim();
   } else {
     tier = "Stale";
-    summary = "Only one active signal remains. The relationship needs re-engagement before it goes fully cold.";
+    summary =
+      "Only one active signal remains. The relationship needs re-engagement before it goes fully cold.";
   }
 
   const scorePercent = Math.min(

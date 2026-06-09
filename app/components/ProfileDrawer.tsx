@@ -12,14 +12,24 @@ interface ProfileDrawerProps {
 function IconClose() {
   return (
     <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
-      <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path
+        d="M1 1L11 11M11 1L1 11"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
 
 /* ── Thin teal bullet ── */
 function Bullet() {
-  return <span className="inline-block w-1 h-1 rounded-full bg-[#0EA5D6] shrink-0 mt-[7px]" aria-hidden />;
+  return (
+    <span
+      className="inline-block w-1 h-1 rounded-full bg-[#0EA5D6] shrink-0 mt-[7px]"
+      aria-hidden
+    />
+  );
 }
 
 /* ── Signal type label ── */
@@ -27,13 +37,18 @@ function signalLabel(type: string): string {
   switch (type) {
     case "co_investment":
     case "co_investment_recency":
-    case "co-investment":        return "Co-investment";
+    case "co-investment":
+      return "Co-investment";
     case "event":
-    case "event_attendance":     return "Event";
+    case "event_attendance":
+      return "Event";
     case "email":
-    case "email_contact":        return "Email";
-    case "meeting":              return "Meeting";
-    default:                     return type.replace(/_/g, " ");
+    case "email_contact":
+      return "Email";
+    case "meeting":
+      return "Meeting";
+    default:
+      return type.replace(/_/g, " ");
   }
 }
 
@@ -51,8 +66,8 @@ function RelationshipSummary({ investor }: { investor: Investor }) {
   if (tier === "Cold") {
     return (
       <p className="text-sm text-[#6B7280] leading-relaxed">
-        No co-investment or contact history on record with {investor.fund.name}.
-        An introduction through a mutual portfolio company would be the natural entry point.
+        No co-investment or contact history on record with {investor.fund.name}. An introduction
+        through a mutual portfolio company would be the natural entry point.
       </p>
     );
   }
@@ -76,7 +91,9 @@ function RelationshipSummary({ investor }: { investor: Investor }) {
             <p className="text-sm text-[#374151] leading-relaxed">
               Last recorded engagement:{" "}
               <span className="font-medium text-[#0D1320]">
-                {latestSignal ? `${signalLabel(latestSignal.type).toLowerCase()} (${investor.lastSignalDate})` : investor.lastSignalDate}
+                {latestSignal
+                  ? `${signalLabel(latestSignal.type).toLowerCase()} (${investor.lastSignalDate})`
+                  : investor.lastSignalDate}
               </span>
               {". "}No touchpoint since.
             </p>
@@ -87,7 +104,9 @@ function RelationshipSummary({ investor }: { investor: Investor }) {
             <Bullet />
             <p className="text-sm text-[#374151] leading-relaxed">
               Relationship evidence:{" "}
-              <span className="text-[#6B7280]">{uniqueSignalTypes.map(signalLabel).join(", ")}</span>
+              <span className="text-[#6B7280]">
+                {uniqueSignalTypes.map(signalLabel).join(", ")}
+              </span>
             </p>
           </div>
         )}
@@ -164,7 +183,6 @@ export function ProfileDrawer({ investor, onClose }: ProfileDrawerProps) {
         className="fixed top-0 right-0 h-[100dvh] w-[440px] max-w-[92vw] bg-white z-50 flex flex-col shadow-2xl animate-drawer-in"
         aria-label={`${investor.fund.name} profile`}
       >
-
         {/* ── Header ── */}
         <div className="px-7 pt-7 pb-6 border-b border-[#F3F4F6] shrink-0">
           <div className="flex items-start justify-between gap-4">
@@ -192,7 +210,6 @@ export function ProfileDrawer({ investor, onClose }: ProfileDrawerProps) {
 
         {/* ── Scrollable content ── */}
         <div className="flex-1 min-h-0 overflow-y-auto">
-
           {/* Relationship summary */}
           <div className="px-7 pt-6 pb-6 border-b border-[#F3F4F6]">
             <SectionLabel>Relationship status</SectionLabel>
@@ -258,7 +275,6 @@ export function ProfileDrawer({ investor, onClose }: ProfileDrawerProps) {
               </div>
             </div>
           )}
-
         </div>
       </aside>
     </>

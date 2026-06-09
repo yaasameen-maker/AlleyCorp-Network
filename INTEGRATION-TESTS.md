@@ -11,14 +11,14 @@ Integration tests verify that two or more components work correctly when connect
 
 Run an integration test any time a new feature is merged that crosses a boundary:
 
-| Boundary | Example |
-|---|---|
-| DB ↔ Scoring | Luba seeds new data → does `scoring.ts` classify it correctly? |
-| DB ↔ MCP tool | Yaasameen wires a SQL query → does the tool handler format the result? |
-| Scoring ↔ MCP | Does the tier computed by `scoring.ts` match what the MCP tool returns? |
-| MCP ↔ Digest | Does `lib/digest.ts` agree with MCP on Lux Capital's tier and reason? |
-| Digest ↔ Resend | Does the email send with the right content? |
-| API Route ↔ DB | Does `GET /api/alerts` return real stale relationships? |
+| Boundary        | Example                                                                 |
+| --------------- | ----------------------------------------------------------------------- |
+| DB ↔ Scoring    | Luba seeds new data → does `scoring.ts` classify it correctly?          |
+| DB ↔ MCP tool   | Yaasameen wires a SQL query → does the tool handler format the result?  |
+| Scoring ↔ MCP   | Does the tier computed by `scoring.ts` match what the MCP tool returns? |
+| MCP ↔ Digest    | Does `lib/digest.ts` agree with MCP on Lux Capital's tier and reason?   |
+| Digest ↔ Resend | Does the email send with the right content?                             |
+| API Route ↔ DB  | Does `GET /api/alerts` return real stale relationships?                 |
 
 **This is not the acceptance test.** The acceptance test (`npm run test:acceptance`) proves Claude picks the right tool and the full chain returns a useful answer. These tests prove the components themselves connect correctly before Claude is involved.
 
@@ -81,6 +81,7 @@ Open a `psql` session against the Railway database and verify each table:
 ```
 
 **Pass criteria:**
+
 - All columns present with correct types
 - `warmth_tier` values are title case: `Hot`, `Warm`, `Stale`, `Cold` — not uppercase
 - `confidence` values are: `high`, `medium`, `low`
@@ -103,7 +104,12 @@ Open a `psql` session against the Railway database and verify each table:
 Create a temporary script at `scripts/it-02-db-tools.ts` and run `npx tsx scripts/it-02-db-tools.ts`:
 
 ```typescript
-import { getInvestorByName, searchRelationships, listStaleRelationships, getWarmthSignals } from "../lib/db.js";
+import {
+  getInvestorByName,
+  searchRelationships,
+  listStaleRelationships,
+  getWarmthSignals,
+} from "../lib/db.js";
 import { handler as getInvestor } from "../mcp/tools/get-investor.js";
 import { handler as searchRels } from "../mcp/tools/search-relationships.js";
 import { handler as listStale } from "../mcp/tools/list-stale-relationships.js";
@@ -132,7 +138,7 @@ async function run() {
     const result = await searchRels({ query: "Hot" });
     const text = result.content[0].text;
     const anchors = ["riot ventures", "snowpoint", "general catalyst", "mach33"];
-    const allFound = anchors.every(a => text.toLowerCase().includes(a));
+    const allFound = anchors.every((a) => text.toLowerCase().includes(a));
     if (allFound) {
       console.log("IT-02-B PASS: search_relationships(Hot) — all 4 anchors returned");
       pass++;
@@ -245,6 +251,7 @@ run();
 **Pass criteria:** Every relationship row: `computeWarmthTier()` result equals `relationships.warmth_tier`.
 
 **Key assertions to verify manually:**
+
 - Lux Capital → `Stale` (co-investment present, `last_signal_date` > 180 days ago)
 - Riot Ventures → `Hot` (HOT_ANCHOR in `scoring.ts`)
 - General Catalyst → `Hot` (HOT_ANCHOR)
@@ -273,7 +280,7 @@ async function run() {
   const mcpText = mcpResult.content[0].text.toLowerCase();
 
   const digest = await generateDigest();
-  const luxItem = digest.find(d => d.fundName.toLowerCase() === "lux capital");
+  const luxItem = digest.find((d) => d.fundName.toLowerCase() === "lux capital");
 
   if (!luxItem) {
     console.log("FAIL: Lux Capital not found in digest output");
@@ -327,6 +334,7 @@ curl http://localhost:3000/api/events
 ```
 
 **Pass criteria:**
+
 - `GET /api/alerts` returns HTTP 200 with at least one Stale relationship (Lux Capital)
 - `GET /api/events` returns HTTP 200 with signal data
 - Neither returns `{ "error": "Not implemented" }` (501)
@@ -370,7 +378,7 @@ async function run() {
     from: "AlleyCorp Network <digest@yourdomain.com>",
     to: ["test@yourdomain.com"],
     subject: `[IT-06 TEST] AlleyCorp Daily Digest`,
-    html: digest.map(d => `<p><b>${d.fundName}</b>: ${d.summary}</p>`).join(""),
+    html: digest.map((d) => `<p><b>${d.fundName}</b>: ${d.summary}</p>`).join(""),
   });
 
   if (error) {
@@ -385,6 +393,7 @@ run();
 ```
 
 **Pass criteria:**
+
 - `generateDigest()` returns at least 1 item
 - Lux Capital appears as a `STALE_ALERT` item
 - Resend API returns a message ID (no error)
@@ -418,7 +427,11 @@ const cases = [
   { name: "delete_investor", args: { name: "Lux Capital" }, expectAllowed: false },
 
   // Injection attempt — extra keys should be stripped, not blocked
-  { name: "get_investor", args: { name: "Lux Capital", __proto__: "injected" }, expectAllowed: true },
+  {
+    name: "get_investor",
+    args: { name: "Lux Capital", __proto__: "injected" },
+    expectAllowed: true,
+  },
 
   // Unknown tool entirely
   { name: "run_sql", args: { query: "DROP TABLE funds" }, expectAllowed: false },
@@ -431,7 +444,9 @@ for (const c of cases) {
     console.log(`PASS: ${c.name} → allowed=${result.allowed}`);
     pass++;
   } else {
-    console.log(`FAIL: ${c.name} — expected allowed=${c.expectAllowed}, got ${result.allowed} (${result.reason})`);
+    console.log(
+      `FAIL: ${c.name} — expected allowed=${c.expectAllowed}, got ${result.allowed} (${result.reason})`
+    );
   }
 }
 
@@ -460,31 +475,31 @@ There is no single command yet — tests are run individually per boundary. Add 
 
 ## Test Ownership
 
-| Test | Owner | Depends On |
-|---|---|---|
-| IT-01 Schema Alignment | Luba | Schema migrations complete |
-| IT-02 DB → MCP Tools | Yaasameen | IT-01 passing, `lib/db.ts` wired |
-| IT-03 Scoring ↔ DB | Luba + Yaasameen | IT-01 passing, seed data in DB |
-| IT-04 MCP ↔ Digest | Yaasameen | IT-02 passing, `lib/digest.ts` created |
-| IT-05 API Routes ↔ DB | Yaasameen + Michael | IT-02 passing, routes implemented |
-| IT-06 Digest ↔ Resend | Yaasameen | IT-04 passing, Resend API key set |
-| IT-07 Security Layer | Yaasameen | No DB dependency — can run now |
+| Test                   | Owner               | Depends On                             |
+| ---------------------- | ------------------- | -------------------------------------- |
+| IT-01 Schema Alignment | Luba                | Schema migrations complete             |
+| IT-02 DB → MCP Tools   | Yaasameen           | IT-01 passing, `lib/db.ts` wired       |
+| IT-03 Scoring ↔ DB     | Luba + Yaasameen    | IT-01 passing, seed data in DB         |
+| IT-04 MCP ↔ Digest     | Yaasameen           | IT-02 passing, `lib/digest.ts` created |
+| IT-05 API Routes ↔ DB  | Yaasameen + Michael | IT-02 passing, routes implemented      |
+| IT-06 Digest ↔ Resend  | Yaasameen           | IT-04 passing, Resend API key set      |
+| IT-07 Security Layer   | Yaasameen           | No DB dependency — can run now         |
 
 ---
 
 ## Integration Test vs Acceptance Test
 
-| | Integration Test | Acceptance Test |
-|---|---|---|
-| **Run with** | `tsx scripts/it-XX.ts` | `npm run test:acceptance` |
-| **Tests** | Component boundary | Full user journey |
-| **Involves Claude** | No | Yes |
-| **Requires DB** | Yes (most) | Yes |
-| **When to run** | When merging a new feature | Before Demo Day |
-| **Failure means** | A wiring bug between two components | A Demo Day blocker |
+|                     | Integration Test                    | Acceptance Test           |
+| ------------------- | ----------------------------------- | ------------------------- |
+| **Run with**        | `tsx scripts/it-XX.ts`              | `npm run test:acceptance` |
+| **Tests**           | Component boundary                  | Full user journey         |
+| **Involves Claude** | No                                  | Yes                       |
+| **Requires DB**     | Yes (most)                          | Yes                       |
+| **When to run**     | When merging a new feature          | Before Demo Day           |
+| **Failure means**   | A wiring bug between two components | A Demo Day blocker        |
 
 Integration tests must pass before acceptance tests are meaningful. A passing acceptance test that sits on top of broken integration boundaries is luck, not correctness.
 
 ---
 
-*Integration Tests v1.0 · May 26, 2026 · AlleyCorp Network · Luba, Michael, Yaasameen*
+_Integration Tests v1.0 · May 26, 2026 · AlleyCorp Network · Luba, Michael, Yaasameen_

@@ -34,7 +34,9 @@ async function run() {
     if (newTier !== oldTier) {
       changes++;
       console.log(`📊 ${rel.fundName}`);
-      console.log(`   ${oldTier} → ${newTier} (${rel.signals.length} active signals, last: ${rel.lastSignalDate?.toISOString().slice(0, 10) ?? "none"})`);
+      console.log(
+        `   ${oldTier} → ${newTier} (${rel.signals.length} active signals, last: ${rel.lastSignalDate?.toISOString().slice(0, 10) ?? "none"})`
+      );
 
       if (!DRY_RUN) {
         await dbRepository.updateTier(rel.id, newTier);

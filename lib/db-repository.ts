@@ -5,29 +5,44 @@
  */
 
 import { pool } from "./db";
-import type { RelationshipRepository, ScoringRelationship, ScoringSignal, ScoringSignalType } from "./scoring";
+import type {
+  RelationshipRepository,
+  ScoringRelationship,
+  ScoringSignal,
+  ScoringSignalType,
+} from "./scoring";
 import type { WarmthTier } from "./types";
 
 // ── Mappers ───────────────────────────────────────────────────────────────────
 
 function confidenceToNumber(c: string): number {
   switch (c) {
-    case "confirmed": return 1.0;
-    case "inferred":  return 0.7;
-    case "pending":   return 0.3;
-    default:          return 0.5;
+    case "confirmed":
+      return 1.0;
+    case "inferred":
+      return 0.7;
+    case "pending":
+      return 0.3;
+    default:
+      return 0.5;
   }
 }
 
 function signalTypeToScoring(t: string): ScoringSignalType | null {
   switch (t) {
     case "co_investment":
-    case "co_investment_recency": return "co_investment";
-    case "event_attendance":      return "event_attendance";
-    case "email_contact":         return "email_thread";
-    case "linkedin_connection":   return "linkedin_connection";
-    case "press_mention":         return null; // press mentions don't contribute to score
-    default:                      return null;
+    case "co_investment_recency":
+      return "co_investment";
+    case "event_attendance":
+      return "event_attendance";
+    case "email_contact":
+      return "email_thread";
+    case "linkedin_connection":
+      return "linkedin_connection";
+    case "press_mention":
+      return null; // press mentions don't contribute to score
+    default:
+      return null;
   }
 }
 
@@ -39,7 +54,10 @@ function toWarmthTier(raw: string): WarmthTier {
 
 const ACTIVE_WINDOW_MONTHS = 24;
 
-async function loadRelationships(where?: string, params?: unknown[]): Promise<ScoringRelationship[]> {
+async function loadRelationships(
+  where?: string,
+  params?: unknown[]
+): Promise<ScoringRelationship[]> {
   const cutoff = new Date();
   cutoff.setMonth(cutoff.getMonth() - ACTIVE_WINDOW_MONTHS);
 

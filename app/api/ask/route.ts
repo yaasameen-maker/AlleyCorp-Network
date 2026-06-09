@@ -3,11 +3,7 @@
 
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
-import {
-  getInvestorByName,
-  listStaleRelationships,
-  searchRelationships,
-} from "../../../lib/db";
+import { getInvestorByName, listStaleRelationships, searchRelationships } from "../../../lib/db";
 import type { Relationship } from "../../../lib/types";
 
 const client = new Anthropic();
@@ -29,7 +25,8 @@ const TOOLS: Anthropic.Tool[] = [
       properties: {
         query: {
           type: "string",
-          description: "Search term: warmth tier (Hot/Warm/Stale/Cold), fund name, or portfolio company",
+          description:
+            "Search term: warmth tier (Hot/Warm/Stale/Cold), fund name, or portfolio company",
         },
       },
       required: ["query"],
@@ -51,7 +48,10 @@ const TOOLS: Anthropic.Tool[] = [
 
 function toWarmthTier(s: string): "Hot" | "Warm" | "Stale" | "Cold" {
   const map: Record<string, "Hot" | "Warm" | "Stale" | "Cold"> = {
-    hot: "Hot", warm: "Warm", stale: "Stale", cold: "Cold",
+    hot: "Hot",
+    warm: "Warm",
+    stale: "Stale",
+    cold: "Cold",
   };
   return map[s.toLowerCase()] ?? "Cold";
 }
@@ -93,7 +93,7 @@ export interface AskCard {
 export interface AskResponse {
   tool: string | null;
   query: string;
-  answer: string;       // Claude's conversational response
+  answer: string; // Claude's conversational response
   cards: AskCard[];
   error?: string;
 }
@@ -118,9 +118,12 @@ const SYSTEM =
 
 export async function POST(req: Request): Promise<NextResponse<AskResponse>> {
   try {
-    const { query } = await req.json() as { query: string };
+    const { query } = (await req.json()) as { query: string };
     if (!query?.trim()) {
-      return NextResponse.json({ tool: null, query: "", answer: "Query required", cards: [] }, { status: 400 });
+      return NextResponse.json(
+        { tool: null, query: "", answer: "Query required", cards: [] },
+        { status: 400 }
+      );
     }
 
     // Turn 1 — Claude decides whether to use a tool (auto) or answer directly
@@ -139,7 +142,10 @@ export async function POST(req: Request): Promise<NextResponse<AskResponse>> {
     );
     if (toolUseBlocks.length === 0) {
       const directAnswer = turn1.content.find((b) => b.type === "text");
-      const answer = directAnswer?.type === "text" ? directAnswer.text : "I can help with questions about AlleyCorp's co-investor network. Try asking about a specific fund or relationship.";
+      const answer =
+        directAnswer?.type === "text"
+          ? directAnswer.text
+          : "I can help with questions about AlleyCorp's co-investor network. Try asking about a specific fund or relationship.";
       return NextResponse.json({ tool: null, query, answer, cards: [] });
     }
 
@@ -157,30 +163,38 @@ export async function POST(req: Request): Promise<NextResponse<AskResponse>> {
 
       if (toolName === "list_stale_relationships") {
         relationships = await listStaleRelationships();
-        toolResultText = relationships.length === 0
-          ? "No stale relationships found."
-          : relationships.map((r) => {
-              const fund = r.fund?.name ?? "Unknown";
-              const company = r.portfolioCompany?.name ?? "Unknown";
-              const date = r.lastSignalDate ? formatDate(r.lastSignalDate) : "unknown date";
-              const signals = r.signals?.length ?? 0;
-              return `${fund} | last signal: ${date} | co-invested in: ${company} | signals: ${signals}`;
-            }).join("\n");
+        toolResultText =
+          relationships.length === 0
+            ? "No stale relationships found."
+            : relationships
+                .map((r) => {
+                  const fund = r.fund?.name ?? "Unknown";
+                  const company = r.portfolioCompany?.name ?? "Unknown";
+                  const date = r.lastSignalDate ? formatDate(r.lastSignalDate) : "unknown date";
+                  const signals = r.signals?.length ?? 0;
+                  return `${fund} | last signal: ${date} | co-invested in: ${company} | signals: ${signals}`;
+                })
+                .join("\n");
       } else if (toolName === "search_relationships") {
         relationships = await searchRelationships(toolInput.query ?? query);
-        toolResultText = relationships.length === 0
-          ? `No results for "${toolInput.query ?? query}".`
-          : relationships.map((r) => {
-              const fund = r.fund?.name ?? "Unknown";
-              const company = r.portfolioCompany?.name ?? "Unknown";
-              const signals = r.signals?.length ?? 0;
-              return `${fund} | warmth: ${r.warmthTier} | co-invested in: ${company} | signals: ${signals}`;
-            }).join("\n");
+        toolResultText =
+          relationships.length === 0
+            ? `No results for "${toolInput.query ?? query}".`
+            : relationships
+                .map((r) => {
+                  const fund = r.fund?.name ?? "Unknown";
+                  const company = r.portfolioCompany?.name ?? "Unknown";
+                  const signals = r.signals?.length ?? 0;
+                  return `${fund} | warmth: ${r.warmthTier} | co-invested in: ${company} | signals: ${signals}`;
+                })
+                .join("\n");
       } else if (toolName === "get_investor") {
         const rel = await getInvestorByName(toolInput.name ?? query);
         if (rel) {
           relationships = [rel];
-          const signals = (rel.signals ?? []).map((s) => `${s.type}: ${s.source} (${s.date})`).join("; ");
+          const signals = (rel.signals ?? [])
+            .map((s) => `${s.type}: ${s.source} (${s.date})`)
+            .join("; ");
           toolResultText = [
             `Fund: ${rel.fund?.name}`,
             `Warmth: ${rel.warmthTier}`,
@@ -224,7 +238,13 @@ export async function POST(req: Request): Promise<NextResponse<AskResponse>> {
   } catch (err) {
     console.error("[POST /api/ask]", err);
     return NextResponse.json(
-      { tool: null, query: "", answer: "Something went wrong. Please try again.", cards: [], error: String(err) },
+      {
+        tool: null,
+        query: "",
+        answer: "Something went wrong. Please try again.",
+        cards: [],
+        error: String(err),
+      },
       { status: 500 }
     );
   }
