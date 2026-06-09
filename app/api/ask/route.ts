@@ -1,5 +1,6 @@
 // POST /api/ask — natural language query routed to real MCP tools via Anthropic
-// Claude picks the tool; we execute it against the Railway DB and return structured results.
+// Claude picks the tool; we execute it against the Railway DB and return the answer as JSON.
+// Turn 1: tool selection. Turn 2: answer generation with tool results injected.
 
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
@@ -93,7 +94,7 @@ export interface AskCard {
 export interface AskResponse {
   tool: string | null;
   query: string;
-  answer: string; // Claude's conversational response
+  answer: string;
   cards: AskCard[];
   error?: string;
 }
@@ -121,7 +122,7 @@ export async function POST(req: Request): Promise<NextResponse<AskResponse>> {
     const { query } = (await req.json()) as { query: string };
     if (!query?.trim()) {
       return NextResponse.json(
-        { tool: null, query: "", answer: "Query required", cards: [] },
+        { tool: null, query: "", answer: "Query required.", cards: [], error: "Query required" },
         { status: 400 }
       );
     }
@@ -150,10 +151,9 @@ export async function POST(req: Request): Promise<NextResponse<AskResponse>> {
     }
 
     // Execute every tool Claude called (it may call more than one in parallel)
-    // and collect a tool_result for each so Turn 2 doesn't get a 400.
     const allRelationships: Relationship[] = [];
     const toolResults: Anthropic.ToolResultBlockParam[] = [];
-    let primaryToolName = toolUseBlocks[0].name;
+    const primaryToolName = toolUseBlocks[0]?.name ?? null;
 
     for (const toolUse of toolUseBlocks) {
       const toolName = toolUse.name;
@@ -211,9 +211,7 @@ export async function POST(req: Request): Promise<NextResponse<AskResponse>> {
       toolResults.push({ type: "tool_result", tool_use_id: toolUse.id, content: toolResultText });
     }
 
-    primaryToolName = toolUseBlocks[0].name;
-
-    // Turn 2 — provide a tool_result for every tool_use Claude made, then get the answer
+    // Turn 2 — Claude synthesizes tool results into a final answer
     const turn2 = await client.messages.create({
       model: "claude-sonnet-4-6",
       max_tokens: 1024,
@@ -227,7 +225,8 @@ export async function POST(req: Request): Promise<NextResponse<AskResponse>> {
     });
 
     const answerBlock = turn2.content.find((b) => b.type === "text");
-    const answer = answerBlock?.type === "text" ? answerBlock.text : "No answer generated.";
+    const answer =
+      answerBlock?.type === "text" ? answerBlock.text : "No answer generated.";
 
     return NextResponse.json({
       tool: primaryToolName,
