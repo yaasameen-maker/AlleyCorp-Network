@@ -12,6 +12,7 @@ interface Particle {
 
 const PARTICLE_COUNT = 120;
 const CONNECTION_DISTANCE = 180;
+const CONNECTION_DISTANCE_SQ = CONNECTION_DISTANCE * CONNECTION_DISTANCE;
 const REPULSION_RADIUS = 120;
 const REPULSION_STRENGTH = 0.012;
 
@@ -64,7 +65,7 @@ export default function NetworkBackground() {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
-          if (dx * dx + dy * dy < CONNECTION_DISTANCE * CONNECTION_DISTANCE) {
+          if (dx * dx + dy * dy < CONNECTION_DISTANCE_SQ) {
             cx.beginPath();
             cx.moveTo(particles[i].x, particles[i].y);
             cx.lineTo(particles[j].x, particles[j].y);
