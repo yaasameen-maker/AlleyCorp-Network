@@ -72,26 +72,30 @@
 ## 2. Portfolio Co-Investor Discovery Agent (NEW — most important gap)
 
 **Owner:** Luba (data layer) / Yaasameen (agent) / Kabir (data source)  
-**Why:** The entire system currently depends on Luba manually researching co-investors for each portfolio company. Avatar Robotics had two real co-investors (Defy Partners, REFASHIOND Ventures — $6.01M seed, Jan 2026) that the existing agent never found because it only enriches *known* relationships. It doesn't discover new ones.
+**Why:** The entire system currently depends on Luba manually researching co-investors for each portfolio company. Avatar Robotics had two real co-investors (Defy Partners, REFASHIOND Ventures — $6.01M seed, Jan 2026) that the existing agent never found because it only enriches _known_ relationships. It doesn't discover new ones.
 
 Lauren's portfolio list also changes over time. New companies get added, companies exit. There's no automated way to pick that up today.
 
 **The gap in plain terms:**
+
 - Current flow: Luba manually seeds company → manually finds co-investors → agent adds more signals
 - Needed flow: Portfolio list changes → agent finds co-investors → relationships appear automatically
 
 **What this agent does differently:**
+
 - Starts from a **portfolio company**, not a fund
 - Asks "who co-invested in Company X?" instead of "tell me more about Fund X"
 - Outputs new `fund` rows + `relationship` rows, not just signals
 
 **Key question for Kabir (raise Thursday):**
 What data source do we use? Options ranked by reliability:
+
 1. Crunchbase API — most complete, has co-investor data per round, costs money
 2. AlleyCorp cap table / internal records — most accurate for early/stealth rounds, requires Lauren to export
 3. Web scraping — inconsistent, misses stealth rounds (Avatar almost wasn't findable)
 
 **Tasks (design only this sprint — build after Thursday answer):**
+
 - [ ] Confirm data source with Kabir/Lauren on Thursday
 - [ ] Design `scripts/discover-portfolio-coinvestors.ts` — takes a company name, returns co-investors with round details
 - [ ] Define how it handles companies with no public data (stealth rounds)
