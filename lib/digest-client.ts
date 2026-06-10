@@ -93,7 +93,10 @@ export function buildWeeklyDigest(investors: Investor[]): WeeklyDigest {
 
   const preheader =
     staleCount > 0
-      ? `Reconnect with ${stale.map((i) => i.fund.name).slice(0, 2).join(", ")}${staleCount > 2 ? ` and ${staleCount - 2} more` : ""}`
+      ? `Reconnect with ${stale
+          .map((i) => i.fund.name)
+          .slice(0, 2)
+          .join(", ")}${staleCount > 2 ? ` and ${staleCount - 2} more` : ""}`
       : "No urgent reconnects — good standing across the portfolio";
 
   return {

@@ -17,11 +17,7 @@ export function DigestSection({ section, onSelectItem }: DigestSectionProps) {
       </div>
       <div>
         {section.items.map((item) => (
-          <DigestItemRow
-            key={item.id}
-            item={item}
-            onSelect={() => onSelectItem(item.investorId)}
-          />
+          <DigestItemRow key={item.id} item={item} onSelect={() => onSelectItem(item.investorId)} />
         ))}
       </div>
     </section>

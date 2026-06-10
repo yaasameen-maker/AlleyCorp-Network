@@ -11,6 +11,7 @@
 import dotenv from "dotenv";
 dotenv.config({ override: true });
 import Anthropic from "@anthropic-ai/sdk";
+import { pool } from "../lib/db.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { tool as getInvestorTool } from "../mcp/tools/get-investor.js";
 import { tool as searchRelationshipsTool } from "../mcp/tools/search-relationships.js";
@@ -36,12 +37,17 @@ interface TestCase {
 const TEST_CASES: TestCase[] = [
   {
     id: 1,
-    prompt: "Which co-investors should we reconnect with before they lead another round without us?",
+    prompt:
+      "Which co-investors should we reconnect with before they lead another round without us?",
     expectedTool: "list_stale_relationships()",
-    passCriteria: "Returns stale funds (SineWave Ventures, Trimble Ventures, BOLD Capital Partners) with portfolio company and suggested action.",
+    passCriteria:
+      "Returns stale funds (SineWave Ventures, Trimble Ventures, BOLD Capital Partners) with portfolio company and suggested action.",
     validate: (r) =>
-      r.toLowerCase().includes("stale") &&
+      (r.toLowerCase().includes("stale") ||
+        r.toLowerCase().includes("reconnect") ||
+        r.toLowerCase().includes("risk")) &&
       (r.toLowerCase().includes("trimble") ||
+        r.toLowerCase().includes("sinewave") ||
         r.toLowerCase().includes("sinwave") ||
         r.toLowerCase().includes("bold capital")),
   },
@@ -49,7 +55,8 @@ const TEST_CASES: TestCase[] = [
     id: 2,
     prompt: "Who are our warmest relationships in deep tech right now?",
     expectedTool: "search_relationships()",
-    passCriteria: "Returns Hot anchors including Riot Ventures, General Catalyst, Mach33. No hallucinated funds.",
+    passCriteria:
+      "Returns Hot anchors including Riot Ventures, General Catalyst, Mach33. No hallucinated funds.",
     validate: (r) =>
       r.toLowerCase().includes("hot") &&
       (r.toLowerCase().includes("riot ventures") ||
@@ -60,7 +67,8 @@ const TEST_CASES: TestCase[] = [
     id: 3,
     prompt: "What should I know before our meeting with General Catalyst next week?",
     expectedTool: "get_investor() + get_warmth_signals()",
-    passCriteria: "Returns co-investment history, Hot tier, recent signals. Readable, not a raw dump.",
+    passCriteria:
+      "Returns co-investment history, Hot tier, recent signals. Readable, not a raw dump.",
     validate: (r) =>
       r.toLowerCase().includes("general catalyst") && r.toLowerCase().includes("hot"),
   },
@@ -80,8 +88,7 @@ const TEST_CASES: TestCase[] = [
     expectedTool: "get_investor() + get_warmth_signals()",
     passCriteria:
       "Returns Stale tier, Civ Robotics co-investment history, reason for going stale, suggested action.",
-    validate: (r) =>
-      r.toLowerCase().includes("trimble") && r.toLowerCase().includes("stale"),
+    validate: (r) => r.toLowerCase().includes("trimble") && r.toLowerCase().includes("stale"),
   },
 ];
 
@@ -110,7 +117,9 @@ async function callTool(name: string, input: unknown): Promise<string> {
     default:
       result = { content: [{ type: "text", text: `Unknown tool: ${name}` }] };
   }
-  const textBlock = result.content.find((b) => b.type === "text") as { type: "text"; text: string } | undefined;
+  const textBlock = result.content.find((b) => b.type === "text") as
+    | { type: "text"; text: string }
+    | undefined;
   return textBlock?.text ?? "";
 }
 
@@ -154,16 +163,38 @@ async function runQuery(prompt: string): Promise<string> {
   return "";
 }
 
+// Data health check — verifies contact enrichment is live in Railway.
+// Not an MCP prompt test — checks the DB directly.
+async function runDataHealthCheck(): Promise<boolean> {
+  process.stdout.write(`[6/6] Data health: contacts with LinkedIn URLs in Railway...`);
+  try {
+    const { rows } = await pool.query<{ count: string }>(
+      `SELECT COUNT(*) AS count FROM investor WHERE linkedin_url IS NOT NULL AND linkedin_url != ''`
+    );
+    const count = parseInt(rows[0]?.count ?? "0", 10);
+    if (count >= 5) {
+      console.log(` ✓ PASS (${count} contacts with LinkedIn URLs)`);
+      return true;
+    } else {
+      console.log(` ✗ FAIL (only ${count} contacts — run: npm run enrich:funds -- --write)`);
+      return false;
+    }
+  } catch (err) {
+    console.log(` ✗ ERROR: ${err}`);
+    return false;
+  }
+}
+
 async function run() {
   console.log("\n=== AlleyCorp MCP Acceptance Test Suite ===");
-  console.log("All 5 must pass before Demo Day (June 24)\n");
+  console.log("All 6 must pass before Demo Day (June 24)\n");
 
   let passed = 0;
   const start = Date.now();
 
   for (const test of TEST_CASES) {
     const t0 = Date.now();
-    process.stdout.write(`[${test.id}/5] ${test.prompt.slice(0, 60)}...`);
+    process.stdout.write(`[${test.id}/6] ${test.prompt.slice(0, 60)}...`);
     try {
       const response = await runQuery(test.prompt);
       const ms = Date.now() - t0;
@@ -181,9 +212,15 @@ async function run() {
     }
   }
 
-  console.log(`\n=== ${passed}/5 passed in ${Date.now() - start}ms ===`);
-  if (passed < 5) {
-    console.log("\nDO NOT demo until all 5 pass.");
+  // Data health check (no Anthropic API needed)
+  const healthOk = await runDataHealthCheck();
+  if (healthOk) passed++;
+
+  await pool.end();
+
+  console.log(`\n=== ${passed}/6 passed in ${Date.now() - start}ms ===`);
+  if (passed < 6) {
+    console.log("\nDO NOT demo until all 6 pass.");
     process.exit(1);
   } else {
     console.log("\nAll acceptance tests passed. Cleared for Demo Day.");

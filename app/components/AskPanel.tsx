@@ -6,11 +6,23 @@ import type { Investor } from "@/app/data/mockData";
 import type { AskCard, AskResponse } from "@/app/api/ask/route";
 
 const QUICK_PROMPTS: { label: string; prompt: string }[] = [
-  { label: "Reconnect Opportunities",   prompt: "Who should we reconnect with before they lead a round without us?" },
-  { label: "Warmest Relationships",     prompt: "Who are our warmest relationships right now?" },
-  { label: "Meeting Prep: General Catalyst", prompt: "What should I know before our meeting with General Catalyst?" },
-  { label: "Target Co-Investors",       prompt: "Are there top deep tech funds we haven't co-invested with yet?" },
-  { label: "Full Picture: Trimble Ventures", prompt: "Show me the full picture on Trimble Ventures." },
+  {
+    label: "Reconnect Opportunities",
+    prompt: "Who should we reconnect with before they lead a round without us?",
+  },
+  { label: "Warmest Relationships", prompt: "Who are our warmest relationships right now?" },
+  {
+    label: "Meeting Prep: General Catalyst",
+    prompt: "What should I know before our meeting with General Catalyst?",
+  },
+  {
+    label: "Target Co-Investors",
+    prompt: "Are there top deep tech funds we haven't co-invested with yet?",
+  },
+  {
+    label: "Full Picture: Trimble Ventures",
+    prompt: "Show me the full picture on Trimble Ventures.",
+  },
 ];
 
 interface AskPanelProps {
@@ -34,8 +46,8 @@ function renderInline(text: string): React.ReactNode {
   const clean = text
     .replace(/\*\*/g, "")
     .replace(/\*/g, "")
-    .replace(/ — /g, ", ")   // em dash with spaces → comma
-    .replace(/—/g, ", ");    // bare em dash → comma
+    .replace(/ — /g, ", ") // em dash with spaces → comma
+    .replace(/—/g, ", "); // bare em dash → comma
   return clean;
 }
 
@@ -57,7 +69,10 @@ function renderAnswer(raw: string): React.ReactNode {
     // ALL CAPS section label (e.g. RECOMMENDATIONS, RATIONALE)
     if (/^[A-Z][A-Z\s]+$/.test(trimmed) && trimmed.length < 40) {
       nodes.push(
-        <p key={key++} className="text-[9px] uppercase tracking-widest text-[#9CA3AF] font-semibold mt-4 mb-1 first:mt-0">
+        <p
+          key={key++}
+          className="text-[9px] uppercase tracking-widest text-[#9CA3AF] font-semibold mt-4 mb-1 first:mt-0"
+        >
           {trimmed}
         </p>
       );
@@ -90,14 +105,24 @@ function renderAnswer(raw: string): React.ReactNode {
 function SendIcon() {
   return (
     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M5 12h14M12 5l7 7-7 7"
+      />
     </svg>
   );
 }
 
 function SpinnerIcon() {
   return (
-    <svg className="w-4 h-4 animate-spin text-[#0EA5D6]" fill="none" viewBox="0 0 24 24" aria-hidden>
+    <svg
+      className="w-4 h-4 animate-spin text-[#0EA5D6]"
+      fill="none"
+      viewBox="0 0 24 24"
+      aria-hidden
+    >
       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
     </svg>
@@ -112,7 +137,7 @@ export function AskPanel({ investors, onSelectInvestor, onClose }: AskPanelProps
   const inputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom after each new message
+  // Auto-scroll to bottom when history or loading state changes
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [history, loading]);
@@ -122,24 +147,29 @@ export function AskPanel({ investors, onSelectInvestor, onClose }: AskPanelProps
     if (!trimmed || loading) return;
     setPendingQuery(trimmed);
     setLoading(true);
+
     try {
       const res = await fetch("/api/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: trimmed }),
       });
-      const data: AskResponse = await res.json();
-      setHistory((prev) => [...prev, {
-        query: trimmed,
-        answer: data.answer || "Something went wrong. Please try again.",
-        cards: data.cards ?? [],
-      }]);
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+
+      const data = (await res.json()) as AskResponse;
+      setHistory((prev) => [...prev, { query: trimmed, answer: data.answer, cards: data.cards }]);
     } catch {
-      setHistory((prev) => [...prev, {
-        query: trimmed,
-        answer: "Couldn't connect. Check your internet connection and try again.",
-        cards: [],
-      }]);
+      setHistory((prev) => [
+        ...prev,
+        {
+          query: trimmed,
+          answer: "Couldn't connect. Check your internet connection and try again.",
+          cards: [],
+        },
+      ]);
     } finally {
       setLoading(false);
       setPendingQuery("");
@@ -187,7 +217,6 @@ export function AskPanel({ investors, onSelectInvestor, onClose }: AskPanelProps
 
       {/* Panel */}
       <div className="fixed top-0 right-0 bottom-0 z-40 w-[420px] flex flex-col bg-white border-l border-[#E5E7EB] shadow-2xl animate-drawer-in">
-
         {/* Header */}
         <div className="shrink-0 px-6 py-5 border-b border-[#F3F4F6] flex items-center justify-between">
           <div>
@@ -213,7 +242,12 @@ export function AskPanel({ investors, onSelectInvestor, onClose }: AskPanelProps
               aria-label="Close"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -221,7 +255,6 @@ export function AskPanel({ investors, onSelectInvestor, onClose }: AskPanelProps
 
         {/* Scrollable conversation area */}
         <div className="flex-1 min-h-0 overflow-y-auto">
-
           {/* Quick prompts — only when no history */}
           {!hasHistory && (
             <div className="px-6 py-4">
@@ -246,7 +279,6 @@ export function AskPanel({ investors, onSelectInvestor, onClose }: AskPanelProps
           {/* Conversation history */}
           {history.map((item, i) => (
             <div key={i} className="px-6 py-4 space-y-3">
-
               {/* User question — subtle right-side bubble */}
               <div className="flex justify-end">
                 <div className="max-w-[85%] px-4 py-2.5 rounded-2xl rounded-tr-sm border border-[#D1E9F5] bg-[#F0F9FF] text-sm text-[#0D1320] leading-snug">
@@ -291,7 +323,9 @@ export function AskPanel({ investors, onSelectInvestor, onClose }: AskPanelProps
                             <p className="text-xs text-[#9CA3AF]">
                               {card.company}
                               {card.lastSignal ? ` · ${card.lastSignal}` : ""}
-                              {card.signalCount > 0 ? ` · ${card.signalCount} signal${card.signalCount !== 1 ? "s" : ""}` : ""}
+                              {card.signalCount > 0
+                                ? ` · ${card.signalCount} signal${card.signalCount !== 1 ? "s" : ""}`
+                                : ""}
                             </p>
                           )}
                           {card.suggestedAction && (
@@ -317,13 +351,11 @@ export function AskPanel({ investors, onSelectInvestor, onClose }: AskPanelProps
               )}
 
               {/* Divider between turns (not after last) */}
-              {i < history.length - 1 && (
-                <hr className="brand-line mt-2" />
-              )}
+              {i < history.length - 1 && <hr className="brand-line mt-2" />}
             </div>
           ))}
 
-          {/* In-flight state while loading */}
+          {/* Spinner — shown while waiting for response */}
           {loading && pendingQuery && (
             <div className="px-6 py-4 space-y-3">
               <div className="flex justify-end">
@@ -333,7 +365,7 @@ export function AskPanel({ investors, onSelectInvestor, onClose }: AskPanelProps
               </div>
               <div className="flex items-center gap-2 text-[#9CA3AF]">
                 <SpinnerIcon />
-                <p className="text-xs">Asking the network…</p>
+                <p className="text-xs">Searching co-investors…</p>
               </div>
             </div>
           )}

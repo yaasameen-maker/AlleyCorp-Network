@@ -1,0 +1,66 @@
+# Autonomous Co-investor Discovery Agent — runs every morning
+#
+# What it does:
+#   Phase 1: Scans AlleyCorp portfolio companies for funding news → finds new co-investors
+#   Phase 2: Expands from hot/warm funds into their orbit → finds 2nd-degree targets
+#   Each new fund gets immediate contact enrichment (LinkedIn via Exa + Claude)
+#
+# Discovery data is stored in Railway with:
+#   discovery_source: 'portfolio_scan' or 'network_expansion'
+#   discovery_context: JSON explanation of why the fund surfaced
+#
+# Required GitHub secrets (repo → Settings → Secrets and variables → Actions):
+#   DATABASE_URL      — Railway PostgreSQL connection string
+#   EXA_API_KEY       — Exa neural search API key
+#   ANTHROPIC_API_KEY — Claude API key
+
+name: Co-investor Discovery
+
+on:
+  schedule:
+    # Every day at 7am UTC — early enough for Abe to see new funds before the work day
+    - cron: "0 7 * * *"
+
+  workflow_dispatch:
+    # Manual trigger from GitHub Actions UI
+    inputs:
+      quick:
+        description: "Quick mode — process 3 companies only (for testing)"
+        required: false
+        default: "false"
+        type: boolean
+
+jobs:
+  discover:
+    name: Discover new co-investors
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run discovery (full)
+        if: ${{ github.event.inputs.quick != 'true' }}
+        run: npm run discover:agent -- --write
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Run discovery (quick mode)
+        if: ${{ github.event.inputs.quick == 'true' }}
+        run: npm run discover:agent -- --write --quick
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

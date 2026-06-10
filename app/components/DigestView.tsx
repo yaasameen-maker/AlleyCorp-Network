@@ -42,22 +42,25 @@ AlleyCorp`;
 function ChevronIcon({ open }: { open: boolean }) {
   return (
     <svg
-      width="12" height="12" viewBox="0 0 12 12" fill="none"
+      width="12"
+      height="12"
+      viewBox="0 0 12 12"
+      fill="none"
       className={`transition-transform duration-200 ${open ? "rotate-90" : ""}`}
       aria-hidden
     >
-      <path d="M4.5 2.5L7.5 6L4.5 9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M4.5 2.5L7.5 6L4.5 9.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
 
-function DigestItemRow({
-  item,
-  investors,
-}: {
-  item: DigestItem;
-  investors: Investor[];
-}) {
+function DigestItemRow({ item, investors }: { item: DigestItem; investors: Investor[] }) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const template = useMemo(() => composeTemplate(item, investors), [item, investors]);
@@ -135,7 +138,9 @@ export function DigestView({ investors }: DigestViewProps) {
   };
 
   const generatedDate = new Date(digest.generatedAt).toLocaleDateString("en-US", {
-    month: "long", day: "numeric", year: "numeric",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
   });
 
   // brand-line + card-lift applied — Luba, Jun 2026 (design system pass)
@@ -214,7 +219,6 @@ export function DigestView({ investors }: DigestViewProps) {
           </button>
         </div>
       )}
-
     </div>
   );
 }

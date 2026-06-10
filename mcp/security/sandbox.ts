@@ -16,15 +16,18 @@ import { resolve, extname, relative, isAbsolute } from "path";
 const SANDBOX_ROOT = resolve(process.env.MCP_SANDBOX_DIR ?? "./data");
 
 const ALLOWED_EXTENSIONS = new Set([
-  ".csv",  // Swoogo / Luma event exports
+  ".csv", // Swoogo / Luma event exports
   ".json", // structured data files
-  ".txt",  // plain text notes
+  ".txt", // plain text notes
 ]);
 
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
 
 export class SandboxViolationError extends Error {
-  constructor(message: string, public readonly path: string) {
+  constructor(
+    message: string,
+    public readonly path: string
+  ) {
     super(`[MCP SANDBOX] ${message}: "${path}"`);
     this.name = "SandboxViolationError";
   }
@@ -37,10 +40,7 @@ async function resolveAndVerify(requestedPath: string): Promise<string> {
   try {
     real = await realpath(candidate);
   } catch {
-    throw new SandboxViolationError(
-      "Path does not exist or cannot be resolved",
-      requestedPath
-    );
+    throw new SandboxViolationError("Path does not exist or cannot be resolved", requestedPath);
   }
 
   const rel = relative(SANDBOX_ROOT, real);

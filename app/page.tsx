@@ -20,10 +20,10 @@ const TIERS: WarmthTier[] = ["Hot", "Warm", "Stale", "Cold"];
 
 // Warmth dot colors — same as WarmthBadge in InvestorRow
 const TIER_DOT: Record<WarmthTier, string> = {
-  Hot:   "#0EA5D6",
-  Warm:  "#94A3B8",
+  Hot: "#0EA5D6",
+  Warm: "#94A3B8",
   Stale: "#CBD5E1",
-  Cold:  "#E2E8F0",
+  Cold: "#E2E8F0",
 };
 
 function DarkToggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
@@ -42,8 +42,12 @@ function DarkToggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
 function ChatIcon() {
   return (
     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-        d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+      />
     </svg>
   );
 }
@@ -84,19 +88,21 @@ export default function DashboardPage() {
   const filteredInvestors = useMemo(() => {
     return sortedInvestors.filter((investor) => {
       const matchesSearch =
-        searchQuery === "" ||
-        investor.fund.name.toLowerCase().includes(searchQuery.toLowerCase());
+        searchQuery === "" || investor.fund.name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesTier = filterTier === "All" || investor.warmthTier === filterTier;
       return matchesSearch && matchesTier;
     });
   }, [sortedInvestors, searchQuery, filterTier]);
 
-  const tierCounts = useMemo(() => ({
-    Hot:   allInvestors.filter((i) => i.warmthTier === "Hot").length,
-    Warm:  allInvestors.filter((i) => i.warmthTier === "Warm").length,
-    Stale: allInvestors.filter((i) => i.warmthTier === "Stale").length,
-    Cold:  allInvestors.filter((i) => i.warmthTier === "Cold").length,
-  }), [allInvestors]);
+  const tierCounts = useMemo(
+    () => ({
+      Hot: allInvestors.filter((i) => i.warmthTier === "Hot").length,
+      Warm: allInvestors.filter((i) => i.warmthTier === "Warm").length,
+      Stale: allInvestors.filter((i) => i.warmthTier === "Stale").length,
+      Cold: allInvestors.filter((i) => i.warmthTier === "Cold").length,
+    }),
+    [allInvestors]
+  );
 
   function openSearch() {
     setSearchOpen(true);
@@ -119,11 +125,14 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-[100dvh] bg-transparent">
-
       {/* ── Teal aurora strip — top edge ── */}
       <div
         className="hero-aurora pointer-events-none fixed top-0 left-0 right-0 z-50"
-        style={{ height: "3px", filter: "blur(0.5px)", boxShadow: "0 2px 12px 2px rgba(14,165,214,0.2)" }}
+        style={{
+          height: "3px",
+          filter: "blur(0.5px)",
+          boxShadow: "0 2px 12px 2px rgba(14,165,214,0.2)",
+        }}
         aria-hidden
       />
 
@@ -133,10 +142,15 @@ export default function DashboardPage() {
         style={{ paddingTop: "3px" }}
       >
         <div className="w-full px-6 py-3 flex items-center justify-between gap-4">
-
           {/* Logo + wordmark */}
           <div className="flex items-center gap-3 min-w-0">
-            <Image src="/logo.png" alt="AlleyCorp" width={28} height={28} className="object-contain rounded-sm shrink-0" />
+            <Image
+              src="/logo.png"
+              alt="AlleyCorp"
+              width={28}
+              height={28}
+              className="object-contain rounded-sm shrink-0"
+            />
             <div className="min-w-0">
               <p className="text-[9px] uppercase tracking-widest text-[#0EA5D6] font-semibold leading-none">
                 AlleyCorp
@@ -176,17 +190,14 @@ export default function DashboardPage() {
 
       {/* ── Main content ── */}
       <main className="max-w-2xl mx-auto px-6 pb-28">
-
         {loading ? (
           <div className="flex items-center justify-center py-24">
             <p className="text-sm text-[#9CA3AF]">Loading…</p>
           </div>
-
         ) : activeView === "digest" ? (
           <div className="pt-6">
             <DigestView investors={allInvestors} />
           </div>
-
         ) : (
           <>
             {/* Hero card — sections hidden, parent handles layout */}
@@ -202,7 +213,6 @@ export default function DashboardPage() {
             {/* ── Filter chips + search ── */}
             <div className="mt-6 flex items-center justify-between gap-3">
               <div className="flex items-center gap-1.5 flex-wrap">
-
                 {/* All */}
                 <button
                   type="button"
@@ -234,7 +244,9 @@ export default function DashboardPage() {
                     >
                       <span
                         className="w-1.5 h-1.5 rounded-full shrink-0"
-                        style={{ backgroundColor: active ? "rgba(255,255,255,0.7)" : TIER_DOT[tier] }}
+                        style={{
+                          backgroundColor: active ? "rgba(255,255,255,0.7)" : TIER_DOT[tier],
+                        }}
                       />
                       {tier}
                       <span className="tabular-nums font-normal opacity-70">
@@ -253,7 +265,9 @@ export default function DashboardPage() {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    onBlur={() => { if (!searchQuery) closeSearch(); }}
+                    onBlur={() => {
+                      if (!searchQuery) closeSearch();
+                    }}
                     placeholder="Search funds…"
                     className="w-40 px-3 py-1.5 text-[12px] bg-[#F7F8FA] border border-[#E5E7EB] rounded-lg text-[#0D1320] placeholder:text-[#C4C9D4] focus:outline-none focus:border-[#0EA5D6] transition-all"
                   />
@@ -317,10 +331,7 @@ export default function DashboardPage() {
 
       {/* ── Profile drawer ── */}
       {selectedInvestor && (
-        <ProfileDrawer
-          investor={selectedInvestor}
-          onClose={() => setSelectedInvestor(null)}
-        />
+        <ProfileDrawer investor={selectedInvestor} onClose={() => setSelectedInvestor(null)} />
       )}
 
       {/* ── Ask panel ── */}
@@ -331,7 +342,6 @@ export default function DashboardPage() {
           onClose={() => setAskOpen(false)}
         />
       )}
-
     </div>
   );
 }

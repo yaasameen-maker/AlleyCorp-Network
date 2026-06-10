@@ -1,10 +1,7 @@
 import type { Investor, WarmthTier } from "@/app/data/mockData";
 import { getRelationshipAlerts } from "./alerts";
 
-export type MCPToolName =
-  | "list_stale_relationships"
-  | "search_relationships"
-  | "get_investor";
+export type MCPToolName = "list_stale_relationships" | "search_relationships" | "get_investor";
 
 export interface MCPQueryResultItem {
   investor: Investor;
@@ -173,9 +170,7 @@ function generalSearch(investors: Investor[], query: string): MCPQueryResult {
     return i.coInvestments.some((ci) => normalize(ci.portfolioCompany.name).includes(term));
   });
 
-  const sorted = [...matches].sort(
-    (a, b) => WARMTH_RANK[a.warmthTier] - WARMTH_RANK[b.warmthTier]
-  );
+  const sorted = [...matches].sort((a, b) => WARMTH_RANK[a.warmthTier] - WARMTH_RANK[b.warmthTier]);
 
   return {
     tool: "search_relationships",
@@ -250,7 +245,10 @@ export function runMCPQuery(query: string, investors: Investor[]): MCPQueryResul
       alerts.filter((a) => a.type === "stale_relationship").map((a) => a.investorId)
     );
     if (staleIds.size > 0) {
-      return listStale(investors.filter((i) => staleIds.has(i.id)), trimmed);
+      return listStale(
+        investors.filter((i) => staleIds.has(i.id)),
+        trimmed
+      );
     }
     return listStale(investors, trimmed);
   }

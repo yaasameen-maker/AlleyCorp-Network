@@ -77,11 +77,7 @@ export function QueryResults({
           </p>
         )}
         {result.items.map((item) => (
-          <QueryResultRow
-            key={item.investor.id}
-            item={item}
-            onSelect={onSelectInvestor}
-          />
+          <QueryResultRow key={item.investor.id} item={item} onSelect={onSelectInvestor} />
         ))}
       </div>
     </div>

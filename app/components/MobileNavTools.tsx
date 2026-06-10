@@ -50,9 +50,7 @@ export function MobileNavTools({
     <div className="lg:hidden shrink-0 border-b border-line bg-paper safe-x relative z-[80]">
       <div className="px-4 py-3 flex items-center justify-between gap-2">
         <div className="min-w-0">
-          <p className="text-[10px] uppercase tracking-wider text-muted font-semibold">
-            AlleyCorp
-          </p>
+          <p className="text-[10px] uppercase tracking-wider text-muted font-semibold">AlleyCorp</p>
           <h1 className="text-[17px] leading-tight font-semibold tracking-tight text-ink truncate">
             Investor Intelligence
           </h1>
@@ -65,7 +63,13 @@ export function MobileNavTools({
             aria-label="Portfolio"
             className="touch-target touch-press flex items-center justify-center w-11 h-11 rounded-2xl border border-line bg-mist text-ink md:w-auto md:h-auto md:px-3 md:py-2 md:gap-1.5 md:rounded-xl md:text-xs md:font-medium"
           >
-            <svg className="w-5 h-5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+            <svg
+              className="w-5 h-5 md:w-4 md:h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -84,7 +88,13 @@ export function MobileNavTools({
             aria-expanded={askOpen}
             className="touch-target touch-press flex lg:hidden items-center justify-center w-11 h-11 rounded-2xl border border-line bg-mist text-ink md:w-auto md:h-auto md:px-3 md:py-2 md:gap-1.5 md:rounded-xl md:text-xs md:font-medium"
           >
-            <svg className="w-5 h-5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+            <svg
+              className="w-5 h-5 md:w-4 md:h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -101,7 +111,13 @@ export function MobileNavTools({
             aria-label="Email digest"
             className="touch-target touch-press flex items-center justify-center w-11 h-11 rounded-2xl border border-line bg-mist text-ink md:w-auto md:h-auto md:px-3 md:py-2 md:gap-1.5 md:rounded-xl md:text-xs md:font-medium"
           >
-            <svg className="w-5 h-5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+            <svg
+              className="w-5 h-5 md:w-4 md:h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

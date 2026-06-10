@@ -12,7 +12,11 @@ export interface MCPQueryInterfaceProps {
   className?: string;
 }
 
-export function MCPQueryInterface({ investors, onSelectInvestor, className = "" }: MCPQueryInterfaceProps) {
+export function MCPQueryInterface({
+  investors,
+  onSelectInvestor,
+  className = "",
+}: MCPQueryInterfaceProps) {
   const [query, setQuery] = useState("");
   const [result, setResult] = useState<MCPQueryResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,7 +47,10 @@ export function MCPQueryInterface({ investors, onSelectInvestor, className = "" 
   };
 
   return (
-    <section className={`mb-5 px-4 lg:px-6 lg:mb-0 ${className}`} aria-label="Ask about the relationship network">
+    <section
+      className={`mb-5 px-4 lg:px-6 lg:mb-0 ${className}`}
+      aria-label="Ask about the relationship network"
+    >
       <div className="mb-3">
         <h2 className="text-sm font-semibold text-ink">Ask the network</h2>
         <p className="text-xs text-muted mt-0.5">Plain English questions · powered by MCP tools</p>
@@ -64,7 +71,13 @@ export function MCPQueryInterface({ investors, onSelectInvestor, className = "" 
             aria-label="Submit question"
             className="touch-target touch-press absolute right-1 top-1/2 -translate-y-1/2 flex items-center justify-center w-10 h-10 rounded-xl bg-ink text-paper"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -79,11 +92,7 @@ export function MCPQueryInterface({ investors, onSelectInvestor, className = "" 
       </form>
 
       <div className="mt-3">
-        <QueryResults
-          result={result}
-          isLoading={isLoading}
-          onSelectInvestor={onSelectInvestor}
-        />
+        <QueryResults result={result} isLoading={isLoading} onSelectInvestor={onSelectInvestor} />
       </div>
     </section>
   );

@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS fund (
     emerging_manager BOOLEAN,
     hq_location      TEXT,
     linkedin_url     TEXT,
+    logo_url         TEXT,
     notes            TEXT,
     created_at       TIMESTAMPTZ  NOT NULL DEFAULT now(),
     updated_at       TIMESTAMPTZ  NOT NULL DEFAULT now()
@@ -157,3 +158,20 @@ DO $$ BEGIN
             FOR EACH ROW EXECUTE FUNCTION set_updated_at();
     END IF;
 END $$;
+
+-- ─────────────────────────────────────────
+-- Column additions (idempotent — safe to re-run on Railway)
+-- ─────────────────────────────────────────
+ALTER TABLE fund ADD COLUMN IF NOT EXISTS logo_url TEXT;
+
+-- discovery_source: why is this fund in the system?
+--   manual           → seeded by Luba / Lauren's confirmed list
+--   portfolio_scan   → Phase 1: found via AlleyCorp portfolio funding news
+--   network_expansion → Phase 2: found through a hot/warm fund's orbit (6-degrees)
+ALTER TABLE relationship ADD COLUMN IF NOT EXISTS discovery_source TEXT
+  CHECK (discovery_source IN ('manual', 'portfolio_scan', 'network_expansion'));
+
+-- discovery_context: structured explanation of why this fund surfaced.
+-- Phase 1 shape: { source_url, round, company, summary }
+-- Phase 2 shape: { via_fund, shared_rounds, companies, oldest_signal_months, summary }
+ALTER TABLE relationship ADD COLUMN IF NOT EXISTS discovery_context JSONB;

@@ -57,9 +57,7 @@ export default function NetworkBackground() {
 
       cx.clearRect(0, 0, cv.width, cv.height);
 
-      cx.strokeStyle = isDark
-        ? "rgba(14, 165, 214, 0.08)"
-        : "rgba(0, 43, 49, 0.15)";
+      cx.strokeStyle = isDark ? "rgba(14, 165, 214, 0.08)" : "rgba(0, 43, 49, 0.15)";
       cx.lineWidth = 0.75;
 
       for (let i = 0; i < particles.length; i++) {
@@ -78,10 +76,10 @@ export default function NetworkBackground() {
       for (const p of particles) {
         p.x += p.speedX;
         p.y += p.speedY;
-        if (p.x > cv.width)  p.x = 0;
-        if (p.x < 0)         p.x = cv.width;
+        if (p.x > cv.width) p.x = 0;
+        if (p.x < 0) p.x = cv.width;
         if (p.y > cv.height) p.y = 0;
-        if (p.y < 0)         p.y = cv.height;
+        if (p.y < 0) p.y = cv.height;
 
         cx.fillStyle = isDark
           ? `rgba(14, 165, 214, ${p.opacity * 0.6})`

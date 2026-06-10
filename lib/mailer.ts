@@ -13,7 +13,7 @@ function getResend(): Resend {
 }
 
 const FROM = process.env.DIGEST_FROM_EMAIL ?? "digest@alleycorp.vc";
-const TO   = process.env.DIGEST_RECIPIENT_EMAIL ?? "";
+const TO = process.env.DIGEST_RECIPIENT_EMAIL ?? "";
 const BASE = (process.env.APP_URL ?? "").replace(/\/$/, "");
 
 function renderItem(item: DigestItem): string {
