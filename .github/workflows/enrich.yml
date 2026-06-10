@@ -1,0 +1,67 @@
+# Fund Enrichment Pipeline — runs automatically every Monday
+#
+# What it does:
+#   - Re-enriches any fund whose contacts are > ENRICH_MAX_AGE_DAYS old (default: 30)
+#   - Detects role changes and logs them prominently in the run output
+#   - Updates logo_url for any fund missing it
+#
+# Required GitHub secrets (repo → Settings → Secrets and variables → Actions):
+#   DATABASE_URL      — Railway PostgreSQL connection string
+#   EXA_API_KEY       — Exa neural search API key
+#   ANTHROPIC_API_KEY — Claude API key for contact extraction
+#
+# Optional env vars (set in repo Variables, not Secrets):
+#   ENRICH_MAX_AGE_DAYS — days before contacts are re-enriched (default: 30)
+
+name: Fund Enrichment
+
+on:
+  schedule:
+    # Every Monday at 9am UTC — early enough for Abe to see updated contacts before the week starts
+    - cron: "0 9 * * 1"
+
+  workflow_dispatch:
+    # Manual trigger from GitHub Actions UI — useful for testing and on-demand refresh
+    inputs:
+      force:
+        description: "Force re-enrich all funds (ignore staleness threshold)"
+        required: false
+        default: "false"
+        type: boolean
+
+jobs:
+  enrich:
+    name: Enrich fund contacts and logos
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run enrichment (stale funds only)
+        if: ${{ github.event.inputs.force != 'true' }}
+        run: npm run enrich:funds -- --write
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ENRICH_MAX_AGE_DAYS: ${{ vars.ENRICH_MAX_AGE_DAYS || '30' }}
+
+      - name: Run enrichment (force all funds)
+        if: ${{ github.event.inputs.force == 'true' }}
+        run: npm run enrich:funds -- --write --force
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ENRICH_MAX_AGE_DAYS: ${{ vars.ENRICH_MAX_AGE_DAYS || '30' }}

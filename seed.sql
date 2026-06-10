@@ -45,18 +45,18 @@ VALUES
 -- ─────────────────────────────────────────
 -- 2. Funds
 -- ─────────────────────────────────────────
-INSERT INTO fund (id, name, focus, stage, created_at, updated_at)
+INSERT INTO fund (id, name, website, focus, stage, created_at, updated_at)
 VALUES
-  (gen_random_uuid(), 'Lux Capital',              'Life sciences and deep tech',      'Multi-stage',      now(), now()),
-  (gen_random_uuid(), 'Union Square Ventures',    'Early stage tech',                 'Seed to Series B', now(), now()),
-  (gen_random_uuid(), 'Riot Ventures',            'Deep tech',                        'Seed',             now(), now()),
-  (gen_random_uuid(), 'Snowpoint Ventures',       'Deep tech',                        'Series A',         now(), now()),
-  (gen_random_uuid(), 'General Catalyst',         'Multi-sector',                     'Multi-stage',      now(), now()),
-  (gen_random_uuid(), 'Mach33',                   'Space tech',                       'Seed to Series A', now(), now()),
+  (gen_random_uuid(), 'Lux Capital',              'luxcapital.com',        'Life sciences and deep tech',       'Multi-stage',      now(), now()),
+  (gen_random_uuid(), 'Union Square Ventures',    'usv.com',               'Early stage tech',                  'Seed to Series B', now(), now()),
+  (gen_random_uuid(), 'Riot Ventures',            'riotvc.com',            'Deep tech',                         'Seed',             now(), now()),
+  (gen_random_uuid(), 'Snowpoint Ventures',       'snowpoint.vc',          'Deep tech',                         'Series A',         now(), now()),
+  (gen_random_uuid(), 'General Catalyst',         'generalcatalyst.com',   'Multi-sector',                      'Multi-stage',      now(), now()),
+  (gen_random_uuid(), 'Mach33',                   '33fg.com',              'Space tech',                        'Seed to Series A', now(), now()),
   -- Cold-tier targets: top deep tech funds AlleyCorp has not yet co-invested with
-  (gen_random_uuid(), 'a16z American Dynamism',   'Defense, aerospace, manufacturing', 'Multi-stage',     now(), now()),
-  (gen_random_uuid(), 'Eclipse Ventures',         'Deep tech, industrial robotics',    'Series A/B',      now(), now()),
-  (gen_random_uuid(), 'Founders Fund',            'Deep tech, defense, biotech',       'Multi-stage',     now(), now());
+  (gen_random_uuid(), 'a16z American Dynamism',   'a16z.com',              'Defense, aerospace, manufacturing', 'Multi-stage',      now(), now()),
+  (gen_random_uuid(), 'Eclipse Ventures',         'eclipse.vc',            'Deep tech, industrial robotics',    'Series A/B',       now(), now()),
+  (gen_random_uuid(), 'Founders Fund',            'foundersfund.com',      'Deep tech, defense, biotech',       'Multi-stage',      now(), now());
 
 -- ─────────────────────────────────────────
 -- 3. Relationships
@@ -163,9 +163,9 @@ SELECT
   gen_random_uuid(),
   r.id,
   'co_investment',
-  '2025-01-20',
-  'Crunchbase',
-  'Series A · Jan 2025 · co-investor',
+  '2025-11-10',
+  'AlleyCorp Substack',
+  'Series A $130M · Nov 2025 · lead alongside AlleyCorp',
   'high',
   'confirmed',
   now()
@@ -229,20 +229,20 @@ WHERE f.name = 'Mach33' AND pc.name = 'Portal Space Systems';
 -- 5. Additional Co-Investor Funds
 --    Source: Crunchbase, TechCrunch, SOSV, GlobeNewswire (May 2026 research)
 -- ─────────────────────────────────────────
-INSERT INTO fund (id, name, focus, stage, created_at, updated_at)
+INSERT INTO fund (id, name, website, focus, stage, created_at, updated_at)
 VALUES
-  (gen_random_uuid(), 'Day One Ventures',           'Deep tech, hard tech',                  'Seed to Series A', now(), now()),
-  (gen_random_uuid(), 'NEA',                        'Multi-sector technology',               'Multi-stage',      now(), now()),
-  (gen_random_uuid(), 'Ubiquity Ventures',          'Deep tech, AI hardware',                'Seed',             now(), now()),
-  (gen_random_uuid(), 'ff Venture Capital',         'Deep tech, robotics, defense',          'Seed to Series A', now(), now()),
-  (gen_random_uuid(), 'Geodesic Capital',           'Defense tech, space',                   'Series A/B',       now(), now()),
-  (gen_random_uuid(), 'Amazon Climate Pledge Fund', 'Climate tech',                          'Multi-stage',      now(), now()),
-  (gen_random_uuid(), 'Flybridge',                  'Enterprise, deep tech',                 'Seed to Series A', now(), now()),
-  (gen_random_uuid(), 'Cherubic Ventures',          'Deep tech, robotics',                   'Seed',             now(), now()),
-  (gen_random_uuid(), 'SOSV',                       'Hard tech, biotech (HAX accelerator)',  'Pre-Seed/Seed',    now(), now()),
-  (gen_random_uuid(), 'Trimble Ventures',           'Construction tech, geospatial',         'Seed to Series A', now(), now()),
-  (gen_random_uuid(), 'BOLD Capital Partners',      'Robotics, AI, defense',                 'Seed to Series A', now(), now()),
-  (gen_random_uuid(), 'SineWave Ventures',          'Deep tech, advanced manufacturing',     'Series A/B',       now(), now());
+  (gen_random_uuid(), 'Day One Ventures',           'dayoneventures.com',    'Deep tech, hard tech',                  'Seed to Series A', now(), now()),
+  (gen_random_uuid(), 'NEA',                        'nea.com',               'Multi-sector technology',               'Multi-stage',      now(), now()),
+  (gen_random_uuid(), 'Ubiquity Ventures',          'ubiquity.vc',           'Deep tech, AI hardware',                'Seed',             now(), now()),
+  (gen_random_uuid(), 'ff Venture Capital',         'ffvc.com',              'Deep tech, robotics, defense',          'Seed to Series A', now(), now()),
+  (gen_random_uuid(), 'Geodesic Capital',           'geodesiccap.com',       'Defense tech, space',                   'Series A/B',       now(), now()),
+  (gen_random_uuid(), 'Amazon Climate Pledge Fund', NULL,                    'Climate tech',                          'Multi-stage',      now(), now()),
+  (gen_random_uuid(), 'Flybridge',                  'flybridge.com',         'Enterprise, deep tech',                 'Seed to Series A', now(), now()),
+  (gen_random_uuid(), 'Cherubic Ventures',          'cherubic.com',          'Deep tech, robotics',                   'Seed',             now(), now()),
+  (gen_random_uuid(), 'SOSV',                       'sosv.com',              'Hard tech, biotech (HAX accelerator)',  'Pre-Seed/Seed',    now(), now()),
+  (gen_random_uuid(), 'Trimble Ventures',           'trimbleventures.com',   'Construction tech, geospatial',         'Seed to Series A', now(), now()),
+  (gen_random_uuid(), 'BOLD Capital Partners',      'boldcap.com',           'Robotics, AI, defense',                 'Seed to Series A', now(), now()),
+  (gen_random_uuid(), 'SineWave Ventures',          'sinewaveventures.com',  'Deep tech, advanced manufacturing',     'Series A/B',       now(), now());
 
 -- ─────────────────────────────────────────
 -- 6. Additional Relationships
@@ -345,14 +345,14 @@ SELECT gen_random_uuid(),
 
 -- Day One Ventures + Valar Atomics: Seed Feb 2025 + Series A Nov 2025
 INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, value, weight, confidence, created_at)
-SELECT gen_random_uuid(), r.id, 'co_investment', '2025-02-15', 'AlleyCorp Substack',
+SELECT gen_random_uuid(), r.id, 'co_investment', '2025-02-20', 'TechCrunch',
   'Seed $19M · Feb 2025 · co-investor alongside Riot Ventures', 'high', 'confirmed', now()
 FROM relationship r JOIN fund f ON f.id = r.fund_id JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
 WHERE f.name = 'Day One Ventures' AND pc.name = 'Valar Atomics';
 
 INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, value, weight, confidence, created_at)
-SELECT gen_random_uuid(), r.id, 'co_investment', '2025-11-10', 'CNBC / TradedVC',
-  'Series A $130M · Nov 2025 · co-lead alongside Snowpoint Ventures', 'high', 'confirmed', now()
+SELECT gen_random_uuid(), r.id, 'co_investment', '2025-11-10', 'AlleyCorp Substack',
+  'Series A $130M · Nov 2025 · led by Snowpoint Ventures, co-investors: Day One Ventures, Dream Ventures', 'high', 'confirmed', now()
 FROM relationship r JOIN fund f ON f.id = r.fund_id JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
 WHERE f.name = 'Day One Ventures' AND pc.name = 'Valar Atomics';
 
@@ -390,23 +390,30 @@ WHERE f.name = 'Ubiquity Ventures' AND pc.name = 'Eyebot';
 
 -- ff Venture Capital + Civ Robotics: Seed Sep 2022 + Series A Jul 2025
 INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, value, weight, confidence, created_at)
-SELECT gen_random_uuid(), r.id, 'co_investment', '2022-09-21', 'GlobeNewswire',
-  'Seed $5M · Sep 2022 · co-lead with Alley Robotics Ventures', 'high', 'confirmed', now()
+SELECT gen_random_uuid(), r.id, 'co_investment', '2022-09-21', 'Crunchbase',
+  'Seed $5M · Sep 2022 · co-investor alongside ff Venture Capital and others', 'high', 'confirmed', now()
 FROM relationship r JOIN fund f ON f.id = r.fund_id JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
 WHERE f.name = 'ff Venture Capital' AND pc.name = 'Civ Robotics';
 
 INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, value, weight, confidence, created_at)
-SELECT gen_random_uuid(), r.id, 'co_investment', '2025-07-15', 'The Robot Report',
-  'Series A $7.5M · Jul 2025 · participant', 'high', 'confirmed', now()
+SELECT gen_random_uuid(), r.id, 'co_investment', '2025-07-15', 'AlleyCorp Substack',
+  'Series A $7.5M · Jul 2025 · participant (AlleyCorp led)', 'high', 'confirmed', now()
 FROM relationship r JOIN fund f ON f.id = r.fund_id JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
 WHERE f.name = 'ff Venture Capital' AND pc.name = 'Civ Robotics';
 
 -- Geodesic Capital + Portal Space Systems: Series A Apr 2026
 INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, value, weight, confidence, created_at)
-SELECT gen_random_uuid(), r.id, 'co_investment', '2026-04-15', 'SpaceNews',
-  'Series A $50M · Apr 2026 · lead', 'high', 'confirmed', now()
+SELECT gen_random_uuid(), r.id, 'co_investment', '2026-04-20', 'AlleyCorp Substack',
+  'Series A $50M · Apr 2026 · co-lead alongside Mach33 (AlleyCorp participated, $250M valuation)', 'high', 'confirmed', now()
 FROM relationship r JOIN fund f ON f.id = r.fund_id JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
 WHERE f.name = 'Geodesic Capital' AND pc.name = 'Portal Space Systems';
+
+-- Mach33 co-led the same Portal Space Systems Series A
+INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, value, weight, confidence, created_at)
+SELECT gen_random_uuid(), r.id, 'co_investment', '2026-04-20', 'AlleyCorp Substack',
+  'Series A $50M · Apr 2026 · co-lead alongside Geodesic Capital (AlleyCorp participated, $250M valuation)', 'high', 'confirmed', now()
+FROM relationship r JOIN fund f ON f.id = r.fund_id JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
+WHERE f.name = 'Mach33' AND pc.name = 'Portal Space Systems';
 
 -- Amazon Climate Pledge Fund + Glacier: Seed Extension Mar 2024 + Series A Apr 2025
 INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, value, weight, confidence, created_at)
@@ -437,8 +444,8 @@ WHERE f.name = 'Cherubic Ventures' AND pc.name = 'Cargo Robotics';
 
 -- SOSV + Renovate Robotics: Pre-Seed Mar 2023 + Seed VC-II Aug 2025 (HAX returned)
 INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, value, weight, confidence, created_at)
-SELECT gen_random_uuid(), r.id, 'co_investment', '2023-03-02', 'SOSV / TechCrunch',
-  'Pre-Seed $2.5M · Mar 2023 · HAX accelerator co-investor', 'high', 'confirmed', now()
+SELECT gen_random_uuid(), r.id, 'co_investment', '2023-02-01', 'AlleyCorp Substack',
+  'Pre-Seed $2.5M · Feb 2023 · AlleyCorp (via Alley Robotics Ventures) led, SOSV/HAX co-investor', 'high', 'confirmed', now()
 FROM relationship r JOIN fund f ON f.id = r.fund_id JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
 WHERE f.name = 'SOSV' AND pc.name = 'Renovate Robotics';
 
@@ -468,5 +475,16 @@ SELECT gen_random_uuid(), r.id, 'co_investment', '2021-09-02', 'TechCrunch',
   'Series A $11.5M · Sep 2021 · lead', 'high', 'confirmed', now()
 FROM relationship r JOIN fund f ON f.id = r.fund_id JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
 WHERE f.name = 'SineWave Ventures' AND pc.name = 'Aon 3D';
+
+-- NOTE: Additional signals for Trimble, General Catalyst, Riot should be added
+-- only after verifying sources on Crunchbase / TechCrunch / fund websites.
+-- Do not add signals you cannot verify — Lauren will fact-check live.
+
+-- ─────────────────────────────────────────
+-- 8. Logo URLs (Google favicon service)
+-- ─────────────────────────────────────────
+UPDATE fund
+SET logo_url = 'https://www.google.com/s2/favicons?domain=' || website || '&sz=128'
+WHERE website IS NOT NULL AND website != '';
 
 COMMIT;
