@@ -20,14 +20,29 @@ const REL_SELECT = `
     r.warmth_tier                                AS "warmthTier",
     to_char(r.last_signal_date, 'YYYY-MM-DD')   AS "lastSignalDate",
     r.override_note                              AS "overrideNote",
+    r.discovery_source                           AS "discoverySource",
+    r.discovery_context                          AS "discoveryContext",
     json_build_object(
       'id',              f.id,
       'name',            f.name,
       'focus',           f.focus,
       'aumTier',         f.aum_tier,
       'emergingManager', f.emerging_manager,
-      'website',         f.website
+      'website',         f.website,
+      'logoUrl',         f.logo_url
     ) AS fund,
+    (
+      SELECT json_build_object(
+        'id',          i.id,
+        'name',        i.name,
+        'role',        i.role,
+        'linkedinUrl', i.linkedin_url
+      )
+      FROM investor i
+      WHERE i.fund_id = f.id
+      ORDER BY i.created_at
+      LIMIT 1
+    ) AS investor,
     CASE WHEN pc.id IS NOT NULL THEN json_build_object(
       'id',            pc.id,
       'name',          pc.name,

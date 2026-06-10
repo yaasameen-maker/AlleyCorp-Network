@@ -30,6 +30,53 @@ interface InvestorRowProps {
   onClick: () => void;
 }
 
+/* ── Small fund logo with initials fallback ── */
+function RowLogo({ name, logoUrl }: { name: string; logoUrl?: string }) {
+  const initials = name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join("");
+
+  if (logoUrl) {
+    return (
+      <div className="relative w-6 h-6 shrink-0">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={logoUrl}
+          alt=""
+          width={24}
+          height={24}
+          className="w-6 h-6 rounded object-contain bg-white border border-[#EAECEF]"
+          onError={(e) => {
+            const target = e.currentTarget as HTMLImageElement;
+            target.style.display = "none";
+            const fallback = target.nextElementSibling as HTMLElement | null;
+            if (fallback) fallback.style.display = "flex";
+          }}
+        />
+        <div
+          className="w-6 h-6 rounded bg-[#0EA5D6] text-white text-[8px] font-bold items-center justify-center absolute inset-0"
+          style={{ display: "none" }}
+          aria-hidden
+        >
+          {initials}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="w-6 h-6 rounded bg-[#0EA5D6]/10 border border-[#0EA5D6]/20 text-[#0EA5D6] text-[8px] font-bold flex items-center justify-center shrink-0"
+      aria-hidden
+    >
+      {initials}
+    </div>
+  );
+}
+
 export function InvestorRow({ investor, isSelected, onClick }: InvestorRowProps) {
   const company = investor.coInvestments[0]?.portfolioCompany.name;
 
@@ -39,28 +86,31 @@ export function InvestorRow({ investor, isSelected, onClick }: InvestorRowProps)
       type="button"
       onClick={onClick}
       className={[
-        "group w-full text-left px-4 py-3.5 flex items-start justify-between gap-2",
+        "group w-full text-left px-4 py-3.5 flex items-center justify-between gap-2",
         "border-l-2 transition-all duration-150 ease-out",
         isSelected
           ? "border-l-[#0EA5D6] bg-[#F8F7F4]"
           : "border-l-transparent hover:bg-[#F8F7F4] hover:border-l-[#0EA5D6]",
       ].join(" ")}
     >
-      <div className="min-w-0 flex-1">
-        <p
-          className={[
-            "text-[12px] truncate leading-snug transition-colors duration-150",
-            isSelected
-              ? "font-bold text-[#0D1320]"
-              : "font-semibold text-[#1F2937] group-hover:text-[#0EA5D6]",
-          ].join(" ")}
-        >
-          {investor.fund.name}
-        </p>
-        <p className="text-[11px] text-[#9CA3AF] mt-0.5 truncate leading-snug">
-          {company ?? ""}
-          {investor.lastSignalDate ? ` · ${investor.lastSignalDate}` : ""}
-        </p>
+      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+        <RowLogo name={investor.fund.name} logoUrl={investor.fund.logoUrl} />
+        <div className="min-w-0">
+          <p
+            className={[
+              "text-[12px] truncate leading-snug transition-colors duration-150",
+              isSelected
+                ? "font-bold text-[#0D1320]"
+                : "font-semibold text-[#1F2937] group-hover:text-[#0EA5D6]",
+            ].join(" ")}
+          >
+            {investor.fund.name}
+          </p>
+          <p className="text-[11px] text-[#9CA3AF] mt-0.5 truncate leading-snug">
+            {company ?? ""}
+            {investor.lastSignalDate ? ` · ${investor.lastSignalDate}` : ""}
+          </p>
+        </div>
       </div>
       <WarmthBadge tier={investor.warmthTier} />
     </button>

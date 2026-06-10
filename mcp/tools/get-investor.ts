@@ -29,6 +29,7 @@ export async function handler(args: { name: string }): Promise<CallToolResult> {
 
   const fund = relationship.fund;
   const company = relationship.portfolioCompany;
+  const contact = relationship.investor;
   const signals = relationship.signals ?? [];
 
   const formatDate = (d: unknown): string => {
@@ -50,11 +51,16 @@ export async function handler(args: { name: string }): Promise<CallToolResult> {
     Cold: "No prior relationship. Identify a warm intro path or shared portfolio company.",
   }[relationship.warmthTier];
 
+  const contactLine = contact
+    ? `Key contact: ${contact.name} · ${contact.role}${contact.linkedinUrl ? ` · ${contact.linkedinUrl}` : ""}`
+    : "";
+
   const text = [
     `**${fund?.name ?? args.name}**`,
     `Warmth tier: ${relationship.warmthTier}`,
     company ? `Co-investment: ${company.name} (${company.stage})` : "",
     `Last signal: ${formatDate(relationship.lastSignalDate)}`,
+    contactLine,
     `Relationship ID: ${relationship.id}`,
     ``,
     `Signals:`,

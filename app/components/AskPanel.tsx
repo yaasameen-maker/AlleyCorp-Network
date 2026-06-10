@@ -137,7 +137,7 @@ export function AskPanel({ investors, onSelectInvestor, onClose }: AskPanelProps
   const inputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom after each new message
+  // Auto-scroll to bottom when history or loading state changes
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [history, loading]);
@@ -147,21 +147,20 @@ export function AskPanel({ investors, onSelectInvestor, onClose }: AskPanelProps
     if (!trimmed || loading) return;
     setPendingQuery(trimmed);
     setLoading(true);
+
     try {
       const res = await fetch("/api/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: trimmed }),
       });
-      const data: AskResponse = await res.json();
-      setHistory((prev) => [
-        ...prev,
-        {
-          query: trimmed,
-          answer: data.answer || "Something went wrong. Please try again.",
-          cards: data.cards ?? [],
-        },
-      ]);
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+
+      const data = (await res.json()) as AskResponse;
+      setHistory((prev) => [...prev, { query: trimmed, answer: data.answer, cards: data.cards }]);
     } catch {
       setHistory((prev) => [
         ...prev,
@@ -356,7 +355,7 @@ export function AskPanel({ investors, onSelectInvestor, onClose }: AskPanelProps
             </div>
           ))}
 
-          {/* In-flight state while loading */}
+          {/* Spinner — shown while waiting for response */}
           {loading && pendingQuery && (
             <div className="px-6 py-4 space-y-3">
               <div className="flex justify-end">
@@ -366,7 +365,7 @@ export function AskPanel({ investors, onSelectInvestor, onClose }: AskPanelProps
               </div>
               <div className="flex items-center gap-2 text-[#9CA3AF]">
                 <SpinnerIcon />
-                <p className="text-xs">Asking the network…</p>
+                <p className="text-xs">Searching co-investors…</p>
               </div>
             </div>
           )}

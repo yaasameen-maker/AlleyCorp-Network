@@ -16,6 +16,7 @@ export interface Fund {
   aumTier?: string;
   emergingManager?: boolean;
   website?: string;
+  logoUrl?: string;
   stage?: string;
   hqLocation?: string;
   linkedinUrl?: string;
@@ -61,10 +62,38 @@ export interface Signal {
   confidence?: "confirmed" | "inferred" | "pending";
 }
 
+export interface RelationshipInvestor {
+  id: string;
+  name: string;
+  role: string;
+  linkedinUrl?: string;
+}
+
+// How this fund entered the system.
+export type DiscoverySource = "manual" | "portfolio_scan" | "network_expansion";
+
+// Structured explanation stored as JSONB in relationship.discovery_context.
+// Phase 1 (portfolio_scan): source article + round details.
+// Phase 2 (network_expansion): network path + evidence count.
+export interface DiscoveryContext {
+  // Phase 1
+  source_url?: string;
+  round?: string;
+  company?: string;
+  // Phase 2
+  via_fund?: string;
+  shared_rounds?: number;
+  companies?: string[]; // non-AlleyCorp companies where overlap was observed
+  oldest_signal_months?: number;
+  // Both
+  summary: string;
+}
+
 export interface Relationship {
   id: string;
   fundId: string;
   fund?: Fund;
+  investor?: RelationshipInvestor | null;
   investorId?: string;
   portfolioCompanyId: string;
   portfolioCompany?: PortfolioCompany;
@@ -77,6 +106,8 @@ export interface Relationship {
   overrideBy?: string;
   overrideAt?: string;
   signals?: Signal[];
+  discoverySource?: DiscoverySource;
+  discoveryContext?: DiscoveryContext | null;
 }
 
 // ── View models ───────────────────────────────────────────────────────

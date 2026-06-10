@@ -14,6 +14,31 @@ export interface Fund {
   id: string;
   name: string;
   logoUrl?: string;
+  website?: string;
+}
+
+// Added by Luba June 2026 — wiring real contact data from investor table through API
+export interface Contact {
+  name: string;
+  role: string;
+  linkedinUrl?: string;
+}
+
+// Added by Luba June 2026 — discovery source + context from autonomous discovery agent
+export type DiscoverySource = "manual" | "portfolio_scan" | "network_expansion";
+
+export interface DiscoveryContext {
+  // network_expansion
+  via_fund?: string;
+  shared_rounds?: number;
+  companies?: string[];
+  oldest_signal_months?: number;
+  // portfolio_scan
+  source_url?: string;
+  round?: string;
+  company?: string;
+  // both
+  summary?: string;
 }
 
 export interface CoInvestment {
@@ -44,6 +69,9 @@ export interface Investor {
   // Undefined for Cold relationships that have no signals yet.
   lastSignalDate?: string;
   suggestedAction?: string;
+  contact?: Contact;
+  discoverySource?: DiscoverySource;
+  discoveryContext?: DiscoveryContext | null;
 }
 
 // Only companies referenced by mock investors below.
