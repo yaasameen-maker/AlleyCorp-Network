@@ -42,12 +42,16 @@ interface HistoryItem {
 // Handles: ALL CAPS section labels, "- item" bullets, plain paragraphs.
 
 function renderInline(text: string): React.ReactNode {
-  // Strip residual markdown and replace em dashes regardless of what Claude emits
+  // Strip residual markdown and replace dashes regardless of what Claude emits
   const clean = text
-    .replace(/\*\*/g, "")
-    .replace(/\*/g, "")
+    .replace(/^#{1,6}\s+/, "") // ## headings → plain text
+    .replace(/\*\*/g, "") // **bold**
+    .replace(/\*/g, "") // *italic*
+    .replace(/_([^_]+)_/g, "$1") // _underline_
     .replace(/ — /g, ", ") // em dash with spaces → comma
-    .replace(/—/g, ", "); // bare em dash → comma
+    .replace(/—/g, ", ") // bare em dash → comma
+    .replace(/ – /g, ", ") // en dash with spaces → comma
+    .replace(/–/g, ", "); // bare en dash → comma
   return clean;
 }
 
