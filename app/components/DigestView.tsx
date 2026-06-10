@@ -146,7 +146,6 @@ export function DigestView({ investors }: DigestViewProps) {
   // brand-line + card-lift applied — Luba, Jun 2026 (design system pass)
   return (
     <div className="max-w-2xl px-8 py-10 space-y-8">
-
       {/* Hero card — matches BriefingDashboard style */}
       <div className="relative overflow-hidden rounded hero-aurora px-7 py-6 shadow-md">
         <div className="hero-shimmer absolute -inset-12" aria-hidden />
@@ -174,8 +173,12 @@ export function DigestView({ investors }: DigestViewProps) {
                 <p className="text-[9px] uppercase tracking-widest text-white/40 mt-0.5">Actions</p>
               </div>
               <div className="text-center">
-                <p className="text-xl font-bold text-white tabular-nums">{digest.sections.length}</p>
-                <p className="text-[9px] uppercase tracking-widest text-white/40 mt-0.5">Sections</p>
+                <p className="text-xl font-bold text-white tabular-nums">
+                  {digest.sections.length}
+                </p>
+                <p className="text-[9px] uppercase tracking-widest text-white/40 mt-0.5">
+                  Sections
+                </p>
               </div>
             </div>
           </div>
