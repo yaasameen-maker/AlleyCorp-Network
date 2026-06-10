@@ -16,8 +16,8 @@ Example: The Grote family (Jim Grote) co-led Appetronix's $10M+ seed alongside A
 **Q2 — Portal Space Systems name**  
 We have "Portal Space Systems" in the DB. Lauren's message referenced "Portal System." Is the full legal name "Portal Space Systems"? Don't want to change without confirmation.
 
-**Q3 — What do you want to see for active companies with no public co-investor data?**  
-4 active portfolio companies returned zero results from web search: Avatar, Root Access, dolaGon, ARIX Technologies. Should we show them on the dashboard with no co-investor data (blank/unknown), or does AlleyCorp have internal records of who co-invested? Can Lauren pull cap table or Crunchbase data for these?
+**Q3 — Avatar: are there any external co-investors, or is ARV the sole backer?**  
+Avatar was co-founded and incubated by AlleyCorp and backed by ARV. We didn't find any external co-investors in public records — is that by design, or are there investors we should be tracking for this company?
 
 **Q4 — Swoogo contacts: any way to get per-event export?**  
 The Swoogo CSV Lauren shared has no dates or event names — it's a flat contact list. It's not actionable for signal tracking. If Lauren can export per-event registration lists (like she did for DTNY), we can ingest those as signals. Worth asking.
@@ -52,6 +52,9 @@ Early docs said "Show me the full picture on Lux Capital." Lux Capital was remov
 The acceptance tests and demo script are written from Abe's POV. Is this Abe Strauss (AlleyCorp)? Confirm so we get the persona right in the demo narrative.
 
 ---
+
+**Q12 — How should we keep co-investor data in sync as the portfolio changes?**  
+Right now co-investor data is researched manually. When AlleyCorp makes a new investment, someone has to find who else invested. We want to automate this. The best source depends on what AlleyCorp has access to — Crunchbase API (paid, reliable), cap table exports from Lauren, or web scraping (free but misses stealth rounds — we nearly missed Avatar's $6M seed with Defy Partners and REFASHIOND Ventures). What's realistic for us to use?
 
 **Q11 — Do you want to discover new funds through your existing co-investors' networks?**  
 Example: Riot Ventures co-invested in a company alongside Fund X, who AlleyCorp has never met. The tool could surface Fund X as a "2nd-degree connection — met through Riot Ventures." Is that something you'd use? Right now the tool only knows about funds that have directly co-invested with AlleyCorp or attended one of your events. Expanding to 2nd-degree connections is doable but would be a bigger build — want to know if it's worth prioritizing.

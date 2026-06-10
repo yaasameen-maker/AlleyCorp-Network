@@ -56,7 +56,11 @@ VALUES
   -- Cold-tier targets: top deep tech funds AlleyCorp has not yet co-invested with
   (gen_random_uuid(), 'a16z American Dynamism',   'a16z.com',              'Defense, aerospace, manufacturing', 'Multi-stage',      now(), now()),
   (gen_random_uuid(), 'Eclipse Ventures',         'eclipse.vc',            'Deep tech, industrial robotics',    'Series A/B',       now(), now()),
-  (gen_random_uuid(), 'Founders Fund',            'foundersfund.com',      'Deep tech, defense, biotech',       'Multi-stage',      now(), now());
+  (gen_random_uuid(), 'Founders Fund',            'foundersfund.com',      'Deep tech, defense, biotech',       'Multi-stage',      now(), now()),
+  -- Avatar Robotics co-investors — Seed $6.01M, Jan 30 2026
+  -- Source: Crunchbase. Round led by ARV alongside Defy Partners and REFASHIOND Ventures.
+  (gen_random_uuid(), 'Defy Partners',            'defy.vc',               'Early-stage technology',            'Pre-Seed to Series A', now(), now()),
+  (gen_random_uuid(), 'REFASHIOND Ventures',      'refashiond.vc',         'Supply chain technology',           'Early-stage',          now(), now());
 
 -- ─────────────────────────────────────────
 -- 3. Relationships
@@ -133,6 +137,28 @@ SELECT
   (SELECT id FROM portfolio_company WHERE name = 'Valar Atomics'),
   'cold',
   now(), now();
+
+-- Defy Partners + Avatar · warm (Seed $6.01M co-investment Jan 2026)
+INSERT INTO relationship (id, fund_id, portfolio_company_id, warmth_tier, last_signal_date, created_at, updated_at)
+VALUES (
+  gen_random_uuid(),
+  (SELECT id FROM fund WHERE name = 'Defy Partners'),
+  (SELECT id FROM portfolio_company WHERE name = 'Avatar'),
+  'warm',
+  '2026-01-30',
+  now(), now()
+);
+
+-- REFASHIOND Ventures + Avatar · warm (Seed $6.01M co-investment Jan 2026)
+INSERT INTO relationship (id, fund_id, portfolio_company_id, warmth_tier, last_signal_date, created_at, updated_at)
+VALUES (
+  gen_random_uuid(),
+  (SELECT id FROM fund WHERE name = 'REFASHIOND Ventures'),
+  (SELECT id FROM portfolio_company WHERE name = 'Avatar'),
+  'warm',
+  '2026-01-30',
+  now(), now()
+);
 
 -- ─────────────────────────────────────────
 -- 4. Signals
@@ -490,6 +516,29 @@ WHERE f.name = 'SineWave Ventures' AND pc.name = 'Aon 3D';
 -- ─────────────────────────────────────────
 UPDATE signal SET source_url = 'https://alleycorp.substack.com'
 WHERE source = 'AlleyCorp Substack' AND source_url IS NULL;
+
+-- Avatar Robotics co-investment signals — Seed $6.01M, Jan 30 2026
+-- Source: Crunchbase. Round led by ARV, co-investors: Defy Partners, REFASHIOND Ventures.
+INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, source_url, value, weight, confidence, created_at)
+SELECT
+  gen_random_uuid(),
+  r.id,
+  'co_investment',
+  '2026-01-30',
+  'Crunchbase',
+  'https://www.crunchbase.com/organization/avatar-robotics',
+  'Seed $6.01M — Avatar Robotics warehouse robot fleet',
+  'high',
+  'confirmed',
+  now()
+FROM relationship r
+JOIN fund f ON f.id = r.fund_id
+JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
+WHERE f.name IN ('Defy Partners', 'REFASHIOND Ventures')
+  AND pc.name = 'Avatar'
+  AND NOT EXISTS (
+    SELECT 1 FROM signal s WHERE s.relationship_id = r.id AND s.signal_type = 'co_investment'
+  );
 
 -- ─────────────────────────────────────────
 -- 9. Logo URLs (Google favicon service)
