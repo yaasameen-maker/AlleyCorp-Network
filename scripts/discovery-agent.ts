@@ -33,11 +33,16 @@ import {
   buildLogoUrl,
   searchLinkedIn,
   extractContacts,
-  confidenceFromSource,
-  warmthFromDate,
   type LinkedInResult,
-  type ConfidenceLevel,
 } from "../lib/enrichment.js";
+import {
+  substackAdapter,
+  searchCompanyFunding,
+  extractInvestors,
+  type RawInvestor,
+} from "./adapters/substackAdapter.js";
+import { SIGNAL_TYPE_TO_DB } from "../lib/discovery-types.js";
+import { confidenceFromSource, type ConfidenceLevel } from "../lib/enrichment.js";
 
 const DRY_RUN = !process.argv.includes("--write");
 const QUICK = process.argv.includes("--quick"); // process only 3 companies
@@ -63,55 +68,6 @@ interface HotWarmFund {
   warmthTier: string;
   portfolioCompanyId: string; // AlleyCorp portfolio company we're linked through
 }
-
-// ── Claude tool schemas ───────────────────────────────────────────────────────
-
-const EXTRACT_INVESTORS_TOOL: Anthropic.Tool = {
-  name: "extract_investors",
-  description:
-    "Extract all VC funds/investors that participated in this company's funding round from the search results.",
-  input_schema: {
-    type: "object" as const,
-    properties: {
-      investors: {
-        type: "array",
-        description: "All investors found. Empty array if none.",
-        items: {
-          type: "object",
-          properties: {
-            fundName: { type: "string", description: "Exact fund name as written in the source." },
-            round: {
-              type: "string",
-              description: "Round: Seed, Series A, Series B, Pre-Seed, etc.",
-            },
-            date: {
-              type: "string",
-              description:
-                "Date YYYY-MM-DD. Use YYYY-01-01 if only year known. 'unknown' if not found.",
-            },
-            amount: {
-              type: "string",
-              description: "Funding amount e.g. '$5M'. Omit if not mentioned.",
-            },
-            sourceTitle: { type: "string", description: "Article or page title." },
-            sourceUrl: { type: "string", description: "Full source URL." },
-            rawSnippet: {
-              type: "string",
-              description: "Exact quote (max 200 chars) confirming this investor.",
-            },
-          },
-          required: ["fundName", "round", "date", "sourceTitle", "sourceUrl", "rawSnippet"],
-        },
-      },
-      gaps: {
-        type: "array",
-        items: { type: "string" },
-        description: "Notes on what couldn't be found or was unclear.",
-      },
-    },
-    required: ["investors", "gaps"],
-  },
-};
 
 const EXTRACT_PORTFOLIO_TOOL: Anthropic.Tool = {
   name: "extract_portfolio_companies",
@@ -142,50 +98,7 @@ const EXTRACT_PORTFOLIO_TOOL: Anthropic.Tool = {
 };
 
 // ── Exa search helpers ────────────────────────────────────────────────────────
-
-async function searchCompanyFunding(
-  companyName: string
-): Promise<{ url: string; title: string; snippet: string }[]> {
-  const queries = [
-    `"${companyName}" funding round investors venture capital`,
-    `"${companyName}" seed series investment announcement`,
-    `"${companyName}" startup raises investors`,
-  ];
-  const found = new Map<string, { url: string; title: string; snippet: string }>();
-
-  for (const query of queries) {
-    try {
-      const results = await exa.search(query, {
-        type: "auto",
-        numResults: 5,
-        contents: { highlights: true },
-        includeDomains: [
-          "alleycorp.substack.com", // AlleyCorp's own newsletter — most authoritative source
-          "techcrunch.com",
-          "prnewswire.com",
-          "businesswire.com",
-          "axios.com",
-          "reuters.com",
-          "bloomberg.com",
-          "crunchbase.com",
-          "forbes.com",
-          "venturebeat.com",
-          "wsj.com",
-        ],
-      });
-      for (const r of results.results) {
-        const snippet = (r as unknown as { highlights?: string[] }).highlights?.join(" ") ?? "";
-        if ((snippet || r.title) && !found.has(r.url)) {
-          found.set(r.url, { url: r.url, title: r.title ?? "", snippet });
-        }
-      }
-    } catch {
-      // continue on individual query failure
-    }
-    await sleep(300);
-  }
-  return [...found.values()];
-}
+// searchCompanyFunding + extractInvestors moved to scripts/adapters/substackAdapter.ts
 
 async function searchFundPortfolio(
   fundName: string
@@ -226,56 +139,8 @@ async function searchFundPortfolio(
 }
 
 // ── Claude extraction helpers ─────────────────────────────────────────────────
-
-interface RawInvestor {
-  fundName: string;
-  round: string;
-  date: string;
-  amount?: string;
-  sourceTitle: string;
-  sourceUrl: string;
-  rawSnippet: string;
-}
-
-async function extractInvestors(
-  companyName: string,
-  pages: { url: string; title: string; snippet: string }[]
-): Promise<(RawInvestor & { confidence: ConfidenceLevel })[]> {
-  if (pages.length === 0) return [];
-
-  const prompt = `Extract all investors/funds that participated in funding rounds for "${companyName}" from these search results.
-
-Rules:
-- Only include investors explicitly named in a source
-- Do not guess or infer fund names
-- If the same investor appears in multiple sources, keep the highest-confidence source
-- Call extract_investors with empty array if nothing found
-
-Search results:
-${pages.map((p, i) => `[${i + 1}] ${p.title}\n${p.url}\n${p.snippet}`).join("\n\n")}`;
-
-  try {
-    const response = await claude.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 2048,
-      tools: [EXTRACT_INVESTORS_TOOL],
-      tool_choice: { type: "tool", name: "extract_investors" },
-      messages: [{ role: "user", content: prompt }],
-    });
-    const toolUse = response.content.find((b) => b.type === "tool_use") as
-      | Anthropic.ToolUseBlock
-      | undefined;
-    if (!toolUse) return [];
-    const input = toolUse.input as { investors: RawInvestor[]; gaps: string[] };
-    return (input.investors ?? []).map((inv) => ({
-      ...inv,
-      confidence: confidenceFromSource(inv.sourceUrl),
-    }));
-  } catch (err) {
-    console.error(`   ✗ Investor extraction failed for "${companyName}": ${err}`);
-    return [];
-  }
-}
+// RawInvestor, extractInvestors imported from substackAdapter
+// searchCompanyFunding imported from substackAdapter (used by Phase 2)
 
 interface PortfolioCompanyRef {
   name: string;
@@ -469,77 +334,76 @@ const stats = {
 };
 
 // ── Phase 1: Portfolio scan ───────────────────────────────────────────────────
+// Delegates search + extraction to substackAdapter.
+// Warmth tier is NOT assigned here — recalibrate.ts computes it from signals.
 
 async function runPortfolioScan(companies: PortfolioRow[]): Promise<void> {
   console.log(`\n${"═".repeat(60)}`);
   console.log(`PHASE 1 — Portfolio Scan (${companies.length} companies)`);
   console.log("═".repeat(60));
 
-  for (const company of companies) {
-    console.log(`\n── ${company.name}`);
-    const pages = await searchCompanyFunding(company.name);
-    console.log(`   Exa: ${pages.length} pages found`);
+  const { signals, rawByCompany } = await substackAdapter(companies, exa, claude);
 
-    if (pages.length === 0) {
-      stats.phase1.skipped++;
-      continue;
-    }
+  console.log(
+    `\n   substackAdapter: ${signals.length} signal candidates from ${companies.length} companies`
+  );
 
-    const investors = await extractInvestors(company.name, pages);
-    const actionable = investors.filter(
-      (i) => i.confidence === "high" || i.confidence === "medium"
+  for (const signal of signals) {
+    const company = companies.find((c) => c.name === signal.portfolioCompanyName);
+    if (!company) continue;
+
+    const rawForCompany = rawByCompany.get(company.name) ?? [];
+    const raw = rawForCompany.find((r) => r.fundName === signal.fundName);
+
+    console.log(`   → ${signal.fundName} · ${signal.confidence} · ${signal.signalDate}`);
+    stats.phase1.fundsFound++;
+
+    if (DRY_RUN) continue;
+
+    const fundId = await upsertFund(signal.fundName!, company.sector, undefined);
+    if (!fundId) continue;
+
+    const context = {
+      source_url: raw?.sourceUrl ?? "",
+      round: raw?.round ?? signal.metadata?.roundName ?? "",
+      company: company.name,
+      summary: signal.value ?? `Co-invested in ${company.name} alongside AlleyCorp.`,
+    };
+
+    const today = new Date().toISOString().slice(0, 10);
+    const signalDate = signal.signalDate ?? today;
+
+    // Warmth tier defaults to 'cold' — recalibrate.ts promotes based on signal history
+    const rel = await upsertRelationship(
+      fundId,
+      company.id,
+      "cold",
+      signalDate,
+      "portfolio_scan",
+      context
     );
-    console.log(
-      `   Claude: ${investors.length} investors (${actionable.length} high/medium confidence)`
+    if (!rel) continue;
+    if (rel.isNew) stats.phase1.fundsNew++;
+
+    await upsertSignal(
+      rel.relId,
+      SIGNAL_TYPE_TO_DB[signal.signalType],
+      signalDate,
+      raw?.sourceTitle ?? signal.sourceId,
+      signal.value ?? "",
+      signal.confidence
     );
+    stats.phase1.signalsAdded++;
 
-    for (const inv of actionable) {
-      const { tier, reason } = warmthFromDate(inv.date);
-      console.log(`   → ${inv.fundName} · ${tier} · ${inv.confidence} (${reason})`);
-      stats.phase1.fundsFound++;
-
-      if (DRY_RUN) continue;
-
-      const fundId = await upsertFund(inv.fundName, company.sector, undefined);
-      if (!fundId) continue;
-
-      const context = {
-        source_url: inv.sourceUrl,
-        round: inv.round,
-        company: company.name,
-        summary: `Co-invested in ${company.name} ${inv.round} alongside AlleyCorp. Source: ${inv.sourceTitle}.`,
-      };
-
-      const rel = await upsertRelationship(
-        fundId,
-        company.id,
-        tier,
-        inv.date === "unknown" ? new Date().toISOString().slice(0, 10) : inv.date,
-        "portfolio_scan",
-        context
-      );
-      if (!rel) continue;
-      if (rel.isNew) stats.phase1.fundsNew++;
-
-      await upsertSignal(
-        rel.relId,
-        "co_investment",
-        inv.date === "unknown" ? new Date().toISOString().slice(0, 10) : inv.date,
-        inv.sourceTitle,
-        `${inv.fundName} co-invested in ${company.name} ${inv.round}${inv.amount ? ` (${inv.amount})` : ""}`,
-        tier === "hot" ? "high" : "medium"
-      );
-      stats.phase1.signalsAdded++;
-
-      if (rel.isNew) {
-        console.log(`     ✓ New fund inserted — enriching contacts`);
-        await enrichNewFund(fundId, inv.fundName);
-        stats.contacts.added++;
-      }
+    if (rel.isNew) {
+      console.log(`     ✓ New fund — enriching contacts`);
+      await enrichNewFund(fundId, signal.fundName!);
+      stats.contacts.added++;
     }
-
-    await sleep(500); // rate limiting
   }
+
+  stats.phase1.skipped =
+    companies.length - new Set(signals.map((s) => s.portfolioCompanyName)).size;
 }
 
 // ── Phase 2: Network expansion ────────────────────────────────────────────────
@@ -575,10 +439,10 @@ async function runNetworkExpansion(hotWarmFunds: HotWarmFund[]): Promise<void> {
 
     for (const company of theirCompanies.slice(0, 6)) {
       // cap at 6 to control Exa usage
-      const coPages = await searchCompanyFunding(company.name);
+      const coPages = await searchCompanyFunding(company.name, exa);
       if (coPages.length === 0) continue;
 
-      const coInvestors = await extractInvestors(company.name, coPages);
+      const coInvestors = await extractInvestors(company.name, coPages, claude);
 
       for (const inv of coInvestors) {
         // Skip funds already known as hot/warm/stale
