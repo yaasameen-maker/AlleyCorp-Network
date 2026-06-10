@@ -105,23 +105,25 @@ SELECT
   '2025-08-26',
   now(), now();
 
--- a16z American Dynamism + Cargo Robotics · cold (target — no co-investment yet)
+-- a16z American Dynamism · cold (target — no co-investment yet, portfolio_company_id NULL)
 INSERT INTO relationship (id, fund_id, portfolio_company_id, warmth_tier, created_at, updated_at)
-SELECT
+VALUES (
   gen_random_uuid(),
   (SELECT id FROM fund WHERE name = 'a16z American Dynamism'),
-  (SELECT id FROM portfolio_company WHERE name = 'Cargo Robotics'),
+  NULL,
   'cold',
-  now(), now();
+  now(), now()
+);
 
--- Eclipse Ventures + Civ Robotics · cold (target — no co-investment yet)
+-- Eclipse Ventures · cold (target — no co-investment yet, portfolio_company_id NULL)
 INSERT INTO relationship (id, fund_id, portfolio_company_id, warmth_tier, created_at, updated_at)
-SELECT
+VALUES (
   gen_random_uuid(),
   (SELECT id FROM fund WHERE name = 'Eclipse Ventures'),
-  (SELECT id FROM portfolio_company WHERE name = 'Civ Robotics'),
+  NULL,
   'cold',
-  now(), now();
+  now(), now()
+);
 
 -- Founders Fund + Valar Atomics · cold (target — no co-investment yet)
 INSERT INTO relationship (id, fund_id, portfolio_company_id, warmth_tier, created_at, updated_at)
@@ -481,7 +483,16 @@ WHERE f.name = 'SineWave Ventures' AND pc.name = 'Aon 3D';
 -- Do not add signals you cannot verify — Lauren will fact-check live.
 
 -- ─────────────────────────────────────────
--- 8. Logo URLs (Google favicon service)
+-- 8. Source URLs — AlleyCorp Substack
+-- Set source_url for all signals sourced from AlleyCorp Substack.
+-- Other sources (Crunchbase, TechCrunch, PRWeb) require specific article
+-- URLs which must be verified before adding — do not fabricate.
+-- ─────────────────────────────────────────
+UPDATE signal SET source_url = 'https://alleycorp.substack.com'
+WHERE source = 'AlleyCorp Substack' AND source_url IS NULL;
+
+-- ─────────────────────────────────────────
+-- 9. Logo URLs (Google favicon service)
 -- ─────────────────────────────────────────
 UPDATE fund
 SET logo_url = 'https://www.google.com/s2/favicons?domain=' || website || '&sz=128'

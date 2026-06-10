@@ -57,6 +57,7 @@ export interface Signal {
   type: SignalType;
   date: string;
   source: string;
+  sourceUrl?: string;
   value: string;
   weight: "high" | "medium" | "low";
   confidence?: "confirmed" | "inferred" | "pending";

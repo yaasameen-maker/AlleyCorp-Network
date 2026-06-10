@@ -7,7 +7,7 @@ import Link from "next/link";
 import { getAllRelationships, pool } from "../../lib/db";
 import { WarmthBadge } from "../components/InvestorRow";
 import { AskFAB } from "../components/AskFAB";
-import type { WarmthTier } from "../data/mockData";
+import type { WarmthTier } from "@/lib/investors";
 
 interface CoInvestorRow {
   fundName: string;

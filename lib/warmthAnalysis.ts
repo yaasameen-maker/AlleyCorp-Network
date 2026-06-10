@@ -1,4 +1,5 @@
-import type { Investor, Signal, WarmthTier } from "@/app/data/mockData";
+import type { Investor, WarmthTier } from "@/lib/investors";
+import type { InvestorSignal as Signal } from "@/lib/investors";
 import { monthsSince, parseMonthYear } from "./dates";
 
 const ACTIVE_WINDOW_MONTHS = 24;

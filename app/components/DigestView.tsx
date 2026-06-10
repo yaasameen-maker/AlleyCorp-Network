@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Investor } from "@/app/data/mockData";
+import type { Investor } from "@/lib/investors";
 import { buildWeeklyDigest, formatDigestAsEmail } from "@/lib/digest-client";
 import type { DigestItem } from "@/lib/digest-client";
 

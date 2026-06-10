@@ -1,7 +1,8 @@
 // Single source of investor data for the frontend.
 // Fetches from GET /api/investors — Railway DB via lib/db.ts → app/api/investors/route.ts
 
-import { mockInvestors, type Investor } from "./mockData";
+import { mockInvestors } from "./mockData";
+import type { Investor } from "@/lib/investors";
 
 /**
  * Returns all investors for the list view from the real DB via GET /api/investors.

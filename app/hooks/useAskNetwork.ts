@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import type { Investor } from "@/app/data/mockData";
+import type { Investor } from "@/lib/investors";
 import { runMCPQuery, type MCPQueryResult } from "@/lib/mcpQuery";
 
 export const ASK_QUICK_QUERIES = {

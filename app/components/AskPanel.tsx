@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { WarmthBadge } from "./InvestorRow";
-import type { Investor } from "@/app/data/mockData";
+import type { Investor } from "@/lib/investors";
 import type { AskCard, AskResponse } from "@/app/api/ask/route";
 
 const QUICK_PROMPTS: { label: string; prompt: string }[] = [
@@ -192,8 +192,9 @@ export function AskPanel({ investors, onSelectInvestor, onClose }: AskPanelProps
       (i) => i.fund.name.toLowerCase() === card.fundName.toLowerCase()
     );
     if (investor) {
+      // Open the profile drawer but keep the chat panel open so the user
+      // can close the drawer and return to the conversation.
       onSelectInvestor(investor);
-      onClose();
     }
   }
 

@@ -2,7 +2,7 @@
 
 import { InvestorCard } from "@/app/components/InvestorCard";
 import { WarmthBadge } from "@/app/components/WarmthBadge";
-import type { Investor, WarmthTier } from "@/app/data/mockData";
+import type { Investor, WarmthTier } from "@/lib/investors";
 
 interface InvestorListSectionProps {
   filteredInvestors: Investor[];

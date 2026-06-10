@@ -1,11 +1,56 @@
 # AlleyCorp Relationship Intelligence — Handoff Doc
 
-**Updated:** June 7, 2026 · **Demo Day:** June 24, 2026  
+**Updated:** June 10, 2026 · **Demo Day:** June 24, 2026  
 **Author:** Luba Kaper
 
 ---
 
-## 1. What Was Fixed in This Session (June 7)
+## 1. What Changed — June 10 Update
+
+### Scoring alignment — `calculateWarmthTier` now matches `computeWarmthTier`
+
+Two scoring APIs existed in `lib/scoring.ts` and were giving different results for the same fund. Fixed:
+
+- `calculateWarmthTier` (API 1, used by alerts + tests) now respects `HOT_ANCHORS` — a HOT_ANCHOR fund always returns Hot regardless of signal count
+- 1 active `co_investment` within 18 months now returns Warm (previously Stale) — matches the weighted scorer where co_investment scores 10, above the Warm threshold of 6
+- 48/48 tests pass
+
+### HOT_ANCHORS audit — trimmed to Lauren-confirmed funds only
+
+`HOT_ANCHORS` in `lib/scoring.ts` was expanded June 4 with 7 extra funds labeled "Lauren-confirmed" — but Lauren only explicitly confirmed 4 funds when asked about strong AlleyCorp relationships:
+
+> "Riot Ventures, Snowpoint Ventures, General Catalyst and Mach33"
+
+The 7 additions (SOSV, Day One Ventures, Amazon Climate Pledge Fund, NEA, Ubiquity Ventures, **Geodesic Capital**, ff Venture Capital) were removed. Those funds are now scored purely by their signals. Some may come out Hot naturally (NEA has 3 signals, ff VC has 3 signals + DTNY event). If Lauren confirms any of them on Thursday, add them back with her name and date in a comment.
+
+### Signal count + source URL in InvestorRow and ProfileDrawer
+
+- **InvestorRow** subtext now shows: `Portal Space Systems · 3 signals · Jan 2026`
+- **ProfileDrawer** Engagement History now shows portfolio company per signal and a clickable source link when `source_url` is populated
+- `signal` table has a new `source_url TEXT` column (idempotent migration in `schema.sql`)
+- `lib/types.ts` Signal now has `sourceUrl?: string`; `lib/db.ts` SELECTs include `source_url`
+- 6 AlleyCorp Substack signals on Railway have `source_url = 'https://alleycorp.substack.com'` (homepage placeholder — specific post URLs are a June 12–16 sprint task)
+
+### Type source of truth moved — mockData no longer owns types
+
+`app/data/mockData.ts` used to define all frontend types (`Investor`, `Signal`, `WarmthTier`, etc.). This caused components to import from mockData even when using real DB data. Fixed:
+
+- **`lib/investors.ts`** is now the source of truth for all frontend types: `Investor`, `InvestorSignal`, `CoInvestment`, `Contact`, `WarmthTier`, `DiscoveryContext`
+- All components (`InvestorRow`, `ProfileDrawer`, `page.tsx`, and 10+ others) import from `@/lib/investors`
+- `mockData.ts` is now data-only — just the fallback array + re-exports from `lib/investors`
+- 0 TypeScript errors, 47/47 tests pass
+
+### Agent foundation — `luba/june10-sprint` branch
+
+- `lib/discovery-types.ts` — shared contracts for the full agent pipeline (`SourceRecord`, `DiscoverySignalCandidate`, `SIGNAL_TYPE_TO_DB`)
+- `scripts/adapters/substackAdapter.ts` — newsletter search + Claude extraction extracted from discovery agent
+- `scripts/adapters/eventPageAdapter.ts` + `eventExportAdapter.ts` — stubs for Phase 2
+- `scripts/discovery-agent.ts` — refactored to use adapter pattern; Phase 1 passes `'cold'` to `upsertRelationship`, recalibrate owns tier logic
+- All agent npm scripts now use `node --env-file=.env --import tsx` to fix ESM pool initialization race condition
+
+---
+
+## 1b. What Was Fixed in the June 7 Session
 
 ### Critical data bug — was showing 6 investors instead of 30+
 
@@ -56,6 +101,10 @@ Warmth breakdown (as of June 7):
   Stale: 17
   Cold:   4
 ```
+
+**Schema changes since June 7:**
+
+- `signal` table has a new `source_url TEXT` column (added Jun 10, idempotent `ALTER TABLE IF NOT EXISTS` in `schema.sql`)
 
 **Run in this order to re-seed:**
 
@@ -123,17 +172,22 @@ These exist in `app/components/` but are not part of the active render tree:
 
 ---
 
-## 4. mockData — What It's For
+## 4. Type Source of Truth — `lib/investors.ts`
 
-`app/data/mockData.ts` serves **two purposes**:
+All frontend types live in **`lib/investors.ts`**:
 
-1. **TypeScript types** — `Investor`, `WarmthTier`, `CoInvestment`, `Signal` interfaces. Everything imports from here.
-2. **Dev fallback** — `getInvestors()` in `app/data/investors.ts` falls back to 6 mock investors in `NODE_ENV === "development"` only, when the API is unreachable.
+| Type               | Description                                                                                |
+| ------------------ | ------------------------------------------------------------------------------------------ |
+| `Investor`         | Full investor card shape — what the API returns and components consume                     |
+| `InvestorSignal`   | Per-signal shape: type, description, date, weight, source, sourceUrl, portfolioCompanyName |
+| `CoInvestment`     | Co-investment entry for the drawer                                                         |
+| `Contact`          | Point of contact (name, role, linkedinUrl)                                                 |
+| `WarmthTier`       | Re-exported from `lib/types.ts` — `"Hot" \| "Warm" \| "Stale" \| "Cold"`                   |
+| `DiscoveryContext` | Re-exported from `lib/types.ts` — network_expansion / portfolio_scan context               |
 
-**Do not delete** `mockData.ts` — the types are referenced everywhere.  
-The fallback only fires in local dev without `DATABASE_URL`. On Railway (production), a failed API call throws.
+**`app/data/mockData.ts`** is now **data-only** — just the 6-investor fallback array typed against `lib/investors.Investor`. It re-exports all types from `lib/investors` so old imports don't break.
 
-Ideally before Demo Day: move the types to `lib/types.ts` (where Luba's `Relationship` type lives). Not urgent but would clean up the dual-purpose confusion.
+The fallback fires in local dev only when the API is unreachable (no `DATABASE_URL`). On Railway it throws.
 
 ---
 
@@ -181,14 +235,17 @@ npm run test:acceptance   # must show 5/5 against Railway
 
 ## 7. Known Issues / Decisions to Revisit
 
-| Issue                                         | Status          | Notes                                                                                                     |
-| --------------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------- |
-| No Warm tier in DB                            | Expected        | Flybridge (Jun 2024) + Cherubic (Oct 2024) recalibrated to Stale — both dates now 20-24mo ago. Not a bug. |
-| `sector`, `stage`, `alley_role` columns empty | Data gap        | Not seeded yet. Portfolio page doesn't show them.                                                         |
-| `WarmthTier` types in `mockData.ts`           | Tech debt       | Should move to `lib/types.ts` pre-Demo Day                                                                |
-| MCP barrel import crash on startup            | Yaasameen's fix | Import directly from `./security/allowlist.js` not the barrel                                             |
-| Chatbot not wired to real MCP                 | Blocked         | Needs `app/api/ask/route.ts` to be built                                                                  |
-| 6 companies missing co-investor data          | Luba's research | Avatar, Root Access, dolaGon, ARIX, Aescape, Spaero Bio                                                   |
+| Issue                                         | Status             | Notes                                                                                                     |
+| --------------------------------------------- | ------------------ | --------------------------------------------------------------------------------------------------------- |
+| No Warm tier in DB                            | Expected           | Flybridge (Jun 2024) + Cherubic (Oct 2024) recalibrated to Stale — both dates now 20-24mo ago. Not a bug. |
+| `sector`, `stage`, `alley_role` columns empty | Data gap           | Not seeded yet. Portfolio page doesn't show them.                                                         |
+| `WarmthTier` types in `mockData.ts`           | ✅ Resolved Jun 10 | Types moved to `lib/investors.ts`. mockData is data-only.                                                 |
+| HOT_ANCHORS had 7 unconfirmed funds           | ✅ Fixed Jun 10    | Removed SOSV, Day One, Amazon CPF, NEA, Ubiquity, Geodesic, ff VC. Only Lauren-confirmed 4 remain.        |
+| MCP barrel import crash on startup            | Yaasameen's fix    | Import directly from `./security/allowlist.js` not the barrel                                             |
+| Chatbot not wired to real MCP                 | Blocked            | Needs `app/api/ask/route.ts` to be built                                                                  |
+| 6 companies missing co-investor data          | Luba's research    | Avatar, Root Access, dolaGon, ARIX, Aescape, Spaero Bio                                                   |
+| `source_url` on seed signals is homepage only | Sprint Jun 12–16   | All 23 seed signals need real article URLs. See `SPRINT-june12-16.md` for full list.                      |
+| `ingest-signals.ts` schema mismatch           | Sprint Jun 12–16   | INSERT references `source_title`, `raw_snippet`, `unique_hash` — not in schema yet. Breaks on `--write`.  |
 
 ---
 
@@ -224,4 +281,4 @@ Do not edit another person's files without flagging it first. Leave a comment if
 
 ---
 
-_Last updated: June 7, 2026 — Luba Kaper_
+_Last updated: June 10, 2026 — Luba Kaper_

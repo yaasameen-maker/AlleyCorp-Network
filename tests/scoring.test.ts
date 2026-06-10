@@ -57,24 +57,52 @@ describe("calculateWarmthTier", () => {
       expect(calculateWarmthTier(signals)).toBe("Stale");
     });
 
-    it("returns Stale when there is only one active signal", () => {
+    it("returns Stale when there is only one active non-co-investment signal", () => {
+      // A single event or press mention isn't enough to be Warm — aligns with weighted scorer
       const signals = [
-        makeSignal({ date: "2025-01-01" }), // active
+        makeSignal({ date: "2025-01-01", type: "event_attendance" }), // active but weak signal
       ];
       expect(calculateWarmthTier(signals)).toBe("Stale");
     });
 
-    it("returns Stale when active signal count is exactly 1 despite older signals", () => {
+    it("returns Warm when active signal count is exactly 1 co_investment despite older decayed signals", () => {
+      // The 1 active co_investment qualifies as Warm — decayed signals don't pull it down
       const signals = [
-        makeSignal({ date: "2025-03-01" }), // active
+        makeSignal({ date: "2025-03-01", type: "co_investment" }), // active, within 18 months
         makeSignal({ date: "2023-06-01" }), // decayed
         makeSignal({ date: "2022-01-01" }), // decayed
       ];
-      expect(calculateWarmthTier(signals)).toBe("Stale");
+      expect(calculateWarmthTier(signals)).toBe("Warm");
+    });
+  });
+
+  describe("HOT_ANCHORS", () => {
+    it("returns Hot for a HOT_ANCHOR fund regardless of signal count", () => {
+      // Mach33 is Lauren-confirmed — should be Hot even with 1 signal
+      const signals = [makeSignal({ date: "2026-04-20", type: "co_investment" })];
+      expect(calculateWarmthTier(signals, "Mach33")).toBe("Hot");
+    });
+
+    it("returns Hot for a HOT_ANCHOR fund with no signals", () => {
+      expect(calculateWarmthTier([], "Riot Ventures")).toBe("Hot");
+    });
+
+    it("returns Warm for Geodesic Capital (removed from HOT_ANCHORS — Lauren did not confirm)", () => {
+      // Geodesic Capital was removed from HOT_ANCHORS June 10 — Lauren only confirmed
+      // Riot Ventures, Snowpoint Ventures, General Catalyst, and Mach33.
+      // 1 co_investment → Warm via the single-co_investment rule.
+      const signals = [makeSignal({ date: "2026-04-20", type: "co_investment" })];
+      expect(calculateWarmthTier(signals, "Geodesic Capital")).toBe("Warm");
     });
   });
 
   describe("Warm", () => {
+    it("returns Warm when there is one active co_investment within 18 months", () => {
+      // Aligns with computeWarmthTier: co_investment scores 10, Warm threshold is 6
+      const signals = [makeSignal({ date: "2025-06-01", type: "co_investment" })];
+      expect(calculateWarmthTier(signals)).toBe("Warm");
+    });
+
     it("returns Warm when there are exactly 2 active signals", () => {
       const signals = [
         makeSignal({ date: "2025-01-01", type: "event_attendance" }),

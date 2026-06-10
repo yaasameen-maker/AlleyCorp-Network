@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { Investor } from "../data/mockData";
+import { Investor } from "@/lib/investors";
 import { WarmthBadge } from "./WarmthBadge";
 import { AnimatedBar, AnimatedNumber } from "./AnimatedBar";
 import { useInView } from "@/app/hooks/useInView";

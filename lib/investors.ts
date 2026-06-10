@@ -4,53 +4,62 @@
  * without importing a Next.js route file (which breaks tsc).
  */
 
-import type { Relationship, Signal, DiscoverySource, DiscoveryContext } from "./types";
+import type { Relationship, Signal, DiscoverySource, DiscoveryContext, WarmthTier } from "./types";
 
-// ── Frontend types (must match app/data/mockData.ts) ─────────────────────────
+// Re-export so components can import everything from one place
+export type { WarmthTier, DiscoveryContext, DiscoverySource };
 
-export interface FrontendPortfolioCompany {
+// ── Frontend types — source of truth for all UI components ───────────────────
+
+export interface PortfolioCompany {
   id: string;
   name: string;
   url: string;
 }
 
-export interface FrontendSignal {
+export interface InvestorSignal {
   type: "co-investment" | "event" | "email" | "meeting";
   description: string;
   date: string;
   weight: "High" | "Medium" | "Low";
+  source?: string;
+  sourceUrl?: string;
+  portfolioCompanyName?: string;
 }
 
-export interface FrontendCoInvestment {
-  portfolioCompany: FrontendPortfolioCompany;
+export interface CoInvestment {
+  portfolioCompany: PortfolioCompany;
   round: string;
   date: string;
   fundParticipated: boolean;
 }
 
-export interface FrontendContact {
+export interface Contact {
   name: string;
   role: string;
   linkedinUrl?: string;
 }
 
-export interface FrontendInvestor {
+export interface Investor {
   id: string;
   name: string;
   fund: { id: string; name: string; logoUrl?: string; website?: string };
-  warmthTier: "Hot" | "Warm" | "Stale" | "Cold";
-  signals: FrontendSignal[];
-  coInvestments: FrontendCoInvestment[];
+  warmthTier: WarmthTier;
+  signals: InvestorSignal[];
+  coInvestments: CoInvestment[];
   lastSignalDate?: string;
   suggestedAction?: string;
-  contact?: FrontendContact;
+  contact?: Contact;
   discoverySource?: DiscoverySource;
   discoveryContext?: DiscoveryContext | null;
 }
 
+// Backward-compat alias — prefer Investor
+export type FrontendInvestor = Investor;
+
 // ── Mappers ───────────────────────────────────────────────────────────────────
 
-function mapSignalType(type: Signal["type"]): FrontendSignal["type"] {
+function mapSignalType(type: Signal["type"]): InvestorSignal["type"] {
   switch (type) {
     case "co_investment":
     case "co_investment_recency":
@@ -95,14 +104,18 @@ function getSuggestedAction(r: Relationship): string {
     case "Stale":
       return `${fund} has gone quiet. Last signal over 18 months ago. Reconnect before they lead a round without us.`;
     case "Cold":
-      return `No co-investment history with ${fund}. Research and explore intro opportunities via existing Hot relationships.`;
+      // lastSignalDate present = co-invested before but gone cold; absent = never co-invested
+      if (r.lastSignalDate) {
+        return `${fund} relationship has gone cold. Re-engage via a shared portfolio company or warm intro from a Hot co-investor.`;
+      }
+      return `No co-investment history with ${fund}. Research intro opportunities via existing Hot relationships.`;
   }
 }
 
 // ── Group relationships by fund → one Investor card per fund ─────────────────
 
-export function groupByFund(relationships: Relationship[]): FrontendInvestor[] {
-  const map = new Map<string, FrontendInvestor>();
+export function groupByFund(relationships: Relationship[]): Investor[] {
+  const map = new Map<string, Investor>();
 
   for (const r of relationships) {
     const fundId = r.fundId;
@@ -113,7 +126,7 @@ export function groupByFund(relationships: Relationship[]): FrontendInvestor[] {
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     const latestCoInvest = coInvestSignals[0];
 
-    const coInvestment: FrontendCoInvestment | null =
+    const coInvestment: CoInvestment | null =
       r.portfolioCompany && latestCoInvest
         ? {
             portfolioCompany: {
@@ -127,11 +140,14 @@ export function groupByFund(relationships: Relationship[]): FrontendInvestor[] {
           }
         : null;
 
-    const signals: FrontendSignal[] = (r.signals ?? []).map((s) => ({
+    const signals: InvestorSignal[] = (r.signals ?? []).map((s) => ({
       type: mapSignalType(s.type),
       description: s.value ? `${s.source}: ${s.value}` : s.source,
       date: formatDate(s.date),
       weight: capitalize(s.weight),
+      source: s.source,
+      sourceUrl: s.sourceUrl ?? undefined,
+      portfolioCompanyName: r.portfolioCompany?.name,
     }));
 
     if (!existing) {

@@ -1,6 +1,6 @@
 "use client";
 
-import type { Investor, WarmthTier } from "@/app/data/mockData";
+import type { Investor, WarmthTier } from "@/lib/investors";
 
 /* ── Warmth badge ── */
 
@@ -79,6 +79,13 @@ function RowLogo({ name, logoUrl }: { name: string; logoUrl?: string }) {
 
 export function InvestorRow({ investor, isSelected, onClick }: InvestorRowProps) {
   const company = investor.coInvestments[0]?.portfolioCompany.name;
+  const signalCount = investor.signals.length;
+
+  // Build the subtext parts: company · N signals · date
+  const subtextParts: string[] = [];
+  if (company) subtextParts.push(company);
+  if (signalCount > 0) subtextParts.push(`${signalCount} signal${signalCount !== 1 ? "s" : ""}`);
+  if (investor.lastSignalDate) subtextParts.push(investor.lastSignalDate);
 
   return (
     // group added so fund name can react to row hover — Luba, Jun 2026
@@ -106,10 +113,11 @@ export function InvestorRow({ investor, isSelected, onClick }: InvestorRowProps)
           >
             {investor.fund.name}
           </p>
-          <p className="text-[11px] text-[#9CA3AF] mt-0.5 truncate leading-snug">
-            {company ?? ""}
-            {investor.lastSignalDate ? ` · ${investor.lastSignalDate}` : ""}
-          </p>
+          {subtextParts.length > 0 && (
+            <p className="text-[11px] text-[#9CA3AF] mt-0.5 truncate leading-snug">
+              {subtextParts.join(" · ")}
+            </p>
+          )}
         </div>
       </div>
       <WarmthBadge tier={investor.warmthTier} />
