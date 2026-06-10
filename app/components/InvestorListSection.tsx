@@ -81,7 +81,7 @@ export function InvestorListSection({
               key={tier}
               type="button"
               onClick={() => onFilterTierChange(tier)}
-              className={`touch-press snap-item px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap ${
+              className={`touch-press snap-item px-4 py-2.5 rounded text-sm font-medium whitespace-nowrap ${
                 filterTier === tier ? "bg-ink text-paper" : "bg-mist text-muted border border-line"
               }`}
             >

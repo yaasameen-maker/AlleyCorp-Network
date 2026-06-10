@@ -146,14 +146,43 @@ export function DigestView({ investors }: DigestViewProps) {
   // brand-line + card-lift applied — Luba, Jun 2026 (design system pass)
   return (
     <div className="max-w-2xl px-8 py-10 space-y-8">
-      {/* Header */}
-      <div className="pb-6">
-        <hr className="brand-line mb-6" />
-        <p className="text-[9px] uppercase tracking-[0.18em] text-[#0EA5D6] font-semibold mb-2">
-          AlleyCorp · Weekly Digest
-        </p>
-        <h1 className="text-xl font-bold text-[#0D1320] leading-tight mb-1">{digest.subject}</h1>
-        <p className="text-xs text-[#9CA3AF]">Generated {generatedDate}</p>
+      {/* Hero card — matches BriefingDashboard style */}
+      <div className="relative overflow-hidden rounded hero-aurora px-7 py-6 shadow-md">
+        <div className="hero-shimmer absolute -inset-12" aria-hidden />
+        <div className="relative z-10">
+          <div className="flex items-end justify-between gap-6">
+            <div>
+              <p className="text-[9px] uppercase tracking-[0.18em] text-[#0EA5D6] font-semibold mb-1.5">
+                AlleyCorp · Weekly Digest
+              </p>
+              <h1 className="text-xl font-bold text-white leading-tight tracking-tight">
+                {digest.subject}
+              </h1>
+              <p className="text-[10px] text-white/35 mt-1">Generated {generatedDate}</p>
+            </div>
+            <div className="flex items-center gap-5 shrink-0">
+              <div className="text-center">
+                <p className="text-xl font-bold text-white tabular-nums">{investors.length}</p>
+                <p className="text-[9px] uppercase tracking-widest text-white/40 mt-0.5">Total</p>
+              </div>
+              <div className="w-px h-6 bg-white/10" aria-hidden />
+              <div className="text-center">
+                <p className="text-xl font-bold text-white tabular-nums">
+                  {digest.sections.reduce((n, s) => n + s.items.length, 0)}
+                </p>
+                <p className="text-[9px] uppercase tracking-widest text-white/40 mt-0.5">Actions</p>
+              </div>
+              <div className="text-center">
+                <p className="text-xl font-bold text-white tabular-nums">
+                  {digest.sections.length}
+                </p>
+                <p className="text-[9px] uppercase tracking-widest text-white/40 mt-0.5">
+                  Sections
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Sections */}
@@ -172,7 +201,7 @@ export function DigestView({ investors }: DigestViewProps) {
               </h2>
               <hr className="brand-line" />
             </div>
-            <div className="bg-white rounded-xl overflow-hidden border border-[#E5E7EB]">
+            <div className="bg-white rounded overflow-hidden border border-[#E5E7EB]">
               {section.items.map((item) => (
                 <DigestItemRow key={item.id} item={item} investors={investors} />
               ))}

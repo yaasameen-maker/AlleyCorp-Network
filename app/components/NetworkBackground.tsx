@@ -30,6 +30,7 @@ export default function NetworkBackground() {
 
     let animationId: number;
     let particles: Particle[] = [];
+    let mousePending = false;
 
     function createParticle(): Particle {
       return {
@@ -63,7 +64,7 @@ export default function NetworkBackground() {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
-          if (Math.sqrt(dx * dx + dy * dy) < CONNECTION_DISTANCE) {
+          if (dx * dx + dy * dy < CONNECTION_DISTANCE * CONNECTION_DISTANCE) {
             cx.beginPath();
             cx.moveTo(particles[i].x, particles[i].y);
             cx.lineTo(particles[j].x, particles[j].y);
@@ -92,15 +93,19 @@ export default function NetworkBackground() {
     }
 
     function handleMouseMove(e: MouseEvent): void {
-      for (const p of particles) {
-        const dx = e.clientX - p.x;
-        const dy = e.clientY - p.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < REPULSION_RADIUS) {
-          p.x -= dx * REPULSION_STRENGTH;
-          p.y -= dy * REPULSION_STRENGTH;
+      if (mousePending) return;
+      mousePending = true;
+      requestAnimationFrame(() => {
+        for (const p of particles) {
+          const dx = e.clientX - p.x;
+          const dy = e.clientY - p.y;
+          if (dx * dx + dy * dy < REPULSION_RADIUS * REPULSION_RADIUS) {
+            p.x -= dx * REPULSION_STRENGTH;
+            p.y -= dy * REPULSION_STRENGTH;
+          }
         }
-      }
+        mousePending = false;
+      });
     }
 
     function handleResize(): void {

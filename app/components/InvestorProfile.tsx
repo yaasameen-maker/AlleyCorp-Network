@@ -32,7 +32,7 @@ export function InvestorProfile({ investor, onClose }: InvestorProfileProps) {
 
         <div className="p-5 sm:p-6 space-y-6">
           {investor.suggestedAction && (
-            <div className="bg-mist border border-line rounded-xl p-4">
+            <div className="bg-mist border border-line rounded p-4">
               <h3 className="mb-2 text-ink text-base sm:text-lg font-semibold">Suggested Action</h3>
               <p className="text-ink text-sm sm:text-base leading-relaxed">
                 {investor.suggestedAction}
@@ -43,13 +43,13 @@ export function InvestorProfile({ investor, onClose }: InvestorProfileProps) {
           <div>
             <h3 className="mb-3 text-base sm:text-lg font-semibold text-ink">Overview</h3>
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
-              <div className="bg-mist border border-line rounded-xl p-4">
+              <div className="bg-mist border border-line rounded p-4">
                 <div className="text-xs sm:text-sm text-muted mb-1">Total Co-investments</div>
                 <div className="text-xl sm:text-2xl text-ink font-semibold">
                   {investor.coInvestments.length}
                 </div>
               </div>
-              <div className="bg-mist border border-line rounded-xl p-4">
+              <div className="bg-mist border border-line rounded p-4">
                 <div className="text-xs sm:text-sm text-muted mb-1">Last Signal</div>
                 <div className="text-xl sm:text-2xl text-ink font-semibold">
                   {investor.lastSignalDate || "No signals yet"}
@@ -64,7 +64,7 @@ export function InvestorProfile({ investor, onClose }: InvestorProfileProps) {
             </h3>
             <div className="space-y-3">
               {investor.signals.map((signal, index) => (
-                <div key={index} className="border border-line rounded-xl p-4 bg-paper">
+                <div key={index} className="border border-line rounded p-4 bg-paper">
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="px-2 py-0.5 bg-mist text-ink text-xs rounded whitespace-nowrap">
@@ -98,7 +98,7 @@ export function InvestorProfile({ investor, onClose }: InvestorProfileProps) {
             </h3>
             <div className="space-y-3">
               {investor.coInvestments.map((investment, index) => (
-                <div key={index} className="border border-line rounded-xl p-4 bg-paper">
+                <div key={index} className="border border-line rounded p-4 bg-paper">
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="min-w-0 flex-1">
                       <h4 className="text-ink text-sm sm:text-base truncate font-semibold">
@@ -114,7 +114,7 @@ export function InvestorProfile({ investor, onClose }: InvestorProfileProps) {
                       </a>
                     </div>
                     <span
-                      className={`px-3 py-1 rounded-full text-xs sm:text-sm border whitespace-nowrap shrink-0 ${
+                      className={`px-3 py-1 rounded text-xs sm:text-sm border whitespace-nowrap shrink-0 ${
                         investment.fundParticipated
                           ? "bg-signal-green/10 text-signal-green border-signal-green/30"
                           : "bg-mist text-muted border-line"

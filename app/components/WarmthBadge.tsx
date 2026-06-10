@@ -21,7 +21,7 @@ export function WarmthBadge({ tier, size = "md" }: WarmthBadgeProps) {
 
   return (
     <span
-      className={`inline-flex items-center rounded-full border font-medium whitespace-nowrap ${styles[tier]} ${sizeClasses[size]}`}
+      className={`inline-flex items-center rounded border font-medium whitespace-nowrap ${styles[tier]} ${sizeClasses[size]}`}
     >
       {tier}
     </span>
