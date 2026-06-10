@@ -1,6 +1,6 @@
 "use client";
 
-import type { Investor } from "@/app/data/mockData";
+import type { Investor } from "@/lib/investors";
 import { useAskNetwork } from "@/app/hooks/useAskNetwork";
 import { QueryResults } from "@/stories/MCPQueryInterface/components/QueryResults";
 

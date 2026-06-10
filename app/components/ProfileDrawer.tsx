@@ -1,6 +1,6 @@
 "use client";
 
-import type { Investor, WarmthTier, DiscoveryContext } from "@/app/data/mockData";
+import type { Investor, WarmthTier, DiscoveryContext } from "@/lib/investors";
 import { WarmthBadge } from "./InvestorRow";
 
 interface ProfileDrawerProps {
@@ -168,6 +168,35 @@ function RelationshipSummary({ investor }: { investor: Investor }) {
   }
 
   if (tier === "Cold") {
+    // Cold with past co-investments = relationship gone cold, not "no history"
+    if (companyNames.length > 0) {
+      return (
+        <div className="space-y-2.5">
+          <div className="flex items-start gap-2.5">
+            <Bullet />
+            <p className="text-sm text-[#374151] leading-relaxed">
+              Co-invested with {investor.fund.name} on{" "}
+              <span className="font-medium text-[#0D1320]">{companyNames.join(" and ")}</span>
+              {", "}but there has been no contact since. The relationship has gone cold.
+            </p>
+          </div>
+          {investor.lastSignalDate && (
+            <div className="flex items-start gap-2.5">
+              <Bullet />
+              <p className="text-sm text-[#6B7280] leading-relaxed">
+                Last signal:{" "}
+                {new Date(investor.lastSignalDate).toLocaleDateString("en-US", {
+                  month: "long",
+                  year: "numeric",
+                })}
+                . Re-engaging through a shared portfolio company is the most natural path.
+              </p>
+            </div>
+          )}
+        </div>
+      );
+    }
+    // Truly cold — no history at all
     return (
       <p className="text-sm text-[#6B7280] leading-relaxed">
         No co-investment or contact history on record with {investor.fund.name}. An introduction
@@ -275,16 +304,16 @@ export function ProfileDrawer({ investor, onClose }: ProfileDrawerProps) {
 
   return (
     <>
-      {/* Scrim */}
+      {/* Scrim — z-[50] so it sits above the AskPanel (z-40) when both are open */}
       <div
-        className="fixed inset-0 bg-black/10 z-40 animate-scrim-in"
+        className="fixed inset-0 bg-black/10 z-[50] animate-scrim-in"
         onClick={onClose}
         aria-hidden
       />
 
-      {/* Drawer panel */}
+      {/* Drawer panel — z-[60] so it's above its own scrim */}
       <aside
-        className="fixed top-0 right-0 h-[100dvh] w-[440px] max-w-[92vw] bg-white z-50 flex flex-col shadow-2xl animate-drawer-in"
+        className="fixed top-0 right-0 h-[100dvh] w-[440px] max-w-[92vw] bg-white z-[60] flex flex-col shadow-2xl animate-drawer-in"
         aria-label={`${investor.fund.name} profile`}
       >
         {/* ── Header ── */}
@@ -435,11 +464,36 @@ export function ProfileDrawer({ investor, onClose }: ProfileDrawerProps) {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-[#0D1320]">
                         {signalLabel(signal.type)}
+                        {signal.type === "co-investment" && signal.portfolioCompanyName && (
+                          <span className="font-normal text-[#6B7280]">
+                            {" · "}
+                            {signal.portfolioCompanyName}
+                          </span>
+                        )}
                       </p>
                       {signal.description && (
                         <p className="text-xs text-[#6B7280] mt-0.5 leading-relaxed">
                           {signal.description}
                         </p>
+                      )}
+                      {signal.sourceUrl && (
+                        <a
+                          href={signal.sourceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-[11px] text-[#0EA5D6] hover:text-[#0284C7] transition-colors mt-1"
+                        >
+                          {signal.source ?? "Source"}
+                          <svg width="9" height="9" viewBox="0 0 10 10" fill="none" aria-hidden>
+                            <path
+                              d="M1.5 8.5L8.5 1.5M8.5 1.5H3.5M8.5 1.5V6.5"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </a>
                       )}
                     </div>
                   </div>

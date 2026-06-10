@@ -1,4 +1,4 @@
-import { WarmthTier } from "../data/mockData";
+import { WarmthTier } from "@/lib/investors";
 
 interface WarmthBadgeProps {
   tier: WarmthTier;

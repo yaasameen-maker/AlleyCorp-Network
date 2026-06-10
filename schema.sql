@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS relationship (
     id                      UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
     fund_id                 UUID         REFERENCES fund(id),
     investor_id             UUID         REFERENCES investor(id),
-    portfolio_company_id    UUID         NOT NULL REFERENCES portfolio_company(id),
+    portfolio_company_id    UUID         REFERENCES portfolio_company(id),  -- nullable: event-only / target relationships have no co-investment yet
     alley_partner           TEXT,
     warmth_tier             TEXT         NOT NULL CHECK (warmth_tier IN ('hot', 'warm', 'stale', 'cold')),
     warmth_calculated_at    TIMESTAMPTZ,
@@ -98,11 +98,16 @@ CREATE TABLE IF NOT EXISTS signal (
                                  )),
     signal_date     DATE         NOT NULL,
     source          TEXT         NOT NULL,
+    source_url      TEXT,
     value           TEXT,
     weight          TEXT         NOT NULL CHECK (weight IN ('high', 'medium', 'low')),
     confidence      TEXT         NOT NULL CHECK (confidence IN ('confirmed', 'inferred', 'pending')),
     created_at      TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
+
+-- Idempotent migration: add source_url to existing signal tables.
+-- Safe to re-run — ADD COLUMN IF NOT EXISTS is a no-op when the column already exists.
+ALTER TABLE signal ADD COLUMN IF NOT EXISTS source_url TEXT;
 
 -- ─────────────────────────────────────────
 -- Indexes
@@ -175,3 +180,8 @@ ALTER TABLE relationship ADD COLUMN IF NOT EXISTS discovery_source TEXT
 -- Phase 1 shape: { source_url, round, company, summary }
 -- Phase 2 shape: { via_fund, shared_rounds, companies, oldest_signal_months, summary }
 ALTER TABLE relationship ADD COLUMN IF NOT EXISTS discovery_context JSONB;
+
+-- Make portfolio_company_id nullable for event-only and target relationships.
+-- Funds that attended an event but have no co-investment should not be forced
+-- to reference an arbitrary portfolio company.
+ALTER TABLE relationship ALTER COLUMN portfolio_company_id DROP NOT NULL;

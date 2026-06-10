@@ -5,14 +5,14 @@
 
 BEGIN;
 
--- USV has no relationship row yet — create one.
--- warmth_tier = 'stale': 1 active signal (DTNY event attendance) per scoring rules (1 signal → Stale).
+-- USV has no relationship row yet — create one without a portfolio company.
+-- portfolio_company_id is NULL: USV attended DTNY but has no AlleyCorp co-investment yet.
 INSERT INTO relationship (id, fund_id, portfolio_company_id, warmth_tier, last_signal_date, created_at, updated_at)
 VALUES (
   gen_random_uuid(),
   (SELECT id FROM fund WHERE name = 'Union Square Ventures'),
-  (SELECT id FROM portfolio_company WHERE name = 'Glacier'),
-  'stale',
+  NULL,
+  'cold',
   '2026-01-28',
   now(), now()
 );

@@ -1,78 +1,14 @@
-// Mock data aligned to seed.sql (Lauren Young confirmed portfolio, May 2026).
+// Mock data — fallback for local dev when DATABASE_URL is not set.
+// Types are imported from lib/investors (the real source of truth).
 // Source of truth for company names: PORTFOLIO.md
-// This file is used for UI development until API routes are wired to the live DB.
 
-export type WarmthTier = "Hot" | "Warm" | "Cold" | "Stale";
+import type { Investor, PortfolioCompany } from "@/lib/investors";
 
-export interface PortfolioCompany {
-  id: string;
-  name: string;
-  url: string;
-}
-
-export interface Fund {
-  id: string;
-  name: string;
-  logoUrl?: string;
-  website?: string;
-}
-
-// Added by Luba June 2026 — wiring real contact data from investor table through API
-export interface Contact {
-  name: string;
-  role: string;
-  linkedinUrl?: string;
-}
-
-// Added by Luba June 2026 — discovery source + context from autonomous discovery agent
-export type DiscoverySource = "manual" | "portfolio_scan" | "network_expansion";
-
-export interface DiscoveryContext {
-  // network_expansion
-  via_fund?: string;
-  shared_rounds?: number;
-  companies?: string[];
-  oldest_signal_months?: number;
-  // portfolio_scan
-  source_url?: string;
-  round?: string;
-  company?: string;
-  // both
-  summary?: string;
-}
-
-export interface CoInvestment {
-  portfolioCompany: PortfolioCompany;
-  round: string;
-  date: string;
-  fundParticipated: boolean;
-}
-
-export interface Signal {
-  type: "co-investment" | "event" | "email" | "meeting";
-  description: string;
-  date: string;
-  weight: "High" | "Medium" | "Low";
-  source?: string;
-}
-
-export interface Investor {
-  id: string;
-  name: string;
-  fund: Fund;
-  warmthTier: WarmthTier;
-  signals: Signal[];
-  coInvestments: CoInvestment[];
-  // Date of the most recent signal (real evidence) on the relationship.
-  // Mirrors backend Relationship.lastSignalDate (lib/types.ts). NOT derived from
-  // the signals array — it is the authoritative last_signal_date from the seed.
-  // Undefined for Cold relationships that have no signals yet.
-  lastSignalDate?: string;
-  suggestedAction?: string;
-  contact?: Contact;
-  discoverySource?: DiscoverySource;
-  discoveryContext?: DiscoveryContext | null;
-}
+// Re-export so any file that still imports types from here keeps working.
+export type { Investor };
+export type { WarmthTier, DiscoveryContext, DiscoverySource, CoInvestment } from "@/lib/investors";
+// InvestorSignal is the real name; Signal is the old alias used by stories/warmthAnalysis.
+export type { InvestorSignal as Signal } from "@/lib/investors";
 
 // Only companies referenced by mock investors below.
 // Full list of 17 active companies is in PORTFOLIO.md.
@@ -101,6 +37,8 @@ export const mockInvestors: Investor[] = [
         description: "Co-led Valar Atomics Seed $19M",
         date: "Mar 2025",
         weight: "High",
+        portfolioCompanyName: "Valar Atomics",
+        sourceUrl: "https://alleycorp.substack.com",
       },
     ],
     coInvestments: [
@@ -127,12 +65,15 @@ export const mockInvestors: Investor[] = [
         description: "Co-led Eyebot Seed $6M",
         date: "Jun 2024",
         weight: "High",
+        portfolioCompanyName: "Eyebot",
       },
       {
         type: "co-investment",
         description: "Led Eyebot Series A $20M",
         date: "Aug 2025",
         weight: "High",
+        portfolioCompanyName: "Eyebot",
+        sourceUrl: "https://alleycorp.substack.com",
       },
     ],
     coInvestments: [
@@ -165,6 +106,8 @@ export const mockInvestors: Investor[] = [
         description: "Co-led Portal Space Systems Seed",
         date: "Apr 2025",
         weight: "High",
+        portfolioCompanyName: "Portal Space Systems",
+        sourceUrl: "https://alleycorp.substack.com",
       },
     ],
     coInvestments: [
@@ -193,6 +136,7 @@ export const mockInvestors: Investor[] = [
         description: "Co-invested in Halo Braid Seed",
         date: "Jun 2024",
         weight: "Medium",
+        portfolioCompanyName: "Halo Braid",
       },
     ],
     coInvestments: [
@@ -221,12 +165,15 @@ export const mockInvestors: Investor[] = [
         description: "Co-invested in Civ Robotics Seed $5M",
         date: "Sep 2022",
         weight: "Medium",
+        portfolioCompanyName: "Civ Robotics",
       },
       {
         type: "co-investment",
         description: "Did not participate in Civ Robotics Series A $7.5M",
         date: "Jul 2025",
         weight: "Medium",
+        portfolioCompanyName: "Civ Robotics",
+        sourceUrl: "https://alleycorp.substack.com",
       },
     ],
     coInvestments: [

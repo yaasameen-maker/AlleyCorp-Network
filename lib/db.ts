@@ -59,6 +59,7 @@ const REL_SELECT = `
           'type',           s.signal_type,
           'date',           to_char(s.signal_date, 'YYYY-MM-DD'),
           'source',         s.source,
+          'sourceUrl',      s.source_url,
           'value',          s.value,
           'weight',         s.weight,
           'confidence',     s.confidence
@@ -146,6 +147,7 @@ export async function getWarmthSignals(investorId: string): Promise<Signal[]> {
        signal_type                          AS type,
        to_char(signal_date, 'YYYY-MM-DD')   AS date,
        source,
+       source_url                           AS "sourceUrl",
        value,
        weight,
        confidence
@@ -165,6 +167,7 @@ export async function getRecentSignals(limit = 20): Promise<Signal[]> {
        signal_type                          AS type,
        to_char(signal_date, 'YYYY-MM-DD')   AS date,
        source,
+       source_url                           AS "sourceUrl",
        value,
        weight,
        confidence

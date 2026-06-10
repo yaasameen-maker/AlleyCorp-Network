@@ -9,7 +9,7 @@ import { InvestorRow } from "@/app/components/InvestorRow";
 import { ProfileDrawer } from "@/app/components/ProfileDrawer";
 import { DigestView } from "@/app/components/DigestView";
 import { getInvestors } from "@/app/data/investors";
-import { type Investor, type WarmthTier } from "@/app/data/mockData";
+import { type Investor, type WarmthTier } from "@/lib/investors";
 import { useDarkMode } from "@/app/hooks/useDarkMode";
 
 // AppSidebar is no longer used — layout is now full-width single column.

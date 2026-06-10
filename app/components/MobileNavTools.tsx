@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { Investor, WarmthTier } from "@/app/data/mockData";
+import type { Investor, WarmthTier } from "@/lib/investors";
 import { useMediaQuery } from "@/app/hooks/useMediaQuery";
 import { AskNetworkPullDown } from "./AskNetworkPullDown";
 import { RelationshipsNavItem } from "./RelationshipsNavItem";

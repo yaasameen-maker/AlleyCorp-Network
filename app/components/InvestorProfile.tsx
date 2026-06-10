@@ -1,6 +1,6 @@
 "use client";
 
-import { Investor } from "../data/mockData";
+import { Investor } from "@/lib/investors";
 import { WarmthBadge } from "./WarmthBadge";
 
 interface InvestorProfileProps {

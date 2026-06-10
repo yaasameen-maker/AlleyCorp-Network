@@ -80,22 +80,16 @@ const SIGNAL_WEIGHTS: Record<ScoringSignalType, number> = {
   manual_override: 0,
 };
 
-// Lauren-confirmed Hot calibration anchors — always Hot regardless of score
-// Updated June 4 2026 — Luba added funds confirmed hot by Lauren Young
+// Lauren-confirmed Hot calibration anchors — always Hot regardless of signal count.
+// Source: Lauren Young interview response, June 2026:
+//   "Who are two or three investors you already consider strong AlleyCorp relationships?"
+//   Answer: "Riot Ventures, Snowpoint Ventures, General Catalyst and Mach33"
+// Do not add funds here without explicit Lauren confirmation.
 export const HOT_ANCHORS = new Set([
-  // Original anchors
   "Riot Ventures",
   "Snowpoint Ventures",
   "General Catalyst",
   "Mach33",
-  // Lauren-confirmed additions (active co-investors with recent deal activity)
-  "SOSV",
-  "Day One Ventures",
-  "Amazon Climate Pledge Fund",
-  "NEA",
-  "Ubiquity Ventures",
-  "Geodesic Capital",
-  "ff Venture Capital",
 ]);
 
 // ─────────────────────────────────────────
@@ -115,19 +109,23 @@ function daysAgo(n: number): Date {
 }
 
 // ─────────────────────────────────────────
-// API 1 — calculateWarmthTier(signals: Signal[])
+// API 1 — calculateWarmthTier(signals: Signal[], fundName?: string)
 // Used by: lib/alerts.ts, tests/scoring.test.ts
 //
-// Rules (source: SCHEMA.md):
-//   Hot   — 3+ active signals AND a co_investment within the last 18 months
-//   Warm  — 2+ active signals
-//   Stale — signals exist but all decayed, or only 1 active
+// Rules:
+//   Hot   — HOT_ANCHOR fund, OR 3+ active signals AND co_investment within 18 months
+//   Warm  — 2+ active signals, OR exactly 1 active co_investment within 18 months
+//   Stale — signals exist but all decayed, or only 1 active non-co-investment signal
 //   Cold  — no signals at all
 //
 // "Active" means the signal date is within the last 24 months.
+// Aligned with computeWarmthTier: HOT_ANCHORS respected, single co_investment = Warm.
 // ─────────────────────────────────────────
 
-export function calculateWarmthTier(signals: Signal[]): WarmthTier {
+export function calculateWarmthTier(signals: Signal[], fundName?: string): WarmthTier {
+  // HOT_ANCHORS always win — matches computeWarmthTier behavior
+  if (fundName && HOT_ANCHORS.has(fundName)) return "Hot";
+
   if (signals.length === 0) return "Cold";
 
   const activeWindow = monthsAgo(ACTIVE_WINDOW_MONTHS);
@@ -143,6 +141,11 @@ export function calculateWarmthTier(signals: Signal[]): WarmthTier {
 
   if (activeSignals.length >= HOT_SIGNAL_THRESHOLD && hasRecentCoInvestment) return "Hot";
   if (activeSignals.length >= WARM_SIGNAL_THRESHOLD) return "Warm";
+
+  // Single active signal: a recent co_investment still means something (aligns with
+  // computeWarmthTier where co_investment scores 10, Warm threshold is 6)
+  if (hasRecentCoInvestment) return "Warm";
+
   return "Stale";
 }
 

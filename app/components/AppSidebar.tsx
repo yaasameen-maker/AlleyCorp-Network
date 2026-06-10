@@ -1,6 +1,6 @@
 "use client";
 
-import type { Investor, WarmthTier } from "@/app/data/mockData";
+import type { Investor, WarmthTier } from "@/lib/investors";
 import { InvestorRow } from "./InvestorRow";
 import { useDarkMode } from "@/app/hooks/useDarkMode";
 

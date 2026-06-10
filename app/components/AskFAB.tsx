@@ -4,7 +4,7 @@ import { useState } from "react";
 import { AskPanel } from "./AskPanel";
 import { getInvestors } from "@/app/data/investors";
 import { useEffect } from "react";
-import type { Investor } from "@/app/data/mockData";
+import type { Investor } from "@/lib/investors";
 
 function ChatIcon() {
   return (
