@@ -42,8 +42,7 @@ const TEST_CASES: TestCase[] = [
     expectedTool: "list_stale_relationships()",
     // Validates behavior: Claude returns funds that need reconnecting with stale/risk language.
     // Does NOT check specific fund names — tiers change as data is updated.
-    passCriteria:
-      "Returns funds with stale/reconnect language and at least one named fund.",
+    passCriteria: "Returns funds with stale/reconnect language and at least one named fund.",
     validate: (r) => {
       const lower = r.toLowerCase();
       const hasConcept =
