@@ -344,7 +344,9 @@ async function runPortfolioScan(companies: PortfolioRow[]): Promise<void> {
 
   const { signals, rawByCompany } = await substackAdapter(companies, exa, claude);
 
-  console.log(`\n   substackAdapter: ${signals.length} signal candidates from ${companies.length} companies`);
+  console.log(
+    `\n   substackAdapter: ${signals.length} signal candidates from ${companies.length} companies`
+  );
 
   for (const signal of signals) {
     const company = companies.find((c) => c.name === signal.portfolioCompanyName);
@@ -372,7 +374,14 @@ async function runPortfolioScan(companies: PortfolioRow[]): Promise<void> {
     const signalDate = signal.signalDate ?? today;
 
     // Warmth tier defaults to 'cold' — recalibrate.ts promotes based on signal history
-    const rel = await upsertRelationship(fundId, company.id, "cold", signalDate, "portfolio_scan", context);
+    const rel = await upsertRelationship(
+      fundId,
+      company.id,
+      "cold",
+      signalDate,
+      "portfolio_scan",
+      context
+    );
     if (!rel) continue;
     if (rel.isNew) stats.phase1.fundsNew++;
 
@@ -393,7 +402,8 @@ async function runPortfolioScan(companies: PortfolioRow[]): Promise<void> {
     }
   }
 
-  stats.phase1.skipped = companies.length - new Set(signals.map((s) => s.portfolioCompanyName)).size;
+  stats.phase1.skipped =
+    companies.length - new Set(signals.map((s) => s.portfolioCompanyName)).size;
 }
 
 // ── Phase 2: Network expansion ────────────────────────────────────────────────
