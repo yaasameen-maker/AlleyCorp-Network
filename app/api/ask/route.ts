@@ -225,8 +225,7 @@ export async function POST(req: Request): Promise<NextResponse<AskResponse>> {
     });
 
     const answerBlock = turn2.content.find((b) => b.type === "text");
-    const answer =
-      answerBlock?.type === "text" ? answerBlock.text : "No answer generated.";
+    const answer = answerBlock?.type === "text" ? answerBlock.text : "No answer generated.";
 
     return NextResponse.json({
       tool: primaryToolName,

@@ -160,10 +160,7 @@ export function AskPanel({ investors, onSelectInvestor, onClose }: AskPanelProps
       }
 
       const data = (await res.json()) as AskResponse;
-      setHistory((prev) => [
-        ...prev,
-        { query: trimmed, answer: data.answer, cards: data.cards },
-      ]);
+      setHistory((prev) => [...prev, { query: trimmed, answer: data.answer, cards: data.cards }]);
     } catch {
       setHistory((prev) => [
         ...prev,
