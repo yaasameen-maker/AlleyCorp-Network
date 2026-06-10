@@ -147,7 +147,7 @@ export default async function PortfolioPage() {
           return (
             <div
               key={company.id}
-              className={`card-lift bg-white border rounded-xl overflow-hidden ${isAlumni ? "border-[#F3F4F6] opacity-75" : "border-[#E5E7EB]"}`}
+              className={`card-lift bg-white border rounded overflow-hidden ${isAlumni ? "border-[#F3F4F6] opacity-75" : "border-[#E5E7EB]"}`}
             >
               {/* Company header */}
               <div className="px-5 py-3.5 flex items-center justify-between">

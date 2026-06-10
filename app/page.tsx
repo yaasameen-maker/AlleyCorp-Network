@@ -129,10 +129,10 @@ export default function DashboardPage() {
 
       {/* ── Sticky top header ── */}
       <header
-        className="sticky top-0 z-20 bg-white/90 backdrop-blur-sm border-b border-[#E5E7EB]"
+        className="sticky top-0 z-20 bg-white/90 backdrop-blur-sm"
         style={{ paddingTop: "3px" }}
       >
-        <div className="max-w-2xl mx-auto px-6 py-3 flex items-center justify-between gap-4">
+        <div className="w-full px-6 py-3 flex items-center justify-between gap-4">
 
           {/* Logo + wordmark */}
           <div className="flex items-center gap-3 min-w-0">
@@ -153,7 +153,7 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => setActiveView(activeView === "digest" ? "briefing" : "digest")}
-                className={`text-[11px] font-medium transition-colors ${
+                className={`text-[11px] font-medium transition-colors rounded ${
                   activeView === "digest"
                     ? "text-[#0EA5D6] hover:text-[#0891B2]"
                     : "text-[#9CA3AF] hover:text-[#6B7280]"
@@ -163,7 +163,7 @@ export default function DashboardPage() {
               </button>
               <Link
                 href="/portfolio"
-                className="text-[11px] font-medium text-[#9CA3AF] hover:text-[#6B7280] transition-colors"
+                className="text-[11px] font-medium text-[#9CA3AF] hover:text-[#6B7280] transition-colors rounded"
               >
                 Portfolio
               </Link>
@@ -207,7 +207,7 @@ export default function DashboardPage() {
                 <button
                   type="button"
                   onClick={() => toggleFilter("All")}
-                  className={`px-3 py-1.5 rounded-full text-[11px] font-semibold border transition-all duration-150 ${
+                  className={`px-3 py-1.5 rounded text-[11px] font-semibold border transition-all duration-150 ${
                     filterTier === "All"
                       ? "bg-[#0EA5D6] text-white border-[#0EA5D6]"
                       : "bg-transparent border-transparent text-[#9CA3AF] hover:text-[#4B5563] hover:bg-[#F3F4F6] hover:border-[#E5E7EB]"
@@ -226,7 +226,7 @@ export default function DashboardPage() {
                       key={tier}
                       type="button"
                       onClick={() => toggleFilter(tier)}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold border transition-all duration-150 ${
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-semibold border transition-all duration-150 ${
                         active
                           ? "bg-[#0EA5D6] text-white border-[#0EA5D6]"
                           : "bg-transparent border-transparent text-[#9CA3AF] hover:text-[#4B5563] hover:bg-[#F3F4F6] hover:border-[#E5E7EB]"
@@ -290,7 +290,7 @@ export default function DashboardPage() {
                 filteredInvestors.map((investor) => (
                   <div
                     key={investor.id}
-                    className="card-lift bg-white rounded-xl border border-[#E5E7EB] overflow-hidden"
+                    className="card-lift bg-white rounded border border-[#E5E7EB] overflow-hidden"
                   >
                     <InvestorRow
                       investor={investor}

@@ -139,7 +139,7 @@ export function BriefingDashboard({ investors, onSelectInvestor, hideSections = 
     <div className={hideSections ? "" : "max-w-2xl px-8 py-10 space-y-8"}>
 
       {/* ── Hero card ── */}
-      <div className="relative overflow-hidden rounded-xl hero-aurora px-7 py-6 shadow-md">
+      <div className="relative overflow-hidden rounded hero-aurora px-7 py-6 shadow-md">
         <div className="hero-shimmer absolute -inset-12" aria-hidden />
 
         <div className="relative z-10">
