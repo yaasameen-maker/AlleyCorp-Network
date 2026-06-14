@@ -17,6 +17,7 @@
     "enrich:funds": "node --env-file=.env --import tsx scripts/enrich-funds.ts",
     "discover": "node --env-file=.env --import tsx scripts/discover-coinvestors.ts",
     "discover:agent": "node --env-file=.env --import tsx scripts/discovery-agent.ts",
+    "orchestrate": "node --env-file=.env --import tsx scripts/orchestrator.ts",
     "recalibrate": "node --env-file=.env --import tsx scripts/recalibrate.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

@@ -18,6 +18,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createHash } from "crypto";
 import { pool } from "../lib/db.js";
 import {
+  canPublishRelationshipSignal,
+  isCandidateOnlySource,
   confidenceFromUrl as sourcePolicyConfidenceFromUrl,
   sourceNameFromUrl,
 } from "../lib/source-policy.js";
@@ -524,12 +526,33 @@ async function run() {
       }
 
       const candidates = await parseSignals(target, pages);
-      totalFound += candidates.length;
 
-      if (candidates.length === 0) continue;
+      // Source-policy gate — applied before display so dry-run output reflects real write set.
+      const gated = candidates.filter((c) => {
+        if (!c.fundName || !c.companyName) {
+          console.log(`  ⊘ SKIP (incomplete) missing fund or company name`);
+          return false;
+        }
+        if (isCandidateOnlySource(c.sourceUrl)) {
+          console.log(
+            `  ⊘ SKIP (candidate-only) ${c.fundName} — ${sourceNameFromUrl(c.sourceUrl)}`
+          );
+          return false;
+        }
+        if (!canPublishRelationshipSignal(c.sourceUrl)) {
+          console.log(
+            `  ⊘ SKIP (not publish-credible) ${c.fundName} — ${sourceNameFromUrl(c.sourceUrl)}`
+          );
+          return false;
+        }
+        return true;
+      });
+      totalFound += gated.length;
 
-      console.log(`\n📋 Candidate signals (${candidates.length}):`);
-      for (const c of candidates) {
+      if (gated.length === 0) continue;
+
+      console.log(`\n📋 Candidate signals (${gated.length}):`);
+      for (const c of gated) {
         console.log(`   [${c.signalType}] ${c.signalDate} | ${c.confidence} | ${c.value}`);
         console.log(`   Source: ${c.sourceUrl}`);
       }
@@ -541,7 +564,7 @@ async function run() {
 
       console.log("\n💾 Writing to DB...");
       let latestDate = "";
-      for (const c of candidates) {
+      for (const c of gated) {
         const result = await writeSignal(c);
         if (result === "inserted") {
           totalInserted++;

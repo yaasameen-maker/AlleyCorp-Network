@@ -44,6 +44,7 @@ import {
 } from "./adapters/substackAdapter.js";
 import { SIGNAL_TYPE_TO_DB } from "../lib/discovery-types.js";
 import { confidenceFromSource, type ConfidenceLevel } from "../lib/enrichment.js";
+import { reviewCandidates, makeDuplicateKey } from "./critic-agent.js";
 
 const DRY_RUN = !process.argv.includes("--write");
 const QUICK = process.argv.includes("--quick"); // process only 3 companies
@@ -367,13 +368,19 @@ async function runPortfolioScan(companies: PortfolioRow[]): Promise<void> {
   console.log(`PHASE 1 — Portfolio Scan (${companies.length} companies)`);
   console.log("═".repeat(60));
 
-  const { signals, rawByCompany } = await substackAdapter(companies, exa, claude);
+  const { signals, sources, rawByCompany } = await substackAdapter(companies, exa, claude);
 
   console.log(
     `\n   substackAdapter: ${signals.length} signal candidates from ${companies.length} companies`
   );
 
-  for (const signal of signals) {
+  // Pre-fetch existing signal hashes for duplicate detection.
+  // Pass empty knownFundNames — Phase 1 discovers new funds not yet in DB (Rule 4 skipped).
+  const existingHashes = await getExistingSignalHashes();
+  const reviewed = reviewCandidates(signals, sources, [], existingHashes);
+  const accepted = reviewed.filter((s) => !s.rejected);
+
+  for (const signal of accepted) {
     const company = companies.find((c) => c.name === signal.portfolioCompanyName);
     if (!company) continue;
 
@@ -573,6 +580,27 @@ async function runNetworkExpansion(hotWarmFunds: HotWarmFund[]): Promise<void> {
       stats.contacts.added++;
     }
   }
+}
+
+// ── Critic helpers ────────────────────────────────────────────────────────────
+
+async function getExistingSignalHashes(): Promise<Set<string>> {
+  const { rows } = await pool.query<{
+    fund: string;
+    company: string;
+    signal_type: string;
+    signal_date: string;
+  }>(
+    `SELECT LOWER(f.name) AS fund, LOWER(pc.name) AS company,
+            s.signal_type, s.signal_date::text
+     FROM signal s
+     JOIN relationship r ON r.id = s.relationship_id
+     JOIN fund f ON f.id = r.fund_id
+     JOIN portfolio_company pc ON pc.id = r.portfolio_company_id`
+  );
+  return new Set(
+    rows.map((r) => makeDuplicateKey(r.fund, r.company, r.signal_type, r.signal_date))
+  );
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
