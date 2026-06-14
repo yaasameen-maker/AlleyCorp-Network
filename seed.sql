@@ -603,6 +603,74 @@ WHERE s.relationship_id = r.id
   AND s.value ILIKE '%Seed $8.6M%';
 
 -- ─────────────────────────────────────────
+-- 8b. Verified source URLs — batch 2 (researched Jun 14 2026)
+-- Mirrors migrations/005. Every URL was checked to confirm the article names the
+-- fund + company + round. Funds findable only via candidate-only directories
+-- (Crunchbase/PitchBook/Tracxn) and DTNY event signals are intentionally left blank.
+-- ─────────────────────────────────────────
+UPDATE signal s SET source='PR Newswire',
+  source_url='https://www.prnewswire.com/news-releases/glacier-raises-4-5m-to-combat-climate-change-with-ai-powered-recycling-robots-301527666.html',
+  source_title='Glacier Raises $4.5M to Combat Climate Change with AI-Powered Recycling Robots'
+FROM relationship r JOIN fund f ON f.id=r.fund_id JOIN portfolio_company pc ON pc.id=r.portfolio_company_id
+WHERE s.relationship_id=r.id AND f.name='NEA' AND pc.name='Glacier' AND s.signal_date='2022-04-19' AND s.value ILIKE '%Seed%';
+
+UPDATE signal s SET signal_date='2025-02-20',
+  value='Seed $19M · Feb 2025 · led by Riot Ventures (AlleyCorp participated)',
+  source='TechCrunch',
+  source_url='https://techcrunch.com/2025/02/20/valar-atomics-comes-out-of-stealth-with-19m-and-a-pilot-reactor-site/',
+  source_title='Valar Atomics comes out of stealth with $19M and a pilot reactor site'
+FROM relationship r JOIN fund f ON f.id=r.fund_id JOIN portfolio_company pc ON pc.id=r.portfolio_company_id
+WHERE s.relationship_id=r.id AND f.name='Riot Ventures' AND pc.name='Valar Atomics' AND s.value ILIKE '%Seed%';
+
+UPDATE signal s SET source='TechCrunch',
+  source_url='https://techcrunch.com/2025/02/20/valar-atomics-comes-out-of-stealth-with-19m-and-a-pilot-reactor-site/',
+  source_title='Valar Atomics comes out of stealth with $19M and a pilot reactor site'
+FROM relationship r JOIN fund f ON f.id=r.fund_id JOIN portfolio_company pc ON pc.id=r.portfolio_company_id
+WHERE s.relationship_id=r.id AND f.name='Day One Ventures' AND pc.name='Valar Atomics' AND s.value ILIKE '%Seed%';
+
+UPDATE signal s SET source='TradedVC',
+  source_url='https://traded.co/vc/deal/valar-atomics-closes-130-million-series-a-funding-round-led-by-snowpoint-ventures/',
+  source_title='Valar Atomics Closes $130 Million Series A Funding Round Led By Snowpoint Ventures'
+FROM relationship r JOIN fund f ON f.id=r.fund_id JOIN portfolio_company pc ON pc.id=r.portfolio_company_id
+WHERE s.relationship_id=r.id AND f.name='Snowpoint Ventures' AND pc.name='Valar Atomics' AND s.value ILIKE '%Series A%';
+
+UPDATE signal s SET source='SpaceNews',
+  source_url='https://spacenews.com/portal-space-systems-raises-50-million-to-accelerate-spacecraft-development/',
+  source_title='Portal Space Systems raises $50 million to accelerate spacecraft development'
+FROM relationship r JOIN fund f ON f.id=r.fund_id JOIN portfolio_company pc ON pc.id=r.portfolio_company_id
+WHERE s.relationship_id=r.id AND f.name='Geodesic Capital' AND pc.name='Portal Space Systems' AND s.value ILIKE '%Series A%';
+
+UPDATE signal s SET source='SpaceNews',
+  source_url='https://spacenews.com/portal-space-systems-raises-50-million-to-accelerate-spacecraft-development/',
+  source_title='Portal Space Systems raises $50 million to accelerate spacecraft development'
+FROM relationship r JOIN fund f ON f.id=r.fund_id JOIN portfolio_company pc ON pc.id=r.portfolio_company_id
+WHERE s.relationship_id=r.id AND f.name='Mach33' AND pc.name='Portal Space Systems' AND s.value ILIKE '%Series A%';
+
+UPDATE signal s SET source='PR Newswire',
+  source_url='https://www.prnewswire.com/news-releases/trimble-ventures-invests-in-civ-roboticsa-construction-tech-startup-focused-on-autonomous-surveying-solutions-301629136.html',
+  source_title='Trimble Ventures Invests in Civ Robotics'
+FROM relationship r JOIN fund f ON f.id=r.fund_id JOIN portfolio_company pc ON pc.id=r.portfolio_company_id
+WHERE s.relationship_id=r.id AND f.name='Trimble Ventures' AND pc.name='Civ Robotics' AND s.value ILIKE '%Seed%';
+
+UPDATE signal s SET source='GlobeNewswire',
+  source_url='https://www.globenewswire.com/news-release/2022/09/21/2520253/0/en/Civ-Robotics-Raises-5-Million-Seed-Funding-Round.html',
+  source_title='Civ Robotics Raises $5 Million Seed Funding Round'
+FROM relationship r JOIN fund f ON f.id=r.fund_id JOIN portfolio_company pc ON pc.id=r.portfolio_company_id
+WHERE s.relationship_id=r.id AND f.name='ff Venture Capital' AND pc.name='Civ Robotics' AND s.value ILIKE '%Seed%';
+
+UPDATE signal s SET signal_date='2025-07-01', source='The Robot Report',
+  source_url='https://www.therobotreport.com/civ-robotics-spots-series-a-funding-automated-surveying/',
+  source_title='Civ Robotics spots Series A funding for automated surveying'
+FROM relationship r JOIN fund f ON f.id=r.fund_id JOIN portfolio_company pc ON pc.id=r.portfolio_company_id
+WHERE s.relationship_id=r.id AND f.name='ff Venture Capital' AND pc.name='Civ Robotics' AND s.value ILIKE '%Series A%';
+
+UPDATE signal s SET source='SOSV',
+  source_url='https://sosv.com/haxs-renovate-robotics-closes-2-5m-pre-seed-to-automate-roofing/',
+  source_title='HAX''s Renovate Robotics closes $2.5M pre-seed to automate roofing'
+FROM relationship r JOIN fund f ON f.id=r.fund_id JOIN portfolio_company pc ON pc.id=r.portfolio_company_id
+WHERE s.relationship_id=r.id AND f.name='SOSV' AND pc.name='Renovate Robotics' AND s.value ILIKE '%Pre-Seed%';
+
+-- ─────────────────────────────────────────
 -- 9. Signal traceability defaults
 -- Keep specific source URLs only when verified. Do not use publication
 -- homepages as evidence links — they look clickable but do not prove the claim.
