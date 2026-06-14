@@ -1,5 +1,7 @@
 # Sprint Plan: June 12–16 (Post-Thursday Feedback Sprint)
 
+> **Superseded:** This plan was replaced after the June 11 AlleyCorp meeting direction change. Use [SPRINT-june14-17.md](./SPRINT-june14-17.md) as the current sprint plan. Keep this file as historical context only.
+
 **Goal:** Incorporate Thursday partner feedback, harden the agent pipeline, and close the remaining UI/data gaps before Demo Day (June 24).  
 **Starts:** Friday June 13 (day after Thursday meeting)  
 **Ends:** Monday June 16 EOD

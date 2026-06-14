@@ -4,6 +4,8 @@
 
 # Keep it updated as work completes or plans change.
 
+> **Note:** This root handoff is older. For current sprint direction, use [docs/SPRINT-june14-17.md](./docs/SPRINT-june14-17.md). For the newer detailed handoff, use [docs/HANDOFF-June2026.md](./docs/HANDOFF-June2026.md).
+
 **Last updated:** June 6, 2026
 **Demo Day:** June 24, 2026
 **Office visit:** June 11, 2026 (5 days away — needs working product with real data)
