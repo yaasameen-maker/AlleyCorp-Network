@@ -19,6 +19,12 @@ export interface Fund {
   logoUrl?: string;
   stage?: string;
   hqLocation?: string;
+  geographyFocus?: string;
+  checkSizeProxy?: string;
+  deepTechSignal?: string;
+  investorStatus?: string;
+  isVip?: boolean;
+  profileLastCheckedAt?: string;
   linkedinUrl?: string;
   notes?: string;
 }
@@ -58,6 +64,9 @@ export interface Signal {
   date: string;
   source: string;
   sourceUrl?: string;
+  sourceTitle?: string;
+  rawSnippet?: string;
+  uniqueHash?: string;
   value: string;
   weight: "high" | "medium" | "low";
   confidence?: "confirmed" | "inferred" | "pending";

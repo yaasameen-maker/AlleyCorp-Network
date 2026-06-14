@@ -17,6 +17,12 @@ CREATE TABLE IF NOT EXISTS fund (
     aum_tier         TEXT,
     emerging_manager BOOLEAN,
     hq_location      TEXT,
+    geography_focus  TEXT,
+    check_size_proxy TEXT,
+    deep_tech_signal TEXT,
+    investor_status  TEXT,
+    is_vip           BOOLEAN      NOT NULL DEFAULT false,
+    profile_last_checked_at TIMESTAMPTZ,
     linkedin_url     TEXT,
     logo_url         TEXT,
     notes            TEXT,
@@ -99,15 +105,21 @@ CREATE TABLE IF NOT EXISTS signal (
     signal_date     DATE         NOT NULL,
     source          TEXT         NOT NULL,
     source_url      TEXT,
+    source_title    TEXT,
+    raw_snippet     TEXT,
+    unique_hash     TEXT,
     value           TEXT,
     weight          TEXT         NOT NULL CHECK (weight IN ('high', 'medium', 'low')),
     confidence      TEXT         NOT NULL CHECK (confidence IN ('confirmed', 'inferred', 'pending')),
     created_at      TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
 
--- Idempotent migration: add source_url to existing signal tables.
+-- Idempotent migrations for existing Railway tables.
 -- Safe to re-run — ADD COLUMN IF NOT EXISTS is a no-op when the column already exists.
 ALTER TABLE signal ADD COLUMN IF NOT EXISTS source_url TEXT;
+ALTER TABLE signal ADD COLUMN IF NOT EXISTS source_title TEXT;
+ALTER TABLE signal ADD COLUMN IF NOT EXISTS raw_snippet TEXT;
+ALTER TABLE signal ADD COLUMN IF NOT EXISTS unique_hash TEXT;
 
 -- ─────────────────────────────────────────
 -- Indexes
@@ -120,6 +132,14 @@ CREATE INDEX IF NOT EXISTS idx_relationship_warmth_tier      ON relationship(war
 CREATE INDEX IF NOT EXISTS idx_signal_relationship_id        ON signal(relationship_id);
 CREATE INDEX IF NOT EXISTS idx_signal_signal_type            ON signal(signal_type);
 CREATE INDEX IF NOT EXISTS idx_signal_signal_date            ON signal(signal_date);
+CREATE INDEX IF NOT EXISTS idx_signal_source_url             ON signal(source_url);
+CREATE INDEX IF NOT EXISTS idx_signal_unique_hash            ON signal(unique_hash);
+
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'signal_unique_hash_key') THEN
+        ALTER TABLE signal ADD CONSTRAINT signal_unique_hash_key UNIQUE (unique_hash);
+    END IF;
+END $$;
 
 -- ─────────────────────────────────────────
 -- Auto-update updated_at trigger
@@ -168,6 +188,12 @@ END $$;
 -- Column additions (idempotent — safe to re-run on Railway)
 -- ─────────────────────────────────────────
 ALTER TABLE fund ADD COLUMN IF NOT EXISTS logo_url TEXT;
+ALTER TABLE fund ADD COLUMN IF NOT EXISTS geography_focus TEXT;
+ALTER TABLE fund ADD COLUMN IF NOT EXISTS check_size_proxy TEXT;
+ALTER TABLE fund ADD COLUMN IF NOT EXISTS deep_tech_signal TEXT;
+ALTER TABLE fund ADD COLUMN IF NOT EXISTS investor_status TEXT;
+ALTER TABLE fund ADD COLUMN IF NOT EXISTS is_vip BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE fund ADD COLUMN IF NOT EXISTS profile_last_checked_at TIMESTAMPTZ;
 
 -- discovery_source: why is this fund in the system?
 --   manual           → seeded by Luba / Lauren's confirmed list
