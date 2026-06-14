@@ -75,9 +75,6 @@ function buildQueries(fundName: string, companyName: string): string[] {
 // ── DB query ──────────────────────────────────────────────────────────────────
 
 async function loadTargetsFromDb(): Promise<OrchestratorTarget[]> {
-  const nineMonthsAgo = new Date();
-  nineMonthsAgo.setMonth(nineMonthsAgo.getMonth() - 9);
-
   const { rows } = await pool.query<{
     id: string;
     fund_name: string;
@@ -228,7 +225,15 @@ const EXTRACT_TOOL: Anthropic.Tool = {
             value: { type: "string" },
             weight: { type: "string", enum: ["high", "medium", "low"] },
           },
-          required: ["signalType", "signalDate", "sourceTitle", "sourceUrl", "rawSnippet", "value", "weight"],
+          required: [
+            "signalType",
+            "signalDate",
+            "sourceTitle",
+            "sourceUrl",
+            "rawSnippet",
+            "value",
+            "weight",
+          ],
         },
       },
     },
@@ -267,7 +272,7 @@ async function searchForSignals(
         type: "auto",
         numResults: 5,
         contents: { highlights: true },
-        includeDomains: [...HIGH_CONFIDENCE_DOMAINS, "crunchbase.com", "forbes.com"],
+        includeDomains: HIGH_CONFIDENCE_DOMAINS,
       });
       for (const r of results.results) {
         const snippet = (r as unknown as { highlights?: string[] }).highlights?.join(" ") ?? "";
@@ -319,7 +324,10 @@ ${pages.map((p, i) => `[${i + 1}] ${p.title}\n${p.url}\n${p.snippet}`).join("\n\
     if (!toolUse) return [];
 
     const input = toolUse.input as {
-      signals: Omit<CandidateSignal, "relationshipId" | "fundName" | "companyName" | "confidence">[];
+      signals: Omit<
+        CandidateSignal,
+        "relationshipId" | "fundName" | "companyName" | "confidence"
+      >[];
     };
 
     return (input.signals ?? []).map((s) => ({
@@ -369,7 +377,7 @@ async function writeSignal(s: CandidateSignal): Promise<"inserted" | "duplicate"
 async function updateRelationshipDate(relationshipId: string, latestDate: string): Promise<void> {
   await pool.query(
     `UPDATE relationship
-     SET last_signal_date = GREATEST(last_signal_date, $1::date), updated_at = now()
+     SET last_signal_date = GREATEST(COALESCE(last_signal_date, $1::date), $1::date), updated_at = now()
      WHERE id = $2`,
     [latestDate, relationshipId]
   );
@@ -463,7 +471,9 @@ async function run(): Promise<void> {
   console.log("╔══════════════════════════════════════════════════════════╗");
   console.log("║   AlleyCorp Signal Orchestrator                          ║");
   console.log("╚══════════════════════════════════════════════════════════╝");
-  console.log(`Mode: ${DRY_RUN ? "DRY RUN — prints plan, no DB writes" : "LIVE — executing ingest pipeline"}`);
+  console.log(
+    `Mode: ${DRY_RUN ? "DRY RUN — prints plan, no DB writes" : "LIVE — executing ingest pipeline"}`
+  );
   console.log(`Date: ${new Date().toISOString().slice(0, 10)}\n`);
 
   const targets = await loadTargetsFromDb();

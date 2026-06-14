@@ -107,11 +107,20 @@ export function reviewCandidates(
   const sourceMap = new Map(sources.map((s) => [s.sourceId, s]));
 
   const reviewed: ReviewedCandidate[] = candidates.map((c) => {
-    const sourceUrl = sourceMap.get(c.sourceId)?.url ?? "";
+    const sourceUrl = sourceMap.get(c.sourceId)?.url;
     const signalTypeDb = SIGNAL_TYPE_TO_DB[c.signalType] ?? c.signalType;
 
+    // Reject immediately when sourceId can't be resolved — source policy can't be applied.
+    if (!sourceUrl) {
+      return {
+        ...c,
+        rejected: true,
+        rejectionReason: "source URL unresolvable — cannot apply source policy",
+      };
+    }
+
     // Rule 1: candidate-only source
-    if (sourceUrl && isCandidateOnlySource(sourceUrl)) {
+    if (isCandidateOnlySource(sourceUrl)) {
       return {
         ...c,
         rejected: true,
@@ -120,7 +129,7 @@ export function reviewCandidates(
     }
 
     // Rule 2: source not credible for signal publish
-    if (sourceUrl && !canPublishRelationshipSignal(sourceUrl)) {
+    if (!canPublishRelationshipSignal(sourceUrl)) {
       return {
         ...c,
         rejected: true,
