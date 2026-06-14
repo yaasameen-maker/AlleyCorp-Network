@@ -3,6 +3,8 @@
 **Updated:** June 10, 2026 · **Demo Day:** June 24, 2026  
 **Author:** Luba Kaper
 
+> **Current sprint plan:** Use [SPRINT-june14-17.md](./SPRINT-june14-17.md). This plan reflects the June 11 AlleyCorp pivot: broader deep tech investor universe, co-investors as VIP/starred nodes, Today Overview as the main demo surface, and the Daily Intelligence Pipeline with deterministic verification.
+
 ---
 
 ## 1. What Changed — June 10 Update
