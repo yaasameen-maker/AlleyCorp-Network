@@ -570,6 +570,14 @@ No one should keep important local-only code overnight.
 
 **Goal:** Make the product answer the questions Kabir actually asked.
 
+> **The three meeting prompts are representative, not exhaustive.** They illustrate the
+> _class_ of question the chatbot must handle naturally — any geography (not just LA), any
+> event/invite framing (not just "rooftop happy hour"), any stage + check-size + deep-tech +
+> warmth combination, and any phrasing (e.g. "which seed funds in NY have we met at an
+> event?"). Build genuine NL→field mapping over the investor data model; do not hardcode or
+> overfit to the three example strings. Acceptance prompts should _sample_ the class —
+> include variations beyond the three — the way the team moved tests off hardcoded fund names.
+
 #### Luba
 
 - Fill enough investor metadata for the three priority query types:
