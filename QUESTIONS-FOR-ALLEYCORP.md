@@ -46,7 +46,7 @@ Several funds attended DTNY (Jan 2026) but have never co-invested with AlleyCorp
 ## Demo Day
 
 **Q9 — Demo Day prompt 5: confirm it's Trimble Ventures, not Lux Capital**  
-Early docs said "Show me the full picture on Lux Capital." Lux Capital was removed from the DB (their co-investment Inductive Bio isn't on Lauren's confirmed list). We now use Trimble Ventures. Confirm this is right before June 24.
+Early docs said "Show me the full picture on Lux Capital." We no longer treat Lux as a co-investor — their only candidate co-investment (Inductive Bio) isn't on Lauren's confirmed list. After the June 11 pivot, Lux stays in the DB as a deep tech market prospect (no co-investment), and Demo Day prompt 5 now uses Trimble Ventures. Confirm this is right before June 24.
 
 **Q10 — Who is "Abe" in the demo scenario?**  
 The acceptance tests and demo script are written from Abe's POV. Is this Abe Strauss (AlleyCorp)? Confirm so we get the persona right in the demo narrative.

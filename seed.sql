@@ -67,10 +67,11 @@ VALUES
 --    IDs are resolved by name via subquery — no hardcoded UUIDs.
 -- ─────────────────────────────────────────
 
--- NOTE: Lux Capital + Inductive Bio (stale) and USV + Viam (stale) were in
--- early planning docs. Inductive Bio and Viam are NOT on Lauren's confirmed
--- Deep Tech portfolio list. These relationships are removed until a confirmed
--- replacement portfolio company is identified. See PORTFOLIO.md.
+-- NOTE: Lux Capital + Inductive Bio and USV + Viam co-investment SIGNALS were in
+-- early planning docs. Inductive Bio and Viam are NOT on Lauren's confirmed Deep
+-- Tech portfolio list, so those co-investment relationships are not seeded. After
+-- the June 11 pivot, Lux Capital and USV are kept as deep tech MARKET PROSPECTS
+-- (real funds, no confirmed AlleyCorp co-investment) — see section 9 metadata.
 
 -- Riot Ventures + Valar Atomics · hot
 INSERT INTO relationship (id, fund_id, portfolio_company_id, warmth_tier, created_at, updated_at)
@@ -165,8 +166,9 @@ VALUES (
 --    relationship_id resolved by joining fund + portfolio_company by name.
 -- ─────────────────────────────────────────
 
--- Lux Capital and USV signals removed — portfolio companies (Inductive Bio,
--- Viam) are not on Lauren's confirmed list. See PORTFOLIO.md.
+-- Lux Capital and USV have no co-investment signals — their portfolio companies
+-- (Inductive Bio, Viam) are not on Lauren's confirmed list. Both remain in the DB
+-- as deep tech market prospects (see section 9), not as co-investors.
 
 -- Riot Ventures + Valar Atomics: co_investment Seed Mar 2025
 INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, value, weight, confidence, created_at)
@@ -724,6 +726,39 @@ SET
     ELSE 'Deep tech relevance inferred from AlleyCorp co-investment context'
   END,
   profile_last_checked_at = now();
+
+-- ─────────────────────────────────────────
+-- 10b. Verified AUM tiers
+-- Researched June 14 2026 from credible public sources (firm press releases,
+-- official fund pages, SEC-registered AUM, reputable VC databases). Coarse tier +
+-- approximate figure. BOLD Capital Partners and REFASHIOND Ventures are left NULL —
+-- no clean public AUM figure was verifiable. Do not fill those without a real source.
+-- ─────────────────────────────────────────
+UPDATE fund
+SET aum_tier = CASE name
+  WHEN 'General Catalyst'           THEN 'Mega (~$43B)'
+  WHEN 'NEA'                        THEN 'Mega (~$28B)'
+  WHEN 'Founders Fund'              THEN 'Mega (~$17B)'
+  WHEN 'a16z American Dynamism'     THEN 'Mega (a16z ~$90B firm-wide)'
+  WHEN 'Eclipse Ventures'           THEN 'Mega (~$10B)'
+  WHEN 'Lux Capital'                THEN 'Large (~$7B)'
+  WHEN 'SOSV'                       THEN 'Large (~$1.5B)'
+  WHEN 'Union Square Ventures'      THEN 'Large (~$1.5B)'
+  WHEN 'Amazon Climate Pledge Fund' THEN 'Large ($2B)'
+  WHEN 'Flybridge'                  THEN 'Large (~$1B)'
+  WHEN 'Geodesic Capital'           THEN 'Large (~$1B)'
+  WHEN 'Riot Ventures'              THEN 'Large (~$1B)'
+  WHEN 'ff Venture Capital'         THEN 'Mid (~$500M)'
+  WHEN 'Cherubic Ventures'          THEN 'Mid (~$460M)'
+  WHEN 'Day One Ventures'           THEN 'Mid (~$450M)'
+  WHEN 'Defy Partners'              THEN 'Mid (~$410M)'
+  WHEN 'SineWave Ventures'          THEN 'Mid (~$300M)'
+  WHEN 'Ubiquity Ventures'          THEN 'Emerging (~$200M)'
+  WHEN 'Trimble Ventures'           THEN 'Emerging ($200M)'
+  WHEN 'Snowpoint Ventures'         THEN 'Emerging (~$185M)'
+  WHEN 'Mach33'                     THEN 'Emerging (~$14M)'
+  ELSE aum_tier
+END;
 
 -- ─────────────────────────────────────────
 -- 11. Logo URLs (Google favicon service)
