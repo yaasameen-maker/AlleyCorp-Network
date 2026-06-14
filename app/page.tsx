@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { AskPanel } from "@/app/components/AskPanel";
 import { BriefingDashboard } from "@/app/components/BriefingDashboard";
 import { InvestorRow } from "@/app/components/InvestorRow";
 import { ProfileDrawer } from "@/app/components/ProfileDrawer";
-import { DigestView } from "@/app/components/DigestView";
+import { TodayOverviewView } from "@/app/components/TodayOverviewView";
 import { getInvestors } from "@/app/data/investors";
+import { matchesInvestorSearch } from "@/app/lib/investorSearch";
 import { type Investor, type WarmthTier } from "@/lib/investors";
 import { useDarkMode } from "@/app/hooks/useDarkMode";
 
@@ -66,12 +67,10 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [selectedInvestor, setSelectedInvestor] = useState<Investor | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchOpen, setSearchOpen] = useState(false);
   const [filterTier, setFilterTier] = useState<WarmthTier | "All">("All");
-  const [activeView, setActiveView] = useState<"briefing" | "digest">("briefing");
+  const [activeView, setActiveView] = useState<"briefing" | "overview">("briefing");
   const [askOpen, setAskOpen] = useState(false);
   const { dark, toggle: toggleDark } = useDarkMode();
-  const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     getInvestors()
@@ -87,8 +86,7 @@ export default function DashboardPage() {
 
   const filteredInvestors = useMemo(() => {
     return sortedInvestors.filter((investor) => {
-      const matchesSearch =
-        searchQuery === "" || investor.fund.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = matchesInvestorSearch(investor, searchQuery);
       const matchesTier = filterTier === "All" || investor.warmthTier === filterTier;
       return matchesSearch && matchesTier;
     });
@@ -103,16 +101,6 @@ export default function DashboardPage() {
     }),
     [allInvestors]
   );
-
-  function openSearch() {
-    setSearchOpen(true);
-    setTimeout(() => searchRef.current?.focus(), 50);
-  }
-
-  function closeSearch() {
-    setSearchQuery("");
-    setSearchOpen(false);
-  }
 
   function toggleFilter(tier: WarmthTier | "All") {
     setFilterTier(tier);
@@ -166,14 +154,14 @@ export default function DashboardPage() {
             <nav className="flex items-center gap-3">
               <button
                 type="button"
-                onClick={() => setActiveView(activeView === "digest" ? "briefing" : "digest")}
+                onClick={() => setActiveView(activeView === "overview" ? "briefing" : "overview")}
                 className={`text-[11px] font-medium transition-colors rounded ${
-                  activeView === "digest"
+                  activeView === "overview"
                     ? "text-[#0EA5D6] hover:text-[#0891B2]"
                     : "text-[#9CA3AF] hover:text-[#6B7280]"
                 }`}
               >
-                {activeView === "digest" ? "Home" : "Digest"}
+                {activeView === "overview" ? "Network" : "Today Overview"}
               </button>
               <Link
                 href="/portfolio"
@@ -194,14 +182,34 @@ export default function DashboardPage() {
           <div className="flex items-center justify-center py-24">
             <p className="text-sm text-[#9CA3AF]">Loading…</p>
           </div>
-        ) : activeView === "digest" ? (
+        ) : activeView === "overview" ? (
           <div className="pt-6">
-            <DigestView investors={allInvestors} />
+            <TodayOverviewView investors={allInvestors} onSelectInvestor={handleSelectInvestor} />
           </div>
         ) : (
           <>
-            {/* Hero card — sections hidden, parent handles layout */}
+            {/* ── Search — always visible ── */}
             <div className="pt-6">
+              <label htmlFor="investor-search" className="sr-only">
+                Search investors
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] pointer-events-none">
+                  <SearchIcon />
+                </span>
+                <input
+                  id="investor-search"
+                  type="search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search fund, contact, company, tier…"
+                  className="w-full pl-9 pr-3 py-2.5 text-[13px] bg-white border border-[#E5E7EB] rounded-lg text-[#0D1320] placeholder:text-[#C4C9D4] focus:outline-none focus:border-[#0EA5D6] transition-colors"
+                />
+              </div>
+            </div>
+
+            {/* Hero card — sections hidden, parent handles layout */}
+            <div className="mt-4">
               <BriefingDashboard
                 investors={allInvestors}
                 onSelectInvestor={handleSelectInvestor}
@@ -210,81 +218,48 @@ export default function DashboardPage() {
               />
             </div>
 
-            {/* ── Filter chips + search ── */}
-            <div className="mt-6 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                {/* All */}
-                <button
-                  type="button"
-                  onClick={() => toggleFilter("All")}
-                  className={`px-3 py-1.5 rounded text-[11px] font-semibold border transition-all duration-150 ${
-                    filterTier === "All"
-                      ? "bg-[#0EA5D6] text-white border-[#0EA5D6]"
-                      : "bg-transparent border-transparent text-[#9CA3AF] hover:text-[#4B5563] hover:bg-[#F3F4F6] hover:border-[#E5E7EB]"
-                  }`}
-                >
-                  All
-                  <span className="ml-1.5 tabular-nums font-normal opacity-70">
-                    {allInvestors.length}
-                  </span>
-                </button>
+            {/* ── Filter chips ── */}
+            <div className="mt-4 flex items-center gap-1.5 flex-wrap">
+              {/* All */}
+              <button
+                type="button"
+                onClick={() => toggleFilter("All")}
+                className={`px-3 py-1.5 rounded text-[11px] font-semibold border transition-all duration-150 ${
+                  filterTier === "All"
+                    ? "bg-[#0EA5D6] text-white border-[#0EA5D6]"
+                    : "bg-transparent border-transparent text-[#9CA3AF] hover:text-[#4B5563] hover:bg-[#F3F4F6] hover:border-[#E5E7EB]"
+                }`}
+              >
+                All
+                <span className="ml-1.5 tabular-nums font-normal opacity-70">
+                  {allInvestors.length}
+                </span>
+              </button>
 
-                {TIERS.map((tier) => {
-                  const active = filterTier === tier;
-                  return (
-                    <button
-                      key={tier}
-                      type="button"
-                      onClick={() => toggleFilter(tier)}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-semibold border transition-all duration-150 ${
-                        active
-                          ? "bg-[#0EA5D6] text-white border-[#0EA5D6]"
-                          : "bg-transparent border-transparent text-[#9CA3AF] hover:text-[#4B5563] hover:bg-[#F3F4F6] hover:border-[#E5E7EB]"
-                      }`}
-                    >
-                      <span
-                        className="w-1.5 h-1.5 rounded-full shrink-0"
-                        style={{
-                          backgroundColor: active ? "rgba(255,255,255,0.7)" : TIER_DOT[tier],
-                        }}
-                      />
-                      {tier}
-                      <span className="tabular-nums font-normal opacity-70">
-                        {tierCounts[tier]}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Collapsible search */}
-              <div className="flex items-center gap-2 shrink-0">
-                {searchOpen && (
-                  <input
-                    ref={searchRef}
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onBlur={() => {
-                      if (!searchQuery) closeSearch();
-                    }}
-                    placeholder="Search funds…"
-                    className="w-40 px-3 py-1.5 text-[12px] bg-[#F7F8FA] border border-[#E5E7EB] rounded-lg text-[#0D1320] placeholder:text-[#C4C9D4] focus:outline-none focus:border-[#0EA5D6] transition-all"
-                  />
-                )}
-                <button
-                  type="button"
-                  onClick={searchOpen ? closeSearch : openSearch}
-                  aria-label={searchOpen ? "Close search" : "Search funds"}
-                  className={`p-2 rounded-lg transition-colors ${
-                    searchOpen || searchQuery
-                      ? "text-[#0EA5D6] bg-[#F0F9FF]"
-                      : "text-[#9CA3AF] hover:text-[#4B5563] hover:bg-[#F3F4F6]"
-                  }`}
-                >
-                  <SearchIcon />
-                </button>
-              </div>
+              {TIERS.map((tier) => {
+                const active = filterTier === tier;
+                return (
+                  <button
+                    key={tier}
+                    type="button"
+                    onClick={() => toggleFilter(tier)}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-semibold border transition-all duration-150 ${
+                      active
+                        ? "bg-[#0EA5D6] text-white border-[#0EA5D6]"
+                        : "bg-transparent border-transparent text-[#9CA3AF] hover:text-[#4B5563] hover:bg-[#F3F4F6] hover:border-[#E5E7EB]"
+                    }`}
+                  >
+                    <span
+                      className="w-1.5 h-1.5 rounded-full shrink-0"
+                      style={{
+                        backgroundColor: active ? "rgba(255,255,255,0.7)" : TIER_DOT[tier],
+                      }}
+                    />
+                    {tier}
+                    <span className="tabular-nums font-normal opacity-70">{tierCounts[tier]}</span>
+                  </button>
+                );
+              })}
             </div>
 
             {/* Brand line + count label */}
