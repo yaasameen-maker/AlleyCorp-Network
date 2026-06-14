@@ -530,9 +530,9 @@ WHERE f.name = 'Founders Fund';
 -- ─────────────────────────────────────────
 UPDATE signal s
 SET
-  source = 'Axios',
-  source_url = 'https://www.axios.com/newsletters/axios-pro-rata-d119cf31-901c-4c24-ad91-18e1951a66fb',
-  source_title = 'Axios Pro Rata: Trump prediction'
+  source = 'TechCrunch',
+  source_url = 'https://techcrunch.com/2025/08/26/eyebot-gets-20m-series-a-to-boost-to-expand-eye-care-access/',
+  source_title = 'Eyebot gets $20M Series A to expand eye care access'
 FROM relationship r
 JOIN fund f ON f.id = r.fund_id
 JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
