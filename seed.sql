@@ -504,6 +504,21 @@ SELECT gen_random_uuid(), r.id, 'co_investment', '2021-09-02', 'TechCrunch',
 FROM relationship r JOIN fund f ON f.id = r.fund_id JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
 WHERE f.name = 'SineWave Ventures' AND pc.name = 'Aon 3D';
 
+-- Founders Fund: leadership relationship (not a co-investment).
+-- Kevin Ryan (AlleyCorp) and Keith Rabois (Founders Fund) co-host the monthly
+-- podcast "This Won't Last" — 4 episodes Sep 2024–May 2025. Verified via Apple
+-- Podcasts. Founders Fund stays Cold (no shared deal), but this surfaces the
+-- active leadership tie in the engagement history. Attached to the Founders Fund
+-- relationship row (Valar Atomics target).
+INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, value, weight, confidence, source_url, source_title, created_at)
+SELECT gen_random_uuid(), r.id, 'press_mention', '2025-05-08', 'This Won''t Last Podcast',
+  'Kevin Ryan (AlleyCorp) and Keith Rabois (Founders Fund) co-host a monthly podcast: This Won''t Last. 4 episodes since Sep 2024, most recent May 2025.',
+  'medium', 'confirmed',
+  'https://podcasts.apple.com/us/podcast/this-wont-last-with-keith-rabois-kevin-ryan-logan/id1765665937',
+  'This Won''t Last — Apple Podcasts', now()
+FROM relationship r JOIN fund f ON f.id = r.fund_id
+WHERE f.name = 'Founders Fund';
+
 -- NOTE: Additional signals for Trimble, General Catalyst, Riot should be added
 -- only after verifying sources on Crunchbase / TechCrunch / fund websites.
 -- Do not add signals you cannot verify — Lauren will fact-check live.
