@@ -13,6 +13,7 @@ import { createHash } from "crypto";
 import type Exa from "exa-js";
 import type Anthropic from "@anthropic-ai/sdk";
 import { confidenceFromSource } from "../../lib/enrichment.js";
+import { sourceUseFromUrl } from "../../lib/source-policy.js";
 import type {
   SourceRecord,
   DiscoverySignalCandidate,
@@ -220,7 +221,8 @@ export async function substackAdapter(
     const investors = await extractInvestors(company.name, pages, claude);
     const actionable = investors.filter((inv) => {
       const conf = confidenceFromSource(inv.sourceUrl);
-      return conf === "high" || conf === "medium";
+      const sourceUse = sourceUseFromUrl(inv.sourceUrl);
+      return sourceUse !== "candidate_only" && (conf === "high" || conf === "medium");
     });
 
     rawByCompany.set(company.name, actionable);

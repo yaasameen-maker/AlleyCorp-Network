@@ -67,10 +67,11 @@ VALUES
 --    IDs are resolved by name via subquery — no hardcoded UUIDs.
 -- ─────────────────────────────────────────
 
--- NOTE: Lux Capital + Inductive Bio (stale) and USV + Viam (stale) were in
--- early planning docs. Inductive Bio and Viam are NOT on Lauren's confirmed
--- Deep Tech portfolio list. These relationships are removed until a confirmed
--- replacement portfolio company is identified. See PORTFOLIO.md.
+-- NOTE: Lux Capital + Inductive Bio and USV + Viam co-investment SIGNALS were in
+-- early planning docs. Inductive Bio and Viam are NOT on Lauren's confirmed Deep
+-- Tech portfolio list, so those co-investment relationships are not seeded. After
+-- the June 11 pivot, Lux Capital and USV are kept as deep tech MARKET PROSPECTS
+-- (real funds, no confirmed AlleyCorp co-investment) — see section 9 metadata.
 
 -- Riot Ventures + Valar Atomics · hot
 INSERT INTO relationship (id, fund_id, portfolio_company_id, warmth_tier, created_at, updated_at)
@@ -99,7 +100,7 @@ SELECT
   'hot',
   now(), now();
 
--- General Catalyst + Eyebot · hot (led Series A Aug 2025; co-led Seed Jun 2024)
+-- General Catalyst + Eyebot · hot (led Series A Aug 2025; GC was NOT in the Jun 2024 seed)
 INSERT INTO relationship (id, fund_id, portfolio_company_id, warmth_tier, last_signal_date, created_at, updated_at)
 SELECT
   gen_random_uuid(),
@@ -165,8 +166,9 @@ VALUES (
 --    relationship_id resolved by joining fund + portfolio_company by name.
 -- ─────────────────────────────────────────
 
--- Lux Capital and USV signals removed — portfolio companies (Inductive Bio,
--- Viam) are not on Lauren's confirmed list. See PORTFOLIO.md.
+-- Lux Capital and USV have no co-investment signals — their portfolio companies
+-- (Inductive Bio, Viam) are not on Lauren's confirmed list. Both remain in the DB
+-- as deep tech market prospects (see section 9), not as co-investors.
 
 -- Riot Ventures + Valar Atomics: co_investment Seed Mar 2025
 INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, value, weight, confidence, created_at)
@@ -202,22 +204,10 @@ JOIN fund f              ON f.id  = r.fund_id
 JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
 WHERE f.name = 'Snowpoint Ventures' AND pc.name = 'Valar Atomics';
 
--- General Catalyst + Eyebot: co-lead Seed Jun 2024
-INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, value, weight, confidence, created_at)
-SELECT
-  gen_random_uuid(),
-  r.id,
-  'co_investment',
-  '2024-06-01',
-  'PRWeb',
-  'Seed $6M · Jun 2024 · co-lead with AlleyCorp and Ubiquity Ventures',
-  'high',
-  'confirmed',
-  now()
-FROM relationship r
-JOIN fund f              ON f.id  = r.fund_id
-JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
-WHERE f.name = 'General Catalyst' AND pc.name = 'Eyebot';
+-- General Catalyst + Eyebot SEED signal intentionally omitted.
+-- Verified Jun 2024 seed was led by AlleyCorp + Ubiquity Ventures (PRWeb/TechCrunch);
+-- General Catalyst did not participate until the Aug 2025 Series A. Do not re-add a
+-- GC seed signal without a source that explicitly names GC in the seed round.
 
 -- General Catalyst + Eyebot: led Series A Aug 2025
 INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, value, weight, confidence, created_at)
@@ -504,12 +494,184 @@ SELECT gen_random_uuid(), r.id, 'co_investment', '2021-09-02', 'TechCrunch',
 FROM relationship r JOIN fund f ON f.id = r.fund_id JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
 WHERE f.name = 'SineWave Ventures' AND pc.name = 'Aon 3D';
 
+-- Founders Fund: leadership relationship (not a co-investment).
+-- Kevin Ryan (AlleyCorp) and Keith Rabois (Founders Fund) co-host the monthly
+-- podcast "This Won't Last" — 4 episodes Sep 2024–May 2025. Verified via Apple
+-- Podcasts. Founders Fund stays Cold (no shared deal), but this surfaces the
+-- active leadership tie in the engagement history. Attached to the Founders Fund
+-- relationship row (Valar Atomics target).
+INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, value, weight, confidence, source_url, source_title, created_at)
+SELECT gen_random_uuid(), r.id, 'press_mention', '2025-05-08', 'This Won''t Last Podcast',
+  'Kevin Ryan (AlleyCorp) and Keith Rabois (Founders Fund) co-host a monthly podcast: This Won''t Last. 4 episodes since Sep 2024, most recent May 2025.',
+  'medium', 'confirmed',
+  'https://podcasts.apple.com/us/podcast/this-wont-last-with-keith-rabois-kevin-ryan-logan/id1765665937',
+  'This Won''t Last — Apple Podcasts', now()
+FROM relationship r JOIN fund f ON f.id = r.fund_id
+WHERE f.name = 'Founders Fund';
+
 -- NOTE: Additional signals for Trimble, General Catalyst, Riot should be added
 -- only after verifying sources on Crunchbase / TechCrunch / fund websites.
 -- Do not add signals you cannot verify — Lauren will fact-check live.
 
 -- ─────────────────────────────────────────
--- 8. Signal traceability defaults
+-- 8. Verified source URLs — small QA batch
+-- Add only source URLs that were verified directly. Do not use publication
+-- homepages or inferred profile slugs as evidence links.
+-- ─────────────────────────────────────────
+UPDATE signal s
+SET
+  source = 'TechCrunch',
+  source_url = 'https://techcrunch.com/2025/08/26/eyebot-gets-20m-series-a-to-boost-to-expand-eye-care-access/',
+  source_title = 'Eyebot gets $20M Series A to expand eye care access'
+FROM relationship r
+JOIN fund f ON f.id = r.fund_id
+JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
+WHERE s.relationship_id = r.id
+  AND pc.name = 'Eyebot'
+  AND f.name IN ('General Catalyst', 'Ubiquity Ventures')
+  AND s.signal_date = '2025-08-26'
+  AND s.value ILIKE '%Series A $20M%';
+
+UPDATE signal s
+SET
+  source = 'TechCrunch',
+  source_url = 'https://techcrunch.com/2024/06/06/eyebot-raised-6m-for-ai-powered-kiosks-that-provide-90-second-eye-exams-without-optometrist/',
+  source_title = 'Eyebot raised $6M for AI-powered kiosks that provide 90-second vision exams without an on-site optometrist'
+FROM relationship r
+JOIN fund f ON f.id = r.fund_id
+JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
+WHERE s.relationship_id = r.id
+  AND pc.name = 'Eyebot'
+  AND f.name = 'Ubiquity Ventures'
+  AND s.signal_date = '2024-06-01'
+  AND s.value ILIKE '%Seed $6M%';
+
+UPDATE signal s
+SET
+  source = 'TechCrunch',
+  source_url = 'https://techcrunch.com/2025/04/28/amazon-backed-glacier-gets-16m-to-expand-its-robot-recycling-fleet/',
+  source_title = 'Amazon-backed Glacier gets $16M to expand its robot recycling fleet'
+FROM relationship r
+JOIN fund f ON f.id = r.fund_id
+JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
+WHERE s.relationship_id = r.id
+  AND pc.name = 'Glacier'
+  AND f.name IN ('NEA', 'Amazon Climate Pledge Fund')
+  AND s.signal_date = '2025-04-28'
+  AND s.value ILIKE '%Series A $16M%';
+
+UPDATE signal s
+SET
+  source = 'Glacier',
+  source_url = 'https://endwaste.io/glacier-amazon-partnership-html/',
+  source_title = 'GLACIER + AMAZON'
+FROM relationship r
+JOIN fund f ON f.id = r.fund_id
+JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
+WHERE s.relationship_id = r.id
+  AND pc.name = 'Glacier'
+  AND f.name IN ('NEA', 'Amazon Climate Pledge Fund')
+  AND s.signal_date = '2024-03-01'
+  AND s.value ILIKE '%Seed Extension $7.7M%';
+
+UPDATE signal s
+SET
+  source = 'TechCrunch',
+  source_url = 'https://techcrunch.com/2021/09/02/3d-printing-startup-aon3d-closes-11-5m-series-a/',
+  source_title = 'AON3D closes $11.5M Series A, partners with Astrobotic to send 3D-printed parts to the moon'
+FROM relationship r
+JOIN fund f ON f.id = r.fund_id
+JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
+WHERE s.relationship_id = r.id
+  AND pc.name = 'Aon 3D'
+  AND f.name = 'SineWave Ventures'
+  AND s.signal_date = '2021-09-02'
+  AND s.value ILIKE '%Series A $11.5M%';
+
+UPDATE signal s
+SET
+  source = 'GlobeNewswire',
+  source_url = 'https://www.globenewswire.com/news-release/2022/11/29/2564034/0/en/Earth-Force-Technologies-Announces-8-6-Million-Raise-to-Prevent-Catastrophic-Wildfire.html',
+  source_title = 'Earth Force Technologies Announces $8.6 Million Raise to Prevent Catastrophic Wildfire'
+FROM relationship r
+JOIN fund f ON f.id = r.fund_id
+JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
+WHERE s.relationship_id = r.id
+  AND pc.name = 'Earth Force'
+  AND f.name = 'BOLD Capital Partners'
+  AND s.signal_date = '2022-11-29'
+  AND s.value ILIKE '%Seed $8.6M%';
+
+-- ─────────────────────────────────────────
+-- 8b. Verified source URLs — batch 2 (researched Jun 14 2026)
+-- Mirrors migrations/005. Every URL was checked to confirm the article names the
+-- fund + company + round. Funds findable only via candidate-only directories
+-- (Crunchbase/PitchBook/Tracxn) and DTNY event signals are intentionally left blank.
+-- ─────────────────────────────────────────
+UPDATE signal s SET source='PR Newswire',
+  source_url='https://www.prnewswire.com/news-releases/glacier-raises-4-5m-to-combat-climate-change-with-ai-powered-recycling-robots-301527666.html',
+  source_title='Glacier Raises $4.5M to Combat Climate Change with AI-Powered Recycling Robots'
+FROM relationship r JOIN fund f ON f.id=r.fund_id JOIN portfolio_company pc ON pc.id=r.portfolio_company_id
+WHERE s.relationship_id=r.id AND f.name='NEA' AND pc.name='Glacier' AND s.signal_date='2022-04-19' AND s.value ILIKE '%Seed%';
+
+UPDATE signal s SET signal_date='2025-02-20',
+  value='Seed $19M · Feb 2025 · led by Riot Ventures (AlleyCorp participated)',
+  source='TechCrunch',
+  source_url='https://techcrunch.com/2025/02/20/valar-atomics-comes-out-of-stealth-with-19m-and-a-pilot-reactor-site/',
+  source_title='Valar Atomics comes out of stealth with $19M and a pilot reactor site'
+FROM relationship r JOIN fund f ON f.id=r.fund_id JOIN portfolio_company pc ON pc.id=r.portfolio_company_id
+WHERE s.relationship_id=r.id AND f.name='Riot Ventures' AND pc.name='Valar Atomics' AND s.value ILIKE '%Seed%';
+
+UPDATE signal s SET source='TechCrunch',
+  source_url='https://techcrunch.com/2025/02/20/valar-atomics-comes-out-of-stealth-with-19m-and-a-pilot-reactor-site/',
+  source_title='Valar Atomics comes out of stealth with $19M and a pilot reactor site'
+FROM relationship r JOIN fund f ON f.id=r.fund_id JOIN portfolio_company pc ON pc.id=r.portfolio_company_id
+WHERE s.relationship_id=r.id AND f.name='Day One Ventures' AND pc.name='Valar Atomics' AND s.value ILIKE '%Seed%';
+
+UPDATE signal s SET source='TradedVC',
+  source_url='https://traded.co/vc/deal/valar-atomics-closes-130-million-series-a-funding-round-led-by-snowpoint-ventures/',
+  source_title='Valar Atomics Closes $130 Million Series A Funding Round Led By Snowpoint Ventures'
+FROM relationship r JOIN fund f ON f.id=r.fund_id JOIN portfolio_company pc ON pc.id=r.portfolio_company_id
+WHERE s.relationship_id=r.id AND f.name='Snowpoint Ventures' AND pc.name='Valar Atomics' AND s.value ILIKE '%Series A%';
+
+UPDATE signal s SET source='SpaceNews',
+  source_url='https://spacenews.com/portal-space-systems-raises-50-million-to-accelerate-spacecraft-development/',
+  source_title='Portal Space Systems raises $50 million to accelerate spacecraft development'
+FROM relationship r JOIN fund f ON f.id=r.fund_id JOIN portfolio_company pc ON pc.id=r.portfolio_company_id
+WHERE s.relationship_id=r.id AND f.name='Geodesic Capital' AND pc.name='Portal Space Systems' AND s.value ILIKE '%Series A%';
+
+UPDATE signal s SET source='SpaceNews',
+  source_url='https://spacenews.com/portal-space-systems-raises-50-million-to-accelerate-spacecraft-development/',
+  source_title='Portal Space Systems raises $50 million to accelerate spacecraft development'
+FROM relationship r JOIN fund f ON f.id=r.fund_id JOIN portfolio_company pc ON pc.id=r.portfolio_company_id
+WHERE s.relationship_id=r.id AND f.name='Mach33' AND pc.name='Portal Space Systems' AND s.value ILIKE '%Series A%';
+
+UPDATE signal s SET source='PR Newswire',
+  source_url='https://www.prnewswire.com/news-releases/trimble-ventures-invests-in-civ-roboticsa-construction-tech-startup-focused-on-autonomous-surveying-solutions-301629136.html',
+  source_title='Trimble Ventures Invests in Civ Robotics'
+FROM relationship r JOIN fund f ON f.id=r.fund_id JOIN portfolio_company pc ON pc.id=r.portfolio_company_id
+WHERE s.relationship_id=r.id AND f.name='Trimble Ventures' AND pc.name='Civ Robotics' AND s.value ILIKE '%Seed%';
+
+UPDATE signal s SET source='GlobeNewswire',
+  source_url='https://www.globenewswire.com/news-release/2022/09/21/2520253/0/en/Civ-Robotics-Raises-5-Million-Seed-Funding-Round.html',
+  source_title='Civ Robotics Raises $5 Million Seed Funding Round'
+FROM relationship r JOIN fund f ON f.id=r.fund_id JOIN portfolio_company pc ON pc.id=r.portfolio_company_id
+WHERE s.relationship_id=r.id AND f.name='ff Venture Capital' AND pc.name='Civ Robotics' AND s.value ILIKE '%Seed%';
+
+UPDATE signal s SET signal_date='2025-07-01', source='The Robot Report',
+  source_url='https://www.therobotreport.com/civ-robotics-spots-series-a-funding-automated-surveying/',
+  source_title='Civ Robotics spots Series A funding for automated surveying'
+FROM relationship r JOIN fund f ON f.id=r.fund_id JOIN portfolio_company pc ON pc.id=r.portfolio_company_id
+WHERE s.relationship_id=r.id AND f.name='ff Venture Capital' AND pc.name='Civ Robotics' AND s.value ILIKE '%Series A%';
+
+UPDATE signal s SET source='SOSV',
+  source_url='https://sosv.com/haxs-renovate-robotics-closes-2-5m-pre-seed-to-automate-roofing/',
+  source_title='HAX''s Renovate Robotics closes $2.5M pre-seed to automate roofing'
+FROM relationship r JOIN fund f ON f.id=r.fund_id JOIN portfolio_company pc ON pc.id=r.portfolio_company_id
+WHERE s.relationship_id=r.id AND f.name='SOSV' AND pc.name='Renovate Robotics' AND s.value ILIKE '%Pre-Seed%';
+
+-- ─────────────────────────────────────────
+-- 9. Signal traceability defaults
 -- Keep specific source URLs only when verified. Do not use publication
 -- homepages as evidence links — they look clickable but do not prove the claim.
 -- Source title/snippet still give the UI and agent pipeline enough provenance
@@ -532,14 +694,13 @@ SET
 
 -- Avatar Robotics co-investment signals — Seed $6.01M, Jan 30 2026
 -- Source: Crunchbase. Round led by ARV, co-investors: Defy Partners, REFASHIOND Ventures.
-INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, source_url, value, weight, confidence, created_at)
+INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, value, weight, confidence, created_at)
 SELECT
   gen_random_uuid(),
   r.id,
   'co_investment',
   '2026-01-30',
   'Crunchbase',
-  'https://www.crunchbase.com/organization/avatar-robotics',
   'Seed $6.01M — Avatar Robotics warehouse robot fleet',
   'high',
   'confirmed',
@@ -569,7 +730,7 @@ SET
   );
 
 -- ─────────────────────────────────────────
--- 9. Investor market-map metadata
+-- 10. Investor market-map metadata
 -- Supports the June 11 pivot: broader deep tech investor universe with
 -- co-investors as VIP/starred nodes. Values are deliberately coarse for Demo
 -- Day query routing; precise AUM/check-size should be verified before being
@@ -635,7 +796,40 @@ SET
   profile_last_checked_at = now();
 
 -- ─────────────────────────────────────────
--- 10. Logo URLs (Google favicon service)
+-- 10b. Verified AUM tiers
+-- Researched June 14 2026 from credible public sources (firm press releases,
+-- official fund pages, SEC-registered AUM, reputable VC databases). Coarse tier +
+-- approximate figure. BOLD Capital Partners and REFASHIOND Ventures are left NULL —
+-- no clean public AUM figure was verifiable. Do not fill those without a real source.
+-- ─────────────────────────────────────────
+UPDATE fund
+SET aum_tier = CASE name
+  WHEN 'General Catalyst'           THEN 'Mega (~$43B)'
+  WHEN 'NEA'                        THEN 'Mega (~$28B)'
+  WHEN 'Founders Fund'              THEN 'Mega (~$17B)'
+  WHEN 'a16z American Dynamism'     THEN 'Mega (a16z ~$90B firm-wide)'
+  WHEN 'Eclipse Ventures'           THEN 'Mega (~$10B)'
+  WHEN 'Lux Capital'                THEN 'Large (~$7B)'
+  WHEN 'SOSV'                       THEN 'Large (~$1.5B)'
+  WHEN 'Union Square Ventures'      THEN 'Large (~$1.5B)'
+  WHEN 'Amazon Climate Pledge Fund' THEN 'Large ($2B)'
+  WHEN 'Flybridge'                  THEN 'Large (~$1B)'
+  WHEN 'Geodesic Capital'           THEN 'Large (~$1B)'
+  WHEN 'Riot Ventures'              THEN 'Large (~$1B)'
+  WHEN 'ff Venture Capital'         THEN 'Mid (~$500M)'
+  WHEN 'Cherubic Ventures'          THEN 'Mid (~$460M)'
+  WHEN 'Day One Ventures'           THEN 'Mid (~$450M)'
+  WHEN 'Defy Partners'              THEN 'Mid (~$410M)'
+  WHEN 'SineWave Ventures'          THEN 'Mid (~$300M)'
+  WHEN 'Ubiquity Ventures'          THEN 'Emerging (~$200M)'
+  WHEN 'Trimble Ventures'           THEN 'Emerging ($200M)'
+  WHEN 'Snowpoint Ventures'         THEN 'Emerging (~$185M)'
+  WHEN 'Mach33'                     THEN 'Emerging (~$14M)'
+  ELSE aum_tier
+END;
+
+-- ─────────────────────────────────────────
+-- 11. Logo URLs (Google favicon service)
 -- ─────────────────────────────────────────
 UPDATE fund
 SET logo_url = 'https://www.google.com/s2/favicons?domain=' || website || '&sz=128'
