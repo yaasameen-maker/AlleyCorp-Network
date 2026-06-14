@@ -85,6 +85,10 @@ function itemFromSignal(investor: Investor, signal: InvestorSignal, idx: number)
   };
 }
 
+// "Today Overview" is a recency surface — what changed lately, not the full history.
+// Signals older than this window are not "new" no matter how well sourced.
+const NEW_SIGNAL_WINDOW_DAYS = 180;
+
 function collectNewSignals(investors: Investor[]): OverviewItem[] {
   const items: OverviewItem[] = [];
 
@@ -101,9 +105,13 @@ function collectNewSignals(investors: Investor[]): OverviewItem[] {
     }
 
     investor.signals.forEach((signal, idx) => {
-      const sourceBacked = Boolean(signal.sourceUrl || signal.sourceTitle);
-      const recent = isRecentDate(signal.date);
-      if (sourceBacked || (recent && signal.weight === "High")) {
+      // Event/podcast/Substack signals belong to the media section — route them there,
+      // not here (otherwise section precedence would swallow them into "new signals").
+      if (isMediaSignal(signal)) return;
+      // Only genuinely recent signals count as "new".
+      if (!isRecentDate(signal.date, NEW_SIGNAL_WINDOW_DAYS)) return;
+      const notable = Boolean(signal.sourceUrl || signal.sourceTitle) || signal.weight === "High";
+      if (notable) {
         items.push(itemFromSignal(investor, signal, idx));
       }
     });
@@ -151,21 +159,17 @@ function collectRelationshipChanges(investors: Investor[]): OverviewItem[] {
 function collectDeepTechHeadlines(investors: Investor[]): OverviewItem[] {
   const items: OverviewItem[] = [];
 
+  // Per the June 11 meeting: this section is "top deep tech news headlines this week",
+  // not a list of every fund's static deep-tech attribute. So we surface only RECENT
+  // co-investment/deal activity. (A true external news feed — AlleyCorp Substack, Abe's
+  // Substack, Brannon's podcast, deep tech publications — is a later agent integration.)
   for (const investor of investors) {
-    if (investor.fund.deepTechSignal) {
-      items.push({
-        id: `${investor.id}-deeptech`,
-        investorId: investor.id,
-        headline: `${investor.fund.name} — ${investor.fund.deepTechSignal}`,
-        detail: investor.fund.stage
-          ? `Stage focus: ${investor.fund.stage}`
-          : (investor.suggestedAction ?? ""),
-        timestamp: investor.fund.profileLastCheckedAt ?? investor.lastSignalDate ?? "—",
-      });
-    }
-
     investor.signals.forEach((signal, idx) => {
-      if (signal.type === "co-investment" && !isMediaSignal(signal)) {
+      if (
+        signal.type === "co-investment" &&
+        !isMediaSignal(signal) &&
+        isRecentDate(signal.date, NEW_SIGNAL_WINDOW_DAYS)
+      ) {
         items.push(itemFromSignal(investor, signal, idx));
       }
     });

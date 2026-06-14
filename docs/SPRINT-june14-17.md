@@ -544,6 +544,12 @@ No one should keep important local-only code overnight.
 #### Michael
 
 - Finish Today Overview UI using live data where available.
+- "Deep tech headlines" section: once recency-bounded it overlaps with "New investor
+  signals" (recent deals get claimed there first). Per the June 11 notes this section is
+  meant to be "top deep tech news headlines this week" — i.e. the external news feed
+  (P1: Brannon podcast + Abe Substack sources). Until that feed lands, hold it as a
+  labeled placeholder ("pending news feed") or merge it into New investor signals so
+  there is no empty/duplicate panel. (Review finding from luba/june14-fixes.)
 - Add "VIP" or starred treatment for known co-investors.
 - Make profile cards distinguish:
   - Active relationship
