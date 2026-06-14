@@ -520,10 +520,14 @@ No one should keep important local-only code overnight.
   - stage focus
   - AUM/check-size proxy
   - geography focus
-- Add initial market investor records for the demo prompts:
-  - NY deep tech investors
-  - LA deep tech investors
-  - Series A relevant investors
+- Seed a small set of **verified example** market investor records as a demo-safe fallback —
+  NOT a hand-curated master list. The discovery agent owns finding the universe; these are
+  just a few real, source-backed seeds so the demo prompts have data if a live run hasn't run.
+  Do not hardcode geography/stage lists or build "the LA list" by hand — geography is a
+  queryable field the agent populates, not a fixed roster.
+  - a few NY deep tech investors (verified)
+  - a few LA deep tech investors (verified)
+  - a few Series A relevant investors (verified)
   - Portal Space Systems co-investors where publicly verified
 
 #### Yaasameen
@@ -631,6 +635,11 @@ No one should keep important local-only code overnight.
   - fund names and dates are correct
   - co-investor/VIP flags are correct
   - stale/warm/hot tiers make sense after recalibration
+- Tech-debt note (post-demo, do not change scoring pre-demo): `HOT_ANCHORS` in
+  `lib/scoring.ts` is a hardcoded list of always-Hot funds. It is Lauren-confirmed so it is
+  fine for the demo, but warmth calibration should not require a code edit. Post-demo, move
+  the anchor flag into the DB (e.g. a `fund.is_anchor` column or warmth override field) so
+  it is data, not code — and update the acceptance tests that key on those fund names.
 - Update docs to remove stale conflicts:
   - Neon -> Railway
   - Lux -> Trimble where applicable
