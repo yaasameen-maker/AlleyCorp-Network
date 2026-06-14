@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   canAutoPublishSource,
+  canEnrichProfile,
+  canPublishRelationshipSignal,
   confidenceFromUrl,
+  isCandidateOnlySource,
   sourceNameFromUrl,
   sourceUseFromUrl,
 } from "../lib/source-policy";
@@ -31,5 +34,36 @@ describe("source policy", () => {
     expect(sourceUseFromUrl(url)).toBe("relationship_signal");
     expect(confidenceFromUrl(url)).toBe("high");
     expect(canAutoPublishSource(url)).toBe(true);
+  });
+
+  it("treats SEC regulatory filings as high-confidence profile sources", () => {
+    const url = "https://reports.adviserinfo.sec.gov/reports/ADV/123456/PDF/123456.pdf";
+
+    expect(sourceUseFromUrl(url)).toBe("profile_enrichment");
+    expect(confidenceFromUrl(url)).toBe("high");
+    expect(sourceNameFromUrl(url)).toBe("SEC");
+    // Regulatory filings back profile fields but are not relationship signals.
+    expect(canEnrichProfile(url)).toBe(true);
+    expect(canPublishRelationshipSignal(url)).toBe(false);
+  });
+
+  it("treats open investor directories as candidate-only leads", () => {
+    const openvc = "https://openvc.app/investors/example-fund";
+    const differentFunds = "https://www.differentfunds.com/fund/example";
+
+    for (const url of [openvc, differentFunds]) {
+      expect(isCandidateOnlySource(url)).toBe(true);
+      expect(canPublishRelationshipSignal(url)).toBe(false);
+      expect(canEnrichProfile(url)).toBe(false);
+    }
+    expect(sourceNameFromUrl(openvc)).toBe("OpenVC");
+  });
+
+  it("allows medium-confidence press to enrich profiles but not publish signals", () => {
+    const url = "https://www.forbes.com/sites/example/2025/01/01/a-fund-profile/";
+
+    expect(confidenceFromUrl(url)).toBe("medium");
+    expect(canEnrichProfile(url)).toBe(true);
+    expect(canPublishRelationshipSignal(url)).toBe(false);
   });
 });
