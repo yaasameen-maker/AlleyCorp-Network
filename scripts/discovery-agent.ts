@@ -26,6 +26,7 @@
 import dotenv from "dotenv";
 dotenv.config({ override: true });
 
+import { createHash } from "crypto";
 import Exa from "exa-js";
 import Anthropic from "@anthropic-ai/sdk";
 import { pool } from "../lib/db.js";
@@ -191,14 +192,21 @@ ${pages.map((p, i) => `[${i + 1}] ${p.title}\n${p.url}\n${p.snippet}`).join("\n\
 async function upsertFund(
   name: string,
   focus: string | null,
-  website?: string
+  website?: string,
+  investorStatus = "market_prospect",
+  isVip = false
 ): Promise<string | null> {
   try {
     const { rows } = await pool.query<{ id: string }>(
       `WITH ins AS (
-         INSERT INTO fund (id, name, focus, website, logo_url, created_at, updated_at)
+         INSERT INTO fund (
+           id, name, focus, website, logo_url,
+           investor_status, is_vip, deep_tech_signal, profile_last_checked_at,
+           created_at, updated_at
+         )
          SELECT gen_random_uuid(), $1, $2, $3,
                 CASE WHEN $3 IS NOT NULL THEN $4 ELSE NULL END,
+                $5, $6, $2, now(),
                 now(), now()
          WHERE NOT EXISTS (SELECT 1 FROM fund WHERE LOWER(name) = LOWER($1))
          RETURNING id
@@ -207,7 +215,7 @@ async function upsertFund(
        UNION ALL
        SELECT id FROM fund WHERE LOWER(name) = LOWER($1)
        LIMIT 1`,
-      [name, focus, website ?? null, website ? buildLogoUrl(website) : null]
+      [name, focus, website ?? null, website ? buildLogoUrl(website) : null, investorStatus, isVip]
     );
     return rows[0]?.id ?? null;
   } catch (err) {
@@ -273,18 +281,35 @@ async function upsertSignal(
   signalDate: string,
   source: string,
   value: string,
-  weight: string
+  weight: string,
+  sourceUrl?: string,
+  sourceTitle?: string,
+  rawSnippet?: string
 ): Promise<void> {
+  const uniqueHash = createHash("sha256")
+    .update(`${relationshipId}|${signalType}|${signalDate}|${sourceUrl ?? source}|${value}`)
+    .digest("hex");
+
   try {
     await pool.query(
-      `INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, value, weight, confidence, created_at)
-       SELECT gen_random_uuid(), $1, $2, $3::date, $4, $5, $6, 'confirmed', now()
-       WHERE NOT EXISTS (
-         SELECT 1 FROM signal
-         WHERE relationship_id = $1 AND signal_type = $2
-           AND signal_date = $3::date AND source = $4
-       )`,
-      [relationshipId, signalType, signalDate, source, value, weight]
+      `INSERT INTO signal (
+         id, relationship_id, signal_type, signal_date, source, source_url,
+         source_title, raw_snippet, unique_hash, value, weight, confidence, created_at
+       )
+       VALUES (gen_random_uuid(), $1, $2, $3::date, $4, $5, $6, $7, $8, $9, $10, 'confirmed', now())
+       ON CONFLICT (unique_hash) DO NOTHING`,
+      [
+        relationshipId,
+        signalType,
+        signalDate,
+        source,
+        sourceUrl ?? null,
+        sourceTitle ?? source,
+        rawSnippet ?? value,
+        uniqueHash,
+        value,
+        weight,
+      ]
     );
   } catch (err) {
     console.error(`   ✗ upsertSignal failed: ${err}`);
@@ -360,7 +385,13 @@ async function runPortfolioScan(companies: PortfolioRow[]): Promise<void> {
 
     if (DRY_RUN) continue;
 
-    const fundId = await upsertFund(signal.fundName!, company.sector, undefined);
+    const fundId = await upsertFund(
+      signal.fundName!,
+      company.sector,
+      undefined,
+      "vip_co_investor",
+      true
+    );
     if (!fundId) continue;
 
     const context = {
@@ -391,7 +422,10 @@ async function runPortfolioScan(companies: PortfolioRow[]): Promise<void> {
       signalDate,
       raw?.sourceTitle ?? signal.sourceId,
       signal.value ?? "",
-      signal.confidence
+      signal.confidence,
+      raw?.sourceUrl,
+      raw?.sourceTitle,
+      raw?.rawSnippet ?? signal.evidenceSnippet
     );
     stats.phase1.signalsAdded++;
 
@@ -495,7 +529,13 @@ async function runNetworkExpansion(hotWarmFunds: HotWarmFund[]): Promise<void> {
 
     if (DRY_RUN) continue;
 
-    const fundId = await upsertFund(candidate.fundName, "Deep tech", undefined);
+    const fundId = await upsertFund(
+      candidate.fundName,
+      "Deep tech",
+      undefined,
+      "market_prospect",
+      false
+    );
     if (!fundId) continue;
 
     const discoveryContext = {

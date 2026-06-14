@@ -344,6 +344,30 @@ function confidenceFromUrl(url: string): "confirmed" | "inferred" | "pending" {
   return "pending";
 }
 
+function sourceNameFromUrl(url: string): string {
+  const hostname = (() => {
+    try {
+      return new URL(url).hostname.replace(/^www\./, "");
+    } catch {
+      return url;
+    }
+  })();
+
+  if (hostname.includes("techcrunch.com")) return "TechCrunch";
+  if (hostname.includes("prnewswire.com")) return "PR Newswire";
+  if (hostname.includes("businesswire.com")) return "Business Wire";
+  if (hostname.includes("crunchbase.com")) return "Crunchbase";
+  if (hostname.includes("axios.com")) return "Axios";
+  if (hostname.includes("reuters.com")) return "Reuters";
+  if (hostname.includes("bloomberg.com")) return "Bloomberg";
+  if (hostname.includes("forbes.com")) return "Forbes";
+  if (hostname.includes("wsj.com")) return "Wall Street Journal";
+  if (hostname.includes("ft.com")) return "Financial Times";
+  if (hostname.includes("cnbc.com")) return "CNBC";
+  if (hostname.includes("venturebeat.com")) return "VentureBeat";
+  return hostname;
+}
+
 // ── Step 1: Search ────────────────────────────────────────────────────────────
 
 async function searchForSignals(
@@ -480,7 +504,7 @@ async function writeSignal(s: CandidateSignal): Promise<"inserted" | "duplicate"
         s.relationshipId,
         s.signalType,
         s.signalDate,
-        s.sourceUrl,
+        sourceNameFromUrl(s.sourceUrl),
         s.value,
         s.weight,
         s.confidence,

@@ -24,6 +24,8 @@ export interface InvestorSignal {
   weight: "High" | "Medium" | "Low";
   source?: string;
   sourceUrl?: string;
+  sourceTitle?: string;
+  rawSnippet?: string;
   portfolioCompanyName?: string;
 }
 
@@ -43,7 +45,20 @@ export interface Contact {
 export interface Investor {
   id: string;
   name: string;
-  fund: { id: string; name: string; logoUrl?: string; website?: string };
+  fund: {
+    id: string;
+    name: string;
+    logoUrl?: string;
+    website?: string;
+    stage?: string;
+    hqLocation?: string;
+    geographyFocus?: string;
+    checkSizeProxy?: string;
+    deepTechSignal?: string;
+    investorStatus?: string;
+    isVip?: boolean;
+    profileLastCheckedAt?: string;
+  };
   warmthTier: WarmthTier;
   signals: InvestorSignal[];
   coInvestments: CoInvestment[];
@@ -147,6 +162,8 @@ export function groupByFund(relationships: Relationship[]): Investor[] {
       weight: capitalize(s.weight),
       source: s.source,
       sourceUrl: s.sourceUrl ?? undefined,
+      sourceTitle: s.sourceTitle ?? undefined,
+      rawSnippet: s.rawSnippet ?? undefined,
       portfolioCompanyName: r.portfolioCompany?.name,
     }));
 
@@ -159,6 +176,14 @@ export function groupByFund(relationships: Relationship[]): Investor[] {
           name: r.fund?.name ?? "",
           logoUrl: r.fund?.logoUrl,
           website: r.fund?.website,
+          stage: r.fund?.stage,
+          hqLocation: r.fund?.hqLocation,
+          geographyFocus: r.fund?.geographyFocus,
+          checkSizeProxy: r.fund?.checkSizeProxy,
+          deepTechSignal: r.fund?.deepTechSignal,
+          investorStatus: r.fund?.investorStatus,
+          isVip: r.fund?.isVip,
+          profileLastCheckedAt: r.fund?.profileLastCheckedAt,
         },
         warmthTier: toWarmthTier(r.warmthTier),
         lastSignalDate: r.lastSignalDate ? formatDate(r.lastSignalDate) : undefined,

@@ -29,7 +29,15 @@ const REL_SELECT = `
       'aumTier',         f.aum_tier,
       'emergingManager', f.emerging_manager,
       'website',         f.website,
-      'logoUrl',         f.logo_url
+      'logoUrl',         f.logo_url,
+      'stage',           f.stage,
+      'hqLocation',      f.hq_location,
+      'geographyFocus',  f.geography_focus,
+      'checkSizeProxy',  f.check_size_proxy,
+      'deepTechSignal',  f.deep_tech_signal,
+      'investorStatus',  f.investor_status,
+      'isVip',           f.is_vip,
+      'profileLastCheckedAt', to_char(f.profile_last_checked_at, 'YYYY-MM-DD')
     ) AS fund,
     (
       SELECT json_build_object(
@@ -60,6 +68,9 @@ const REL_SELECT = `
           'date',           to_char(s.signal_date, 'YYYY-MM-DD'),
           'source',         s.source,
           'sourceUrl',      s.source_url,
+          'sourceTitle',    s.source_title,
+          'rawSnippet',     s.raw_snippet,
+          'uniqueHash',     s.unique_hash,
           'value',          s.value,
           'weight',         s.weight,
           'confidence',     s.confidence
@@ -148,6 +159,9 @@ export async function getWarmthSignals(investorId: string): Promise<Signal[]> {
        to_char(signal_date, 'YYYY-MM-DD')   AS date,
        source,
        source_url                           AS "sourceUrl",
+       source_title                         AS "sourceTitle",
+       raw_snippet                          AS "rawSnippet",
+       unique_hash                          AS "uniqueHash",
        value,
        weight,
        confidence
@@ -168,6 +182,9 @@ export async function getRecentSignals(limit = 20): Promise<Signal[]> {
        to_char(signal_date, 'YYYY-MM-DD')   AS date,
        source,
        source_url                           AS "sourceUrl",
+       source_title                         AS "sourceTitle",
+       raw_snippet                          AS "rawSnippet",
+       unique_hash                          AS "uniqueHash",
        value,
        weight,
        confidence
