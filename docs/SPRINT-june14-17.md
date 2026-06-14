@@ -36,24 +36,24 @@ The north star is not an email digest or a static dashboard. It is a daily-updat
 
 ### P0 — Must Finish By June 17
 
-| Priority | Workstream | Owner | Outcome |
-| --- | --- | --- | --- |
-| P0 | Today Overview centerpiece | Michael + Luba | The main demo surface: what changed, what matters, and where Abe/Brannon should look today. |
-| P0 | Evidence-gated Daily Intelligence Pipeline | Yaasameen + Luba | The system can discover investors, enrich profiles, monitor signals, and publish only high-confidence evidence. |
-| P0 | Source traceability | Luba | Every published signal has source URL, title/snippet when available, date, signal type, and confidence. |
-| P0 | Broader investor schema | Luba | Investor/fund profiles support location, AUM/check-size proxy, stage, geography, deep tech signal, and VIP/co-investor flag. |
-| P0 | Investor discovery/enrichment | Luba + Yaasameen | Discover and enrich deep tech investors beyond known co-investors; mark them as market prospects unless already known/VIP. |
-| P0 | Obvious search + query readiness | Michael + Yaasameen | Search is visible and chatbot can answer the three AlleyCorp query types from the meeting. |
-| P0 | Safety fixes from review | Yaasameen + Luba | Warmth tier normalization, scheduled write guardrails, and minimum app auth before sharing externally. |
+| Priority | Workstream                                 | Owner               | Outcome                                                                                                                      |
+| -------- | ------------------------------------------ | ------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| P0       | Today Overview centerpiece                 | Michael + Luba      | The main demo surface: what changed, what matters, and where Abe/Brannon should look today.                                  |
+| P0       | Evidence-gated Daily Intelligence Pipeline | Yaasameen + Luba    | The system can discover investors, enrich profiles, monitor signals, and publish only high-confidence evidence.              |
+| P0       | Source traceability                        | Luba                | Every published signal has source URL, title/snippet when available, date, signal type, and confidence.                      |
+| P0       | Broader investor schema                    | Luba                | Investor/fund profiles support location, AUM/check-size proxy, stage, geography, deep tech signal, and VIP/co-investor flag. |
+| P0       | Investor discovery/enrichment              | Luba + Yaasameen    | Discover and enrich deep tech investors beyond known co-investors; mark them as market prospects unless already known/VIP.   |
+| P0       | Obvious search + query readiness           | Michael + Yaasameen | Search is visible and chatbot can answer the three AlleyCorp query types from the meeting.                                   |
+| P0       | Safety fixes from review                   | Yaasameen + Luba    | Warmth tier normalization, scheduled write guardrails, and minimum app auth before sharing externally.                       |
 
 ### P1 — Finish If P0 Is Stable
 
-| Priority | Workstream | Owner | Outcome |
-| --- | --- | --- | --- |
-| P1 | Portal Space Systems co-investor expansion | Luba + Agent | Expand beyond Mach33 and Geodesic using public sources and mark verified evidence. |
-| P1 | Brannon podcast + Abe Substack sources | Yaasameen | Add these as monitored signal sources for the Daily Intelligence Pipeline. |
-| P1 | Profile evidence grouping | Michael | Group signals by portfolio company / source type so profiles are easier to verify. |
-| P1 | Latency tightening | Yaasameen | Acceptance prompts trend closer to demo-safe timing; document any unavoidable target change. |
+| Priority | Workstream                                 | Owner        | Outcome                                                                                      |
+| -------- | ------------------------------------------ | ------------ | -------------------------------------------------------------------------------------------- |
+| P1       | Portal Space Systems co-investor expansion | Luba + Agent | Expand beyond Mach33 and Geodesic using public sources and mark verified evidence.           |
+| P1       | Brannon podcast + Abe Substack sources     | Yaasameen    | Add these as monitored signal sources for the Daily Intelligence Pipeline.                   |
+| P1       | Profile evidence grouping                  | Michael      | Group signals by portfolio company / source type so profiles are easier to verify.           |
+| P1       | Latency tightening                         | Yaasameen    | Acceptance prompts trend closer to demo-safe timing; document any unavoidable target change. |
 
 ### P2 — Defer To Polish Or Post-Demo
 
@@ -110,11 +110,11 @@ For this sprint, verification should stay practical:
 
 ### Confidence Policy
 
-| Confidence | Product Behavior |
-| --- | --- |
-| High | Auto-publish to dashboard, affects warmth/scoring, appears in Today Overview. |
-| Medium | Store as candidate or publish with "Needs verification" badge; does not strongly affect warmth. |
-| Low | Do not show in main UI and do not affect warmth. Keep in run report for debugging. |
+| Confidence | Product Behavior                                                                                |
+| ---------- | ----------------------------------------------------------------------------------------------- |
+| High       | Auto-publish to dashboard, affects warmth/scoring, appears in Today Overview.                   |
+| Medium     | Store as candidate or publish with "Needs verification" badge; does not strongly affect warmth. |
+| Low        | Do not show in main UI and do not affect warmth. Keep in run report for debugging.              |
 
 ### Loop State File
 
@@ -136,13 +136,13 @@ Each run should write a report to `data/agent-runs/YYYY-MM-DD.md` or equivalent 
 
 No demo should depend on a live agent run working perfectly in real time.
 
-| Area | Fallback |
-| --- | --- |
-| Daily Intelligence Pipeline | Can run manually from the command line if GitHub Actions fails. |
-| Today Overview | Can render from the latest successful saved run report or seeded relationship updates. |
-| Query layer | Can answer from seeded investor metadata if live discovery has not produced new data. |
-| Investor discovery | New market prospects can be seeded from verified public sources if automated discovery misses them. |
-| Source evidence | If a source URL is not available, the signal must be clearly marked manual/internal and should not be presented as agent-verified. |
+| Area                        | Fallback                                                                                                                           |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Daily Intelligence Pipeline | Can run manually from the command line if GitHub Actions fails.                                                                    |
+| Today Overview              | Can render from the latest successful saved run report or seeded relationship updates.                                             |
+| Query layer                 | Can answer from seeded investor metadata if live discovery has not produced new data.                                              |
+| Investor discovery          | New market prospects can be seeded from verified public sources if automated discovery misses them.                                |
+| Source evidence             | If a source URL is not available, the signal must be clearly marked manual/internal and should not be presented as agent-verified. |
 
 ---
 
@@ -152,24 +152,24 @@ Do cleanup only where it reduces demo risk or makes the Daily Intelligence Pipel
 
 ### Cleanup Timing
 
-| Timing | Cleanup Type | Why |
-| --- | --- | --- |
-| Sunday | Risk cleanup | Fix the paths that can produce wrong or untrusted data before more pipeline work lands. |
-| Tuesday | Query/API cleanup | Align `/api/ask`, `/api/chat`, and MCP behavior while adding the new meeting-driven prompts. |
-| Wednesday | Verification cleanup | Remove stale docs/product language and fix only issues found during build/test/demo QA. |
+| Timing    | Cleanup Type         | Why                                                                                          |
+| --------- | -------------------- | -------------------------------------------------------------------------------------------- |
+| Sunday    | Risk cleanup         | Fix the paths that can produce wrong or untrusted data before more pipeline work lands.      |
+| Tuesday   | Query/API cleanup    | Align `/api/ask`, `/api/chat`, and MCP behavior while adding the new meeting-driven prompts. |
+| Wednesday | Verification cleanup | Remove stale docs/product language and fix only issues found during build/test/demo QA.      |
 
 ### Required Cleanup
 
-| Area | Owner | When | Done Means |
-| --- | --- | --- | --- |
-| Agent write path | Yaasameen | Sunday-Monday | Discovery candidates pass through the verification gate before live DB writes. |
-| Scheduled workflows | Yaasameen | Sunday | GitHub Actions cannot write unverified raw discoveries directly to Railway. |
-| Schema/migrations | Luba | Sunday | Source evidence fields are in the canonical schema/migration path. |
-| Warmth tier shape | Yaasameen | Sunday | DB/API/MCP callers use one normalized warmth tier format. |
-| Source evidence | Luba | Sunday-Wednesday | Published signals have source URL/title/snippet where available. |
-| API/MCP duplication | Yaasameen | Tuesday | Ask/chat/MCP responses are normalized through shared logic or matching formatters. |
-| Digest naming | Michael + Luba | Sunday-Wednesday | Product UI says Today Overview, not email digest, except in old archived docs. |
-| Docs cleanup | Luba | Wednesday | Neon/Lux/digest-first conflicts are removed from current handoff/sprint docs. |
+| Area                | Owner          | When             | Done Means                                                                         |
+| ------------------- | -------------- | ---------------- | ---------------------------------------------------------------------------------- |
+| Agent write path    | Yaasameen      | Sunday-Monday    | Discovery candidates pass through the verification gate before live DB writes.     |
+| Scheduled workflows | Yaasameen      | Sunday           | GitHub Actions cannot write unverified raw discoveries directly to Railway.        |
+| Schema/migrations   | Luba           | Sunday           | Source evidence fields are in the canonical schema/migration path.                 |
+| Warmth tier shape   | Yaasameen      | Sunday           | DB/API/MCP callers use one normalized warmth tier format.                          |
+| Source evidence     | Luba           | Sunday-Wednesday | Published signals have source URL/title/snippet where available.                   |
+| API/MCP duplication | Yaasameen      | Tuesday          | Ask/chat/MCP responses are normalized through shared logic or matching formatters. |
+| Digest naming       | Michael + Luba | Sunday-Wednesday | Product UI says Today Overview, not email digest, except in old archived docs.     |
+| Docs cleanup        | Luba           | Wednesday        | Neon/Lux/digest-first conflicts are removed from current handoff/sprint docs.      |
 
 ### Explicit Non-Goals
 
