@@ -44,13 +44,29 @@ function SectionBlock({
         <div className="bg-white rounded border border-[#E5E7EB] divide-y divide-[#F3F4F6]">
           {items.map((item) => {
             const investor = investors.find((i) => i.id === item.investorId);
+            const clickable = Boolean(investor && onSelectInvestor);
+            const select = () => investor && onSelectInvestor?.(investor);
+            // Row is a div (not a button) so the "Source" <a> can live inside it —
+            // an <a> nested in a <button> is invalid HTML and warns in React.
             return (
-              <button
+              <div
                 key={item.id}
-                type="button"
-                onClick={() => investor && onSelectInvestor?.(investor)}
-                disabled={!investor || !onSelectInvestor}
-                className="w-full text-left px-4 py-3 hover:bg-[#F8F7F4] transition-colors disabled:cursor-default disabled:hover:bg-white"
+                role={clickable ? "button" : undefined}
+                tabIndex={clickable ? 0 : undefined}
+                onClick={clickable ? select : undefined}
+                onKeyDown={
+                  clickable
+                    ? (e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          select();
+                        }
+                      }
+                    : undefined
+                }
+                className={`px-4 py-3 transition-colors ${
+                  clickable ? "cursor-pointer hover:bg-[#F8F7F4]" : ""
+                }`}
               >
                 <p className="text-sm font-semibold text-[#0D1320] leading-snug">{item.headline}</p>
                 {item.detail ? (
@@ -62,15 +78,19 @@ function SectionBlock({
                   {item.sourceUrl ? (
                     <>
                       {" · "}
-                      <span className="text-[#0EA5D6]" onClick={(e) => e.stopPropagation()}>
-                        <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer">
-                          Source
-                        </a>
-                      </span>
+                      <a
+                        href={item.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-[#0EA5D6]"
+                      >
+                        Source
+                      </a>
                     </>
                   ) : null}
                 </p>
-              </button>
+              </div>
             );
           })}
         </div>

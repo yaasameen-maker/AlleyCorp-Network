@@ -20,12 +20,10 @@ export function matchesInvestorSearch(investor: Investor, query: string): boolea
     return true;
   }
 
-  if (
-    investor.signals.some(
-      (s) =>
-        s.portfolioCompanyName?.toLowerCase().includes(q) || s.description.toLowerCase().includes(q)
-    )
-  ) {
+  // Match the portfolio company named on a signal, but NOT free-text signal descriptions —
+  // matching descriptions surfaced unrelated funds (e.g. searching "Mach33" returned Geodesic
+  // because its signal text reads "co-lead alongside Mach33"). Keep results to structured fields.
+  if (investor.signals.some((s) => s.portfolioCompanyName?.toLowerCase().includes(q))) {
     return true;
   }
 

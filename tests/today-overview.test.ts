@@ -23,10 +23,15 @@ describe("buildTodayOverview", () => {
     });
   });
 
-  it("includes relationship changes for stale investors", () => {
+  it("surfaces a relationship-change item for every stale investor", () => {
+    // Contract-based: do not hardcode fund names — tiers change as data is updated.
     const overview = buildTodayOverview(mockInvestors);
     const rel = overview.sections.find((s) => s.id === "relationship-changes");
-    expect(rel?.items.some((i) => i.headline.includes("Trimble Ventures"))).toBe(true);
+    const staleInvestors = mockInvestors.filter((i) => i.warmthTier === "Stale");
+
+    for (const investor of staleInvestors) {
+      expect(rel?.items.some((item) => item.investorId === investor.id)).toBe(true);
+    }
   });
 });
 
