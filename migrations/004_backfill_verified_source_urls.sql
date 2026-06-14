@@ -5,6 +5,19 @@
 
 BEGIN;
 
+-- Remove the unverified General Catalyst + Eyebot SEED signal.
+-- Verified sources (PRWeb/TechCrunch) show the Jun 2024 seed was led by AlleyCorp +
+-- Ubiquity Ventures; General Catalyst first invested at the Aug 2025 Series A.
+DELETE FROM signal s
+USING relationship r, fund f, portfolio_company pc
+WHERE s.relationship_id = r.id
+  AND f.id = r.fund_id
+  AND pc.id = r.portfolio_company_id
+  AND f.name = 'General Catalyst'
+  AND pc.name = 'Eyebot'
+  AND s.signal_date = '2024-06-01'
+  AND s.value ILIKE '%Seed%';
+
 UPDATE signal
 SET source_url = NULL
 WHERE source = 'AlleyCorp Substack'

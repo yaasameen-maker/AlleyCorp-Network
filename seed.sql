@@ -99,7 +99,7 @@ SELECT
   'hot',
   now(), now();
 
--- General Catalyst + Eyebot · hot (led Series A Aug 2025; co-led Seed Jun 2024)
+-- General Catalyst + Eyebot · hot (led Series A Aug 2025; GC was NOT in the Jun 2024 seed)
 INSERT INTO relationship (id, fund_id, portfolio_company_id, warmth_tier, last_signal_date, created_at, updated_at)
 SELECT
   gen_random_uuid(),
@@ -202,22 +202,10 @@ JOIN fund f              ON f.id  = r.fund_id
 JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
 WHERE f.name = 'Snowpoint Ventures' AND pc.name = 'Valar Atomics';
 
--- General Catalyst + Eyebot: co-lead Seed Jun 2024
-INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, value, weight, confidence, created_at)
-SELECT
-  gen_random_uuid(),
-  r.id,
-  'co_investment',
-  '2024-06-01',
-  'PRWeb',
-  'Seed $6M · Jun 2024 · co-lead with AlleyCorp and Ubiquity Ventures',
-  'high',
-  'confirmed',
-  now()
-FROM relationship r
-JOIN fund f              ON f.id  = r.fund_id
-JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
-WHERE f.name = 'General Catalyst' AND pc.name = 'Eyebot';
+-- General Catalyst + Eyebot SEED signal intentionally omitted.
+-- Verified Jun 2024 seed was led by AlleyCorp + Ubiquity Ventures (PRWeb/TechCrunch);
+-- General Catalyst did not participate until the Aug 2025 Series A. Do not re-add a
+-- GC seed signal without a source that explicitly names GC in the seed round.
 
 -- General Catalyst + Eyebot: led Series A Aug 2025
 INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, value, weight, confidence, created_at)
