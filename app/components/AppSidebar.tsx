@@ -13,8 +13,8 @@ interface AppSidebarProps {
   filterTier: WarmthTier | "All";
   onFilterTierChange: (tier: WarmthTier | "All") => void;
   tierCounts: Record<WarmthTier | "All", number>;
-  activeView: "briefing" | "digest";
-  onViewChange: (view: "briefing" | "digest") => void;
+  activeView: "briefing" | "overview";
+  onViewChange: (view: "briefing" | "overview") => void;
   onAskOpen: () => void;
 }
 
@@ -189,14 +189,14 @@ export function AppSidebar({
 
         <button
           type="button"
-          onClick={() => onViewChange(activeView === "digest" ? "briefing" : "digest")}
+          onClick={() => onViewChange(activeView === "overview" ? "briefing" : "overview")}
           className={`w-full text-left px-3 py-1.5 rounded text-[11px] transition-colors ${
-            activeView === "digest"
+            activeView === "overview"
               ? "text-[#0EA5D6] bg-[#F0F9FF]"
               : "text-[#9CA3AF] hover:text-[#0D1320] hover:bg-[#F7F8FA]"
           }`}
         >
-          Email Digest
+          Today Overview
         </button>
         <a
           href="/portfolio"

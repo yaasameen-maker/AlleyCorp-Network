@@ -108,7 +108,7 @@ export function MobileNavTools({
           <button
             type="button"
             onClick={onOpenDigest}
-            aria-label="Email digest"
+            aria-label="Today Overview"
             className="touch-target touch-press flex items-center justify-center w-11 h-11 rounded-2xl border border-line bg-mist text-ink md:w-auto md:h-auto md:px-3 md:py-2 md:gap-1.5 md:rounded-xl md:text-xs md:font-medium"
           >
             <svg
@@ -125,7 +125,7 @@ export function MobileNavTools({
                 d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
               />
             </svg>
-            <span className="hidden md:inline">Digest</span>
+            <span className="hidden md:inline">Today Overview</span>
           </button>
         </div>
       </div>
