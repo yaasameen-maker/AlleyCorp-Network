@@ -184,6 +184,23 @@ For this sprint, verification should stay practical:
 
 Agents must not treat search results, inferred URLs, or model output as verified evidence by themselves.
 
+> **Implemented helpers (use these, do not re-derive):** `lib/source-policy.ts` already
+> encodes this policy. The verification gate should call:
+>
+> - `canPublishRelationshipSignal(url)` — true only for credible news / AlleyCorp
+>   relationship sources at high confidence; **rejects candidate-only and profile-only
+>   sources** (this is the gate for writing a live co-investment/relationship signal).
+> - `isCandidateOnlySource(url)` — true for open directories (Crunchbase, PitchBook,
+>   OpenVC, DifferentFunds, Notion/Coda, public Sheets). Treat as a lead, never publish.
+> - `canEnrichProfile(url)` — true for sources allowed to back a profile field
+>   (regulatory filings, fund-owned pages, credible press); excludes candidate-only.
+> - `sourceUseFromUrl` / `confidenceFromUrl` / `sourceNameFromUrl` — classification + naming.
+>
+> Already wired: `ingest-signals.ts` (confidence + source name) and `substackAdapter.ts`
+> (drops candidate-only at discovery input). **Not yet wired:** the write gate in the
+> discovery/ingest path and the staging→accept verification layer (Yaasameen, Agent write
+> path). The "source names both fund and company" rule is still done manually today.
+
 #### Verified Source Rules
 
 A source can be published only when:
