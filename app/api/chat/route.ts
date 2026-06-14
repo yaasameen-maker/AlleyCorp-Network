@@ -30,14 +30,14 @@ const TOOLS: Anthropic.Tool[] = [
   {
     name: "search_relationships",
     description:
-      "Search the co-investor network by warmth tier, sector, fund name, or portfolio company. Returns matching relationships with warmth tier and signal evidence. Use this for broad network questions (e.g. 'Who are our warmest relationships in deep tech right now?', 'Which funds have we co-invested with in robotics?', 'Are there top deep tech funds we haven't worked with yet?').",
+      "Search the AlleyCorp deep tech investor universe by warmth tier, sector, fund name, portfolio company, or market-prospect status. Returns matching relationships with warmth tier and signal evidence. Use this for broad network questions (e.g. 'Who are our warmest relationships in deep tech right now?', 'Which funds have we co-invested with in robotics?', 'Are there top deep tech funds we haven't co-invested with yet?').",
     input_schema: {
       type: "object",
       properties: {
         query: {
           type: "string",
           description:
-            "Search query — can include warmth tier (Hot, Warm, Stale, Cold), sector (robotics, biotech, space), fund name, or portfolio company name",
+            "Search query — can include warmth tier (Hot, Warm, Stale, Cold), sector (robotics, biotech, space), fund name, portfolio company name, or prospect/no co-investment intent",
         },
       },
       required: ["query"],
@@ -70,9 +70,9 @@ const TOOLS: Anthropic.Tool[] = [
   },
 ];
 
-const SYSTEM = `You are the AlleyCorp relationship intelligence assistant. You help the AlleyCorp Deep Tech investment team understand their co-investor network.
+const SYSTEM = `You are the AlleyCorp relationship intelligence assistant. You help the AlleyCorp Deep Tech investment team understand their investor universe.
 
-Use the available tools to answer questions about co-investors, warmth tiers, signals, and relationship health. Always ground your answers in data from the tools — do not fabricate fund names, tiers, or relationship history.
+Use the available tools to answer questions about co-investors, market prospects, warmth tiers, signals, and relationship health. Always ground your answers in data from the tools — do not fabricate fund names, tiers, or relationship history.
 
 When a user asks about a specific fund, call get_investor first. If they ask a broad question about the network, use search_relationships. For reconnection or at-risk relationship questions, use list_stale_relationships.
 
@@ -130,7 +130,7 @@ async function runTool(name: string, input: Record<string, unknown>): Promise<st
 
       const entries = rels.map(
         (r) =>
-          `• **${r.fund?.name ?? "Unknown fund"}** — ${r.warmthTier} — ${r.portfolioCompany?.name ?? "Unknown company"} — ${r.signals?.length ?? 0} signal(s)`
+          `• **${r.fund?.name ?? "Unknown fund"}** — ${r.warmthTier} — ${r.portfolioCompany?.name ?? "No co-investment on record"}${r.portfolioCompany ? "" : " — target/prospect"} — ${r.signals?.length ?? 0} signal(s)`
       );
 
       return [`**Results for "${input.query}" (${rels.length} found)**`, "", ...entries].join("\n");

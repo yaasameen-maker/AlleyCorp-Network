@@ -17,6 +17,10 @@ import Exa from "exa-js";
 import Anthropic from "@anthropic-ai/sdk";
 import { createHash } from "crypto";
 import { pool } from "../lib/db.js";
+import {
+  confidenceFromUrl as sourcePolicyConfidenceFromUrl,
+  sourceNameFromUrl,
+} from "../lib/source-policy.js";
 
 const DRY_RUN = !process.argv.includes("--write");
 const exa = new Exa(process.env.EXA_API_KEY!);
@@ -320,52 +324,11 @@ const EXTRACT_TOOL: Anthropic.Tool = {
 // ── Priority 4: Source-based confidence ──────────────────────────────────────
 // Derived automatically from URL — not left to Claude's judgment.
 
-const HIGH_CONFIDENCE_DOMAINS = [
-  "techcrunch.com",
-  "bloomberg.com",
-  "prnewswire.com",
-  "businesswire.com",
-  "axios.com",
-  "reuters.com",
-  "venturebeat.com",
-];
-const MEDIUM_CONFIDENCE_DOMAINS = [
-  "crunchbase.com",
-  "news.crunchbase.com",
-  "forbes.com",
-  "wsj.com",
-  "ft.com",
-  "cnbc.com",
-];
-
 function confidenceFromUrl(url: string): "confirmed" | "inferred" | "pending" {
-  if (HIGH_CONFIDENCE_DOMAINS.some((d) => url.includes(d))) return "confirmed";
-  if (MEDIUM_CONFIDENCE_DOMAINS.some((d) => url.includes(d))) return "inferred";
+  const confidence = sourcePolicyConfidenceFromUrl(url);
+  if (confidence === "high") return "confirmed";
+  if (confidence === "medium") return "inferred";
   return "pending";
-}
-
-function sourceNameFromUrl(url: string): string {
-  const hostname = (() => {
-    try {
-      return new URL(url).hostname.replace(/^www\./, "");
-    } catch {
-      return url;
-    }
-  })();
-
-  if (hostname.includes("techcrunch.com")) return "TechCrunch";
-  if (hostname.includes("prnewswire.com")) return "PR Newswire";
-  if (hostname.includes("businesswire.com")) return "Business Wire";
-  if (hostname.includes("crunchbase.com")) return "Crunchbase";
-  if (hostname.includes("axios.com")) return "Axios";
-  if (hostname.includes("reuters.com")) return "Reuters";
-  if (hostname.includes("bloomberg.com")) return "Bloomberg";
-  if (hostname.includes("forbes.com")) return "Forbes";
-  if (hostname.includes("wsj.com")) return "Wall Street Journal";
-  if (hostname.includes("ft.com")) return "Financial Times";
-  if (hostname.includes("cnbc.com")) return "CNBC";
-  if (hostname.includes("venturebeat.com")) return "VentureBeat";
-  return hostname;
 }
 
 // ── Step 1: Search ────────────────────────────────────────────────────────────

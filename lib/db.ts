@@ -98,9 +98,75 @@ export async function getInvestorByName(name: string): Promise<Relationship | nu
   return (rows[0] as Relationship) ?? null;
 }
 
-// Search relationships by fund name, fund focus, portfolio company name, sector, or warmth tier.
+function isProspectSearch(query: string): boolean {
+  const normalized = query.toLowerCase();
+  return (
+    normalized.includes("haven't co-invested") ||
+    normalized.includes("have not co-invested") ||
+    normalized.includes("no co-investment") ||
+    normalized.includes("not co-invested") ||
+    normalized.includes("haven't worked with") ||
+    normalized.includes("prospect") ||
+    normalized.includes("market") ||
+    normalized.includes("target")
+  );
+}
+
+function isWarmRelationshipSearch(query: string): boolean {
+  const normalized = query.toLowerCase();
+  return (
+    normalized.includes("warmest") ||
+    normalized.includes("strongest") ||
+    normalized.includes("hottest") ||
+    normalized.includes("best relationship") ||
+    (normalized.includes("deep tech") && normalized.includes("relationship"))
+  );
+}
+
+// Search relationships by fund name, fund focus, portfolio company name, sector, warmth tier,
+// or the broader market-prospect class introduced after the June 11 AlleyCorp pivot.
 // Signals are not loaded here — callers only need the count (r.signals?.length).
 export async function searchRelationships(query: string): Promise<Relationship[]> {
+  if (isWarmRelationshipSearch(query)) {
+    const { rows } = await pool.query(
+      `${REL_SELECT}
+       WHERE f.focus ILIKE '%deep%'
+          OR f.deep_tech_signal IS NOT NULL
+       GROUP BY r.id, f.id, pc.id
+       ORDER BY
+         CASE r.warmth_tier
+           WHEN 'hot'   THEN 1
+           WHEN 'warm'  THEN 2
+           WHEN 'stale' THEN 3
+           WHEN 'cold'  THEN 4
+           ELSE 5
+         END,
+         r.last_signal_date DESC NULLS LAST,
+         f.name`
+    );
+    return rows as Relationship[];
+  }
+
+  if (isProspectSearch(query)) {
+    const { rows } = await pool.query(
+      `${REL_SELECT}
+       WHERE r.portfolio_company_id IS NULL
+          OR f.investor_status = 'market_prospect'
+       GROUP BY r.id, f.id, pc.id
+       ORDER BY
+         COALESCE(f.is_vip, false) DESC,
+         CASE r.warmth_tier
+           WHEN 'hot'   THEN 1
+           WHEN 'warm'  THEN 2
+           WHEN 'stale' THEN 3
+           WHEN 'cold'  THEN 4
+           ELSE 5
+         END,
+         f.name`
+    );
+    return rows as Relationship[];
+  }
+
   const param = `%${query}%`;
   const { rows } = await pool.query(
     `${REL_SELECT}

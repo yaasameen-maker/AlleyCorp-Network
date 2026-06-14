@@ -98,6 +98,78 @@ portfolio companies + known funds + market watchlist
   -> save run report
 ```
 
+### Agent Architecture & Data Flow
+
+The pipeline starts from the investor universe:
+
+- known co-investors
+- VIP relationships
+- AlleyCorp portfolio companies
+- broader deep tech market prospects
+
+#### 1. Discovery Agent
+
+Responsibility:
+
+- find new investor signals
+- discover new deep tech investors entering the market
+- identify potential co-investors
+- surface relevant podcast, publication, event, and newsletter signals
+
+Write permission:
+
+- produces candidate investors and candidate signals only
+- writes to candidate storage, staging tables, or run reports
+- does not write directly to live `relationship`, `signal`, or scoring state
+
+#### 2. Enrichment Agent
+
+Responsibility:
+
+- enrich investor profiles using public information
+- propose team location, AUM/AUM tier, stage focus, geography focus, portfolio references, deep tech evidence, and check-size proxy
+- attach source evidence and confidence to proposed profile updates
+
+Write permission:
+
+- may write proposed profile updates with evidence and confidence
+- does not publish relationship signals
+- does not alter warmth tier or relationship state
+
+#### 3. Verification Layer
+
+Responsibility:
+
+- decide whether a candidate is trustworthy enough to enter the product
+- classify each candidate as `Accepted`, `Needs Verification`, or `Rejected`
+
+Only `Accepted` signals can affect investor profiles, relationships, warmth scoring, or Today Overview.
+
+#### 4. Scoring And Relationship Engine
+
+Responsibility:
+
+- update warmth tiers
+- update relationship freshness
+- aggregate signals
+- preserve VIP/co-investor status
+
+Scoring stays deterministic and explainable. The system should provide trustworthy investor intelligence, not opaque AI-generated relationship scores.
+
+#### 5. Today Overview And Query Layer
+
+Responsibility:
+
+- consume accepted signals only
+- show newly discovered investors, relationship updates, podcast/publication mentions, deep tech news, and notable co-investor activity
+- answer meeting-driven queries from accepted data and seeded investor metadata
+
+Unverified signals must not appear in Today Overview.
+
+Critical rule:
+
+> Discovery and enrichment agents do not write directly to live relationship tables. Only verified and accepted signals may affect investor profiles, relationship records, warmth scoring, or content shown in Today Overview.
+
 ### Verification Gate
 
 For this sprint, verification should stay practical:
@@ -107,6 +179,53 @@ For this sprint, verification should stay practical:
 - signal is not a duplicate
 - date is reasonable
 - confidence is high enough to publish
+
+### Source Policy For Scrapers And Agents
+
+Agents must not treat search results, inferred URLs, or model output as verified evidence by themselves.
+
+#### Verified Source Rules
+
+A source can be published only when:
+
+- the page is directly accessible or the source text is captured in the run report
+- the source explicitly names the relevant investor/fund
+- the source explicitly names the company/person/event/publication signal
+- the source supports the date, round, role, or claim being written
+- the run stores source URL, source title, snippet, retrieved date, and confidence
+
+Do not publish:
+
+- publication homepages
+- inferred profile URLs
+- search-result-only claims without saved source text
+- paywalled/member-only data that the team cannot access later
+- AI-extracted facts without the underlying source evidence
+
+#### Crunchbase Rule
+
+Crunchbase can be used only if the team has access to the specific page/data being cited and the run stores evidence from that page. Without membership/API access, Crunchbase should be treated as a lead for follow-up research, not as a verified source URL.
+
+#### Investor Profile Sources
+
+For broad deep tech investor profiles, agents should prioritize:
+
+| Field              | Preferred Sources                                                                                               |
+| ------------------ | --------------------------------------------------------------------------------------------------------------- |
+| Website            | fund website, firm LinkedIn page, SEC/IAPD listing                                                              |
+| Team location      | fund website team/contact page, SEC/IAPD, LinkedIn public pages                                                 |
+| AUM / AUM tier     | SEC IAPD / Form ADV when available, fund website, credible press                                                |
+| Portfolio          | fund website portfolio page, fund announcements, company press releases                                         |
+| Stage focus        | fund website, fund thesis pages, credible interviews/press                                                      |
+| Geography focus    | fund website, thesis pages, portfolio concentration, public filings                                             |
+| Check-size proxy   | fund website, AUM tier, fund size, stage focus, credible interviews                                             |
+| Deep tech evidence | fund portfolio, fund thesis, AlleyCorp Substack, Abe Substack, Brannon podcast, credible deep tech publications |
+
+SEC IAPD / Form ADV and EDGAR should be used when applicable because they are public regulatory sources. Not every VC fund will have useful filings, so fund websites and source-backed press remain important.
+
+#### Substack / Podcast Rule
+
+AlleyCorp Substack, Abe Murray's Substack, and Brannon Jones's podcast are high-value relationship signal sources because they reflect AlleyCorp-specific context. They still need exact post/episode URLs and snippets before appearing as verified evidence.
 
 ### Confidence Policy
 
@@ -128,6 +247,7 @@ Each run should write a report to `data/agent-runs/YYYY-MM-DD.md` or equivalent 
 - Quarantined signals
 - Rejected signals with reasons
 - Recalibration summary
+- Changes made during the run
 - Errors and skipped targets
 
 ---
@@ -143,6 +263,10 @@ No demo should depend on a live agent run working perfectly in real time.
 | Query layer                 | Can answer from seeded investor metadata if live discovery has not produced new data.                                              |
 | Investor discovery          | New market prospects can be seeded from verified public sources if automated discovery misses them.                                |
 | Source evidence             | If a source URL is not available, the signal must be clearly marked manual/internal and should not be presented as agent-verified. |
+
+Demo Day safety rule:
+
+> The demo should show trustworthy, source-backed investor intelligence, not real-time autonomous behavior. If a live run fails, use the most recent successful accepted data and keep Today Overview and the query layer working.
 
 ---
 

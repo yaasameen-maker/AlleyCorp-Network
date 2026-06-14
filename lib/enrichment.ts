@@ -9,6 +9,7 @@
 
 import type Exa from "exa-js";
 import type Anthropic from "@anthropic-ai/sdk";
+import { confidenceFromUrl } from "./source-policy";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -28,29 +29,8 @@ export type ConfidenceLevel = "high" | "medium" | "low";
 
 // ── Source confidence ─────────────────────────────────────────────────────────
 
-const HIGH_CONFIDENCE_DOMAINS = [
-  "techcrunch.com",
-  "prnewswire.com",
-  "businesswire.com",
-  "axios.com",
-  "reuters.com",
-  "bloomberg.com",
-  "venturebeat.com",
-];
-
-const MEDIUM_CONFIDENCE_DOMAINS = [
-  "crunchbase.com",
-  "forbes.com",
-  "wsj.com",
-  "ft.com",
-  "cnbc.com",
-  "pitchbook.com",
-];
-
 export function confidenceFromSource(url: string): ConfidenceLevel {
-  if (HIGH_CONFIDENCE_DOMAINS.some((d) => url.includes(d))) return "high";
-  if (MEDIUM_CONFIDENCE_DOMAINS.some((d) => url.includes(d))) return "medium";
-  return "low";
+  return confidenceFromUrl(url);
 }
 
 // ── Warmth from signal date ───────────────────────────────────────────────────
