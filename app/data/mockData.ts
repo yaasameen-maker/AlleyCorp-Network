@@ -26,7 +26,7 @@ export const mockInvestors: Investor[] = [
   {
     id: "1",
     name: "Riot Ventures",
-    fund: { id: "f1", name: "Riot Ventures" },
+    fund: { id: "f1", name: "Riot Ventures", isVip: true },
     warmthTier: "Hot",
     lastSignalDate: "Mar 2025",
     suggestedAction:
@@ -54,7 +54,7 @@ export const mockInvestors: Investor[] = [
   {
     id: "2",
     name: "General Catalyst",
-    fund: { id: "f2", name: "General Catalyst" },
+    fund: { id: "f2", name: "General Catalyst", isVip: true },
     warmthTier: "Hot",
     lastSignalDate: "Aug 2025",
     suggestedAction:
@@ -95,7 +95,7 @@ export const mockInvestors: Investor[] = [
   {
     id: "3",
     name: "Mach33",
-    fund: { id: "f3", name: "Mach33" },
+    fund: { id: "f3", name: "Mach33", isVip: true },
     warmthTier: "Hot",
     lastSignalDate: "Apr 2025",
     suggestedAction:
@@ -197,7 +197,7 @@ export const mockInvestors: Investor[] = [
   {
     id: "6",
     name: "a16z American Dynamism",
-    fund: { id: "f6", name: "a16z American Dynamism" },
+    fund: { id: "f6", name: "a16z American Dynamism", investorStatus: "market_prospect" },
     warmthTier: "Cold",
     lastSignalDate: undefined,
     suggestedAction:

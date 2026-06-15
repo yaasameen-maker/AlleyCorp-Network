@@ -1,6 +1,8 @@
 "use client";
 
 import type { Investor, WarmthTier } from "@/lib/investors";
+import { getInvestorCategory, isVipInvestor } from "@/app/lib/investorCategory";
+import { InvestorCategoryBadge, VipStar } from "@/app/components/InvestorCategoryBadge";
 
 /* ── Warmth badge ── */
 
@@ -80,6 +82,8 @@ function RowLogo({ name, logoUrl }: { name: string; logoUrl?: string }) {
 export function InvestorRow({ investor, isSelected, onClick }: InvestorRowProps) {
   const company = investor.coInvestments[0]?.portfolioCompany.name;
   const signalCount = investor.signals.length;
+  const category = getInvestorCategory(investor);
+  const vip = isVipInvestor(investor);
 
   // Build the subtext parts: company · N signals · date
   const subtextParts: string[] = [];
@@ -105,13 +109,14 @@ export function InvestorRow({ investor, isSelected, onClick }: InvestorRowProps)
         <div className="min-w-0">
           <p
             className={[
-              "text-[12px] truncate leading-snug transition-colors duration-150",
+              "text-[12px] truncate leading-snug transition-colors duration-150 flex items-center gap-1",
               isSelected
                 ? "font-bold text-[#0D1320]"
                 : "font-semibold text-[#1F2937] group-hover:text-[#0EA5D6]",
             ].join(" ")}
           >
-            {investor.fund.name}
+            {vip ? <VipStar className="shrink-0" /> : null}
+            <span className="truncate">{investor.fund.name}</span>
           </p>
           {subtextParts.length > 0 && (
             <p className="text-[11px] text-[#9CA3AF] mt-0.5 truncate leading-snug">
@@ -120,7 +125,10 @@ export function InvestorRow({ investor, isSelected, onClick }: InvestorRowProps)
           )}
         </div>
       </div>
-      <WarmthBadge tier={investor.warmthTier} />
+      <div className="flex flex-col items-end gap-1.5 shrink-0">
+        <WarmthBadge tier={investor.warmthTier} />
+        <InvestorCategoryBadge category={category} compact />
+      </div>
     </button>
   );
 }
