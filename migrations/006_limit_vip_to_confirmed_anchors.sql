@@ -9,7 +9,7 @@ BEGIN;
 UPDATE fund
 SET
   investor_status = CASE
-    WHEN name IN ('Lux Capital', 'Union Square Ventures', 'a16z American Dynamism', 'Eclipse Ventures', 'Founders Fund')
+    WHEN name IN ('Lux Capital', 'Union Square Ventures', 'a16z American Dynamism', 'Eclipse Ventures', 'Eclipse', 'Founders Fund')
       THEN 'market_prospect'
     WHEN name IN ('Riot Ventures', 'Snowpoint Ventures', 'General Catalyst', 'Mach33')
       THEN 'vip_co_investor'

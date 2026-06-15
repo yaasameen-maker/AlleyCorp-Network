@@ -117,6 +117,7 @@
     },
     {
       "fundName": "Eclipse",
+      "aliases": ["Eclipse Ventures"],
       "website": "https://eclipse.capital",
       "discoverySourceUrl": "https://eclipse.capital/",
       "discoverySourceTitle": "Eclipse homepage",

@@ -75,9 +75,10 @@ function valueOrNull(value: string | undefined): string | null {
 async function upsertMarketProspect(
   candidate: ReviewedInvestorProspect
 ): Promise<"inserted" | "updated"> {
+  const matchNames = [candidate.fundName, ...(candidate.aliases ?? [])];
   const existing = await pool.query<{ id: string }>(
-    `SELECT id FROM fund WHERE LOWER(name) = LOWER($1) LIMIT 1`,
-    [candidate.fundName]
+    `SELECT id FROM fund WHERE LOWER(name) = ANY($1::text[]) ORDER BY name LIMIT 1`,
+    [matchNames.map((name) => name.toLowerCase())]
   );
 
   if (!existing.rows[0]) {

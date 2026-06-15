@@ -47,15 +47,15 @@ VALUES
 -- ─────────────────────────────────────────
 INSERT INTO fund (id, name, website, focus, stage, created_at, updated_at)
 VALUES
-  (gen_random_uuid(), 'Lux Capital',              'luxcapital.com',        'Life sciences and deep tech',       'Multi-stage',      now(), now()),
+  (gen_random_uuid(), 'Lux Capital',              'https://www.luxcapital.com', 'Science and technology venture capital', 'Any stage', now(), now()),
   (gen_random_uuid(), 'Union Square Ventures',    'usv.com',               'Early stage tech',                  'Seed to Series B', now(), now()),
   (gen_random_uuid(), 'Riot Ventures',            'riotvc.com',            'Deep tech',                         'Seed',             now(), now()),
   (gen_random_uuid(), 'Snowpoint Ventures',       'snowpoint.vc',          'Deep tech',                         'Series A',         now(), now()),
   (gen_random_uuid(), 'General Catalyst',         'generalcatalyst.com',   'Multi-sector',                      'Multi-stage',      now(), now()),
   (gen_random_uuid(), 'Mach33',                   '33fg.com',              'Space tech',                        'Seed to Series A', now(), now()),
   -- Cold-tier targets: top deep tech funds AlleyCorp has not yet co-invested with
-  (gen_random_uuid(), 'a16z American Dynamism',   'a16z.com',              'Defense, aerospace, manufacturing', 'Multi-stage',      now(), now()),
-  (gen_random_uuid(), 'Eclipse Ventures',         'eclipse.vc',            'Deep tech, industrial robotics',    'Series A/B',       now(), now()),
+  (gen_random_uuid(), 'a16z American Dynamism',   'https://a16z.com/american-dynamism/', 'American Dynamism: aerospace, defense, public safety, education, housing, supply chain, industrials, and manufacturing', NULL, now(), now()),
+  (gen_random_uuid(), 'Eclipse',                  'https://eclipse.capital', 'Physical economy and critical systems', NULL, now(), now()),
   (gen_random_uuid(), 'Founders Fund',            'foundersfund.com',      'Deep tech, defense, biotech',       'Multi-stage',      now(), now()),
   -- Avatar Robotics co-investors — Seed $6.01M, Jan 30 2026
   -- Source: Crunchbase. Round led by ARV alongside Defy Partners and REFASHIOND Ventures.
@@ -109,26 +109,6 @@ SELECT
   'hot',
   '2025-08-26',
   now(), now();
-
--- a16z American Dynamism · cold (target — no co-investment yet, portfolio_company_id NULL)
-INSERT INTO relationship (id, fund_id, portfolio_company_id, warmth_tier, created_at, updated_at)
-VALUES (
-  gen_random_uuid(),
-  (SELECT id FROM fund WHERE name = 'a16z American Dynamism'),
-  NULL,
-  'cold',
-  now(), now()
-);
-
--- Eclipse Ventures · cold (target — no co-investment yet, portfolio_company_id NULL)
-INSERT INTO relationship (id, fund_id, portfolio_company_id, warmth_tier, created_at, updated_at)
-VALUES (
-  gen_random_uuid(),
-  (SELECT id FROM fund WHERE name = 'Eclipse Ventures'),
-  NULL,
-  'cold',
-  now(), now()
-);
 
 -- Founders Fund + Valar Atomics · cold (target — no co-investment yet)
 INSERT INTO relationship (id, fund_id, portfolio_company_id, warmth_tier, created_at, updated_at)
@@ -739,7 +719,7 @@ SET
 UPDATE fund
 SET
   investor_status = CASE
-    WHEN name IN ('Lux Capital', 'Union Square Ventures', 'a16z American Dynamism', 'Eclipse Ventures', 'Founders Fund') THEN 'market_prospect'
+    WHEN name IN ('Lux Capital', 'Union Square Ventures', 'a16z American Dynamism', 'Eclipse', 'Founders Fund') THEN 'market_prospect'
     WHEN name IN ('Riot Ventures', 'Snowpoint Ventures', 'General Catalyst', 'Mach33') THEN 'vip_co_investor'
     ELSE 'known_co_investor'
   END,
@@ -748,14 +728,14 @@ SET
     ELSE false
   END,
   hq_location = CASE name
-    WHEN 'Lux Capital' THEN 'New York'
+    WHEN 'Lux Capital' THEN 'New York City / Silicon Valley'
     WHEN 'Union Square Ventures' THEN 'New York'
     WHEN 'Riot Ventures' THEN 'Los Angeles'
     WHEN 'Snowpoint Ventures' THEN 'San Francisco'
     WHEN 'General Catalyst' THEN 'Cambridge / New York / San Francisco'
     WHEN 'Mach33' THEN 'Los Angeles'
-    WHEN 'a16z American Dynamism' THEN 'San Francisco'
-    WHEN 'Eclipse Ventures' THEN 'Palo Alto'
+    WHEN 'a16z American Dynamism' THEN NULL
+    WHEN 'Eclipse' THEN NULL
     WHEN 'Founders Fund' THEN 'San Francisco'
     WHEN 'Defy Partners' THEN 'Bay Area'
     WHEN 'REFASHIOND Ventures' THEN 'New York'
@@ -775,15 +755,17 @@ SET
   END,
   geography_focus = CASE name
     WHEN 'Union Square Ventures' THEN 'US, New York network'
-    WHEN 'Lux Capital' THEN 'US, New York and Bay Area network'
-    WHEN 'a16z American Dynamism' THEN 'US, defense and national resilience'
-    WHEN 'Eclipse Ventures' THEN 'US industrial technology'
+    WHEN 'Lux Capital' THEN 'New York City and Silicon Valley network'
+    WHEN 'a16z American Dynamism' THEN 'US national-interest sectors with companies across all 50 states and global impact'
+    WHEN 'Eclipse' THEN 'Physical economy and critical systems'
     WHEN 'Founders Fund' THEN 'US, hard tech and frontier technology'
     WHEN 'Geodesic Capital' THEN 'US and global growth-stage network'
     WHEN 'Amazon Climate Pledge Fund' THEN 'Climate and sustainability network'
     ELSE 'US deep tech network'
   END,
   check_size_proxy = CASE
+    WHEN name = 'Lux Capital' THEN '$100K to $100M stated investment range'
+    WHEN name IN ('a16z American Dynamism', 'Eclipse') THEN NULL
     WHEN stage ILIKE '%Series A%' OR stage ILIKE '%Series B%' OR stage ILIKE '%Multi%' THEN 'Series A+ capable'
     WHEN stage ILIKE '%Pre-Seed%' THEN 'Pre-seed / seed'
     WHEN stage ILIKE '%Seed%' THEN 'Seed / early Series A'
@@ -791,7 +773,7 @@ SET
   END,
   deep_tech_signal = CASE
     WHEN focus ILIKE '%deep tech%' OR focus ILIKE '%hard tech%' OR focus ILIKE '%space%' OR focus ILIKE '%robotics%' OR focus ILIKE '%defense%' OR focus ILIKE '%climate%' THEN focus
-    WHEN name IN ('Founders Fund', 'General Catalyst', 'NEA', 'Lux Capital', 'a16z American Dynamism', 'Eclipse Ventures') THEN focus
+    WHEN name IN ('Founders Fund', 'General Catalyst', 'NEA', 'Lux Capital', 'a16z American Dynamism', 'Eclipse') THEN focus
     ELSE 'Deep tech relevance inferred from AlleyCorp co-investment context'
   END,
   profile_last_checked_at = now();
@@ -808,9 +790,7 @@ SET aum_tier = CASE name
   WHEN 'General Catalyst'           THEN 'Mega (~$43B)'
   WHEN 'NEA'                        THEN 'Mega (~$28B)'
   WHEN 'Founders Fund'              THEN 'Mega (~$17B)'
-  WHEN 'a16z American Dynamism'     THEN 'Mega (a16z ~$90B firm-wide)'
-  WHEN 'Eclipse Ventures'           THEN 'Mega (~$10B)'
-  WHEN 'Lux Capital'                THEN 'Large (~$7B)'
+  WHEN 'Lux Capital'                THEN 'Large ($7B+ AUM)'
   WHEN 'SOSV'                       THEN 'Large (~$1.5B)'
   WHEN 'Union Square Ventures'      THEN 'Large (~$1.5B)'
   WHEN 'Amazon Climate Pledge Fund' THEN 'Large ($2B)'

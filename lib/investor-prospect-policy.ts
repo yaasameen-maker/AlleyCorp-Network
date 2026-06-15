@@ -18,6 +18,7 @@ export interface ProspectFieldEvidence {
 
 export interface InvestorProspectCandidate {
   fundName: string;
+  aliases?: string[];
   website?: string;
   discoverySourceUrl: string;
   discoverySourceTitle?: string;
