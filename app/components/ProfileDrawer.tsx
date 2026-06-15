@@ -1,6 +1,8 @@
 "use client";
 
 import type { Investor, WarmthTier, DiscoveryContext } from "@/lib/investors";
+import { getInvestorCategory, isVipInvestor } from "@/app/lib/investorCategory";
+import { InvestorCategoryBadge, VipStar } from "@/app/components/InvestorCategoryBadge";
 import { WarmthBadge } from "./InvestorRow";
 
 interface ProfileDrawerProps {
@@ -70,18 +72,6 @@ function FundLogo({ name, logoUrl, size = 40 }: { name: string; logoUrl?: string
     >
       {initials}
     </div>
-  );
-}
-
-/* ── Network Expansion badge — matches WarmthBadge style from InvestorRow.tsx ── */
-function NetworkExpansionBadge() {
-  return (
-    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#F0FBFF] border border-[#0EA5D6]/30">
-      <span className="w-1.5 h-1.5 rounded-full shrink-0 bg-[#0EA5D6]" aria-hidden />
-      <span className="text-[9px] font-semibold tracking-widest uppercase text-[#0EA5D6] leading-none">
-        Network Target
-      </span>
-    </span>
   );
 }
 
@@ -301,6 +291,8 @@ export function ProfileDrawer({ investor, onClose }: ProfileDrawerProps) {
     (ci, idx, arr) =>
       arr.findIndex((c) => c.portfolioCompany.name === ci.portfolioCompany.name) === idx
   );
+  const category = getInvestorCategory(investor);
+  const vip = isVipInvestor(investor);
 
   return (
     <>
@@ -323,8 +315,9 @@ export function ProfileDrawer({ investor, onClose }: ProfileDrawerProps) {
               {/* Fund logo */}
               <FundLogo name={investor.fund.name} logoUrl={investor.fund.logoUrl} size={40} />
               <div className="min-w-0">
-                <p className="text-[9px] uppercase tracking-[0.15em] text-[#C4C9D4] font-semibold mb-1.5">
-                  Co-investor
+                <p className="text-[9px] uppercase tracking-[0.15em] text-[#C4C9D4] font-semibold mb-1.5 flex items-center gap-1.5">
+                  {vip ? <VipStar /> : null}
+                  {category.label}
                 </p>
                 {investor.fund.website ? (
                   <a
@@ -342,7 +335,7 @@ export function ProfileDrawer({ investor, onClose }: ProfileDrawerProps) {
                 )}
                 <div className="mt-2.5 flex flex-wrap items-center gap-2">
                   <WarmthBadge tier={investor.warmthTier} />
-                  {investor.discoverySource === "network_expansion" && <NetworkExpansionBadge />}
+                  <InvestorCategoryBadge category={category} />
                 </div>
               </div>
             </div>

@@ -17,6 +17,8 @@ function SectionBlock({
   title,
   count,
   emptyLabel,
+  pending,
+  pendingMessage,
   items,
   investors,
   onSelectInvestor,
@@ -24,6 +26,8 @@ function SectionBlock({
   title: string;
   count: number;
   emptyLabel: string;
+  pending?: boolean;
+  pendingMessage?: string;
   items: OverviewItem[];
   investors: Investor[];
   onSelectInvestor?: (investor: Investor) => void;
@@ -38,7 +42,14 @@ function SectionBlock({
         <hr className="brand-line" />
       </div>
 
-      {items.length === 0 ? (
+      {pending ? (
+        <div className="rounded border border-dashed border-[#E5E7EB] bg-[#FAFAFA] px-4 py-3">
+          <p className="text-[10px] uppercase tracking-widest text-[#9CA3AF] font-semibold mb-1">
+            Pending news feed
+          </p>
+          <p className="text-xs text-[#6B7280] leading-relaxed">{pendingMessage ?? emptyLabel}</p>
+        </div>
+      ) : items.length === 0 ? (
         <p className="text-xs text-[#9CA3AF] py-3 px-1">{emptyLabel}</p>
       ) : (
         <div className="bg-white rounded border border-[#E5E7EB] divide-y divide-[#F3F4F6]">
@@ -102,7 +113,7 @@ function SectionBlock({
 const EMPTY_LABELS: Record<string, string> = {
   "new-signals": "No new source-backed signals yet.",
   "relationship-changes": "No relationship tier changes to flag.",
-  "deep-tech-headlines": "No deep tech headlines logged yet.",
+  "deep-tech-headlines": "External news feed not connected yet.",
   "media-signals": "No event, podcast, or Substack signals yet.",
 };
 
@@ -123,7 +134,7 @@ export function TodayOverviewView({ investors, onSelectInvestor }: TodayOverview
     day: "numeric",
   });
 
-  const totalItems = overview.sections.reduce((n, s) => n + s.items.length, 0);
+  const totalItems = overview.sections.reduce((n, s) => n + (s.pending ? 0 : s.items.length), 0);
 
   return (
     <div className="space-y-6">
@@ -145,8 +156,10 @@ export function TodayOverviewView({ investors, onSelectInvestor }: TodayOverview
         <SectionBlock
           key={section.id}
           title={section.title}
-          count={section.items.length}
+          count={section.pending ? 0 : section.items.length}
           emptyLabel={EMPTY_LABELS[section.id] ?? "No updates yet."}
+          pending={section.pending}
+          pendingMessage={section.pendingMessage}
           items={section.items}
           investors={investors}
           onSelectInvestor={onSelectInvestor}

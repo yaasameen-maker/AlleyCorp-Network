@@ -33,6 +33,14 @@ describe("buildTodayOverview", () => {
       expect(rel?.items.some((item) => item.investorId === investor.id)).toBe(true);
     }
   });
+
+  it("marks deep tech headlines as pending news feed", () => {
+    const overview = buildTodayOverview(mockInvestors);
+    const headlines = overview.sections.find((s) => s.id === "deep-tech-headlines");
+    expect(headlines?.pending).toBe(true);
+    expect(headlines?.items).toHaveLength(0);
+    expect(headlines?.pendingMessage).toMatch(/news feed pending/i);
+  });
 });
 
 describe("matchesInvestorSearch", () => {

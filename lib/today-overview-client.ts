@@ -19,6 +19,9 @@ export interface OverviewSection {
   id: "new-signals" | "relationship-changes" | "deep-tech-headlines" | "media-signals";
   title: string;
   items: OverviewItem[];
+  /** External feed not wired yet — show placeholder instead of duplicate/empty items. */
+  pending?: boolean;
+  pendingMessage?: string;
 }
 
 export interface TodayOverview {
@@ -156,27 +159,14 @@ function collectRelationshipChanges(investors: Investor[]): OverviewItem[] {
   return dedupeItems(items);
 }
 
-function collectDeepTechHeadlines(investors: Investor[]): OverviewItem[] {
-  const items: OverviewItem[] = [];
-
-  // Per the June 11 meeting: this section is "top deep tech news headlines this week",
-  // not a list of every fund's static deep-tech attribute. So we surface only RECENT
-  // co-investment/deal activity. (A true external news feed — AlleyCorp Substack, Abe's
-  // Substack, Brannon's podcast, deep tech publications — is a later agent integration.)
-  for (const investor of investors) {
-    investor.signals.forEach((signal, idx) => {
-      if (
-        signal.type === "co-investment" &&
-        !isMediaSignal(signal) &&
-        isRecentDate(signal.date, NEW_SIGNAL_WINDOW_DAYS)
-      ) {
-        items.push(itemFromSignal(investor, signal, idx));
-      }
-    });
-  }
-
-  return dedupeItems(items);
+function collectDeepTechHeadlines(_investors: Investor[]): OverviewItem[] {
+  // Reserved for the external news feed (Brannon podcast, Abe Substack, deep tech
+  // publications). Recent deal signals live under "New investor signals" instead.
+  return [];
 }
+
+const DEEP_TECH_HEADLINES_PENDING_MESSAGE =
+  "News feed pending — Brannon podcast and Abe Substack sources arriving soon.";
 
 function collectMediaSignals(investors: Investor[]): OverviewItem[] {
   const items: OverviewItem[] = [];
@@ -222,6 +212,17 @@ export function buildTodayOverview(investors: Investor[]): TodayOverview {
       usedKeys.add(key);
       return true;
     });
+
+    if (id === "deep-tech-headlines") {
+      return {
+        id,
+        title,
+        items: [],
+        pending: true,
+        pendingMessage: DEEP_TECH_HEADLINES_PENDING_MESSAGE,
+      };
+    }
+
     return { id, title, items };
   });
 
