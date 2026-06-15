@@ -41,8 +41,7 @@ function hasCoInvestment(investor: Investor): boolean {
 
 /** Known co-investor with VIP/starred status in the network map. */
 export function isVipInvestor(investor: Investor): boolean {
-  if (investor.fund.isVip) return true;
-  return hasCoInvestment(investor) && investor.fund.investorStatus !== "market_prospect";
+  return investor.fund.isVip === true;
 }
 
 /** Primary relationship category for list rows and profile header. */

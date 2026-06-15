@@ -17,10 +17,10 @@ describe("investorCategory", () => {
     expect(isVipInvestor(a16z!)).toBe(false);
   });
 
-  it("classifies warm co-investors as active or VIP", () => {
+  it("classifies warm co-investors without explicit star as active relationship", () => {
     const flybridge = mockInvestors.find((i) => i.fund.name === "Flybridge");
     expect(flybridge).toBeDefined();
-    const cat = getInvestorCategory(flybridge!);
-    expect(["active_relationship", "co_investor_vip"]).toContain(cat.id);
+    expect(isVipInvestor(flybridge!)).toBe(false);
+    expect(getInvestorCategory(flybridge!).id).toBe("active_relationship");
   });
 });

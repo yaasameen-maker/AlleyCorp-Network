@@ -510,9 +510,11 @@ No one should keep important local-only code overnight.
 #### Luba
 
 - Update data model and seed/update script for broad investor universe:
-  - existing co-investors are starred/VIP
+  - confirmed anchor co-investors are starred/VIP
+  - ordinary co-investors remain known co-investors, not automatically VIP
   - cold/prospect investors can exist without a co-investment
   - profiles can show why the investor is relevant to deep tech
+  - VIP/starred status should come from DB-backed `fund.is_vip`, not a broad code rule
 - Add investor discovery/enrichment fields for market prospects:
   - deep tech relevance
   - portfolio proof

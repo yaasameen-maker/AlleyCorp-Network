@@ -1,32 +1,34 @@
 /**
- * Autonomous Daily Co-investor Discovery Agent
+ * Daily Intelligence Pipeline discovery agent
  *
  * Runs every morning via GitHub Actions (see .github/workflows/discovery.yml).
- * Discovers new co-investors through two phases and writes directly to Railway — no manual review step.
+ * Discovers investor signals and market-prospect leads with an evidence gate before writes.
  *
  * Phase 1 — Portfolio Scan:
  *   For each active AlleyCorp portfolio company, searches funding news and extracts
- *   co-investors. High/medium confidence findings go straight into the DB.
+ *   co-investors. Candidates pass through critic-agent.ts before accepted writes.
  *
  * Phase 2 — Network Expansion (6 degrees):
  *   For each hot/warm fund, finds what OTHER companies they've backed, then finds
- *   who else was in those rounds. These "2nd-degree" funds are inserted as Cold with
- *   a full discovery_context explaining why they surfaced.
+ *   who else was in those rounds. These leads are report-only by default because they
+ *   are market-prospect candidates, not verified AlleyCorp relationship signals.
  *
  * Phase 3 — Contact Enrichment:
- *   Every newly discovered fund immediately gets a LinkedIn enrichment pass so the
- *   dashboard shows a real contact, not just a fund name.
+ *   Newly accepted funds get a LinkedIn enrichment pass so the dashboard shows a real
+ *   contact, not just a fund name.
  *
  * Usage:
  *   npm run discover:agent                     # dry run — shows what would change
- *   npm run discover:agent -- --write          # live run
+ *   npm run discover:agent -- --write          # writes accepted Phase 1 findings only
  *   npm run discover:agent -- --write --quick  # live run, 3 companies only (for testing)
+ *   npm run discover:agent -- --write --allow-network-expansion-write
  */
 
 import dotenv from "dotenv";
 dotenv.config({ override: true });
 
 import { createHash } from "crypto";
+import { mkdir, writeFile } from "fs/promises";
 import Exa from "exa-js";
 import Anthropic from "@anthropic-ai/sdk";
 import { pool } from "../lib/db.js";
@@ -48,6 +50,7 @@ import { reviewCandidates, makeDuplicateKey } from "./critic-agent.js";
 
 const DRY_RUN = !process.argv.includes("--write");
 const QUICK = process.argv.includes("--quick"); // process only 3 companies
+const ALLOW_NETWORK_EXPANSION_WRITE = process.argv.includes("--allow-network-expansion-write");
 
 const exa = new Exa(process.env.EXA_API_KEY!);
 const claude = new Anthropic();
@@ -355,7 +358,7 @@ async function getKnownFundIds(): Promise<Set<string>> {
 
 const stats = {
   phase1: { fundsFound: 0, fundsNew: 0, signalsAdded: 0, skipped: 0 },
-  phase2: { fundsFound: 0, fundsNew: 0, signalsAdded: 0 },
+  phase2: { fundsFound: 0, fundsNew: 0, signalsAdded: 0, quarantined: 0 },
   contacts: { added: 0 },
 };
 
@@ -396,8 +399,8 @@ async function runPortfolioScan(companies: PortfolioRow[]): Promise<void> {
       signal.fundName!,
       company.sector,
       undefined,
-      "vip_co_investor",
-      true
+      "known_co_investor",
+      false
     );
     if (!fundId) continue;
 
@@ -536,6 +539,14 @@ async function runNetworkExpansion(hotWarmFunds: HotWarmFund[]): Promise<void> {
 
     if (DRY_RUN) continue;
 
+    if (!ALLOW_NETWORK_EXPANSION_WRITE) {
+      stats.phase2.quarantined++;
+      console.log(
+        "     ⊘ Report-only candidate — network expansion writes require --allow-network-expansion-write"
+      );
+      continue;
+    }
+
     const fundId = await upsertFund(
       candidate.fundName,
       "Deep tech",
@@ -603,13 +614,48 @@ async function getExistingSignalHashes(): Promise<Set<string>> {
   );
 }
 
+async function writeRunReport(args: {
+  startedAt: string;
+  endedAt: string;
+  elapsedSeconds: number;
+  companiesProcessed: number;
+  totalCompanies: number;
+  hotWarmFunds: number;
+}): Promise<string> {
+  const report = {
+    agent: "discovery-agent",
+    mode: DRY_RUN ? "dry_run" : "write",
+    scope: QUICK ? "quick" : "full",
+    startedAt: args.startedAt,
+    endedAt: args.endedAt,
+    elapsedSeconds: args.elapsedSeconds,
+    safety: {
+      phase1Writes: DRY_RUN ? "disabled_dry_run" : "critic_accepted_only",
+      phase2NetworkExpansionWrites:
+        !DRY_RUN && ALLOW_NETWORK_EXPANSION_WRITE ? "explicitly_allowed" : "report_only",
+    },
+    inputs: {
+      portfolioCompaniesTotal: args.totalCompanies,
+      portfolioCompaniesProcessed: args.companiesProcessed,
+      hotWarmFundsForExpansion: args.hotWarmFunds,
+    },
+    stats,
+  };
+
+  await mkdir(".agent-runs", { recursive: true });
+  const fileName = `.agent-runs/discovery-agent-${args.endedAt.replace(/[:.]/g, "-")}.json`;
+  await writeFile(fileName, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  return fileName;
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function run() {
   const startTime = Date.now();
+  const startedAt = new Date().toISOString();
 
   console.log("╔══════════════════════════════════════════════════════════╗");
-  console.log("║   AlleyCorp Autonomous Co-investor Discovery Agent       ║");
+  console.log("║   AlleyCorp Daily Intelligence Pipeline Discovery        ║");
   console.log("╚══════════════════════════════════════════════════════════╝");
   console.log(`Mode:  ${DRY_RUN ? "DRY RUN — no DB writes" : "LIVE — writing to Railway"}`);
   console.log(`Scope: ${QUICK ? "QUICK — 3 companies only" : "FULL"}`);
@@ -651,9 +697,21 @@ async function run() {
   console.log(`  No data:          ${stats.phase1.skipped} companies`);
   console.log(`Phase 2 (network expansion):`);
   console.log(`  Candidates found: ${stats.phase2.fundsFound}`);
+  console.log(`  Report-only:      ${stats.phase2.quarantined}`);
   console.log(`  New to DB:        ${stats.phase2.fundsNew}`);
   console.log(`  Signals added:    ${stats.phase2.signalsAdded}`);
   console.log(`Contact enrichment: ${stats.contacts.added} funds enriched`);
+
+  const endedAt = new Date().toISOString();
+  const reportPath = await writeRunReport({
+    startedAt,
+    endedAt,
+    elapsedSeconds: elapsed,
+    companiesProcessed: companies.length,
+    totalCompanies: allCompanies.length,
+    hotWarmFunds: hotWarmFunds.length,
+  });
+  console.log(`Run report: ${reportPath}`);
 
   if (DRY_RUN) {
     console.log(`\nRun with --write to commit to Railway.`);

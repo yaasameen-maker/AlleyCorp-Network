@@ -50,13 +50,18 @@ describe("source policy", () => {
   it("treats open investor directories as candidate-only leads", () => {
     const openvc = "https://openvc.app/investors/example-fund";
     const differentFunds = "https://www.differentfunds.com/fund/example";
+    const deepTechVcList = "https://deeptechvclist.com/investors/example-fund";
+    const helloTomorrow = "https://www.hellotomorrow.org/deep-tech-investors";
+    const publicSheet = "https://docs.google.com/spreadsheets/d/example";
 
-    for (const url of [openvc, differentFunds]) {
+    for (const url of [openvc, differentFunds, deepTechVcList, helloTomorrow, publicSheet]) {
       expect(isCandidateOnlySource(url)).toBe(true);
       expect(canPublishRelationshipSignal(url)).toBe(false);
       expect(canEnrichProfile(url)).toBe(false);
     }
     expect(sourceNameFromUrl(openvc)).toBe("OpenVC");
+    expect(sourceNameFromUrl(deepTechVcList)).toBe("DeepTechVCList");
+    expect(sourceNameFromUrl(helloTomorrow)).toBe("Hello Tomorrow");
   });
 
   it("allows medium-confidence press to enrich profiles but not publish signals", () => {

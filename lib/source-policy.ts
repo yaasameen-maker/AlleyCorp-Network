@@ -50,9 +50,14 @@ export const CANDIDATE_ONLY_DOMAINS = [
   "news.crunchbase.com",
   "pitchbook.com",
   "openvc.app",
+  "deeptechvclist.com",
+  "startuphub.ai",
+  "hellotomorrow.org",
   "differentfunds.com",
+  "vcsheet.com",
   "airtable.com",
   "docs.google.com",
+  "sheets.google.com",
   "notion.so",
   "coda.io",
 ] as const;
@@ -113,7 +118,11 @@ export function sourceNameFromUrl(url: string): string {
   if (hostname.includes("spotify.com")) return "Spotify";
   if (hostname.includes("sec.gov")) return "SEC";
   if (hostname.includes("openvc.app")) return "OpenVC";
+  if (hostname.includes("deeptechvclist.com")) return "DeepTechVCList";
+  if (hostname.includes("startuphub.ai")) return "StartupHub.ai";
+  if (hostname.includes("hellotomorrow.org")) return "Hello Tomorrow";
   if (hostname.includes("differentfunds.com")) return "DifferentFunds";
+  if (hostname.includes("vcsheet.com")) return "VC Sheet";
   if (hostname.includes("pitchbook.com")) return "PitchBook";
 
   return hostname;

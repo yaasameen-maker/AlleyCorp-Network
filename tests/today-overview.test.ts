@@ -1,7 +1,25 @@
 import { describe, expect, it } from "vitest";
 import { mockInvestors } from "../app/data/mockData";
-import { buildTodayOverview } from "../lib/today-overview-client";
+import { buildTodayOverview, formatTodayOverviewPlainText } from "../lib/today-overview-client";
 import { matchesInvestorSearch } from "../app/lib/investorSearch";
+import type { Investor } from "../lib/investors";
+
+function isoDaysAgo(days: number): string {
+  const date = new Date(Date.now() - days * 86_400_000);
+  return date.toISOString().slice(0, 10);
+}
+
+function makeInvestor(overrides: Partial<Investor> = {}): Investor {
+  return {
+    id: "test-investor",
+    name: "Test Capital",
+    fund: { id: "test-fund", name: "Test Capital" },
+    warmthTier: "Cold",
+    signals: [],
+    coInvestments: [],
+    ...overrides,
+  };
+}
 
 describe("buildTodayOverview", () => {
   it("returns all four sections for demo safety", () => {
@@ -40,6 +58,41 @@ describe("buildTodayOverview", () => {
     expect(headlines?.pending).toBe(true);
     expect(headlines?.items).toHaveLength(0);
     expect(headlines?.pendingMessage).toMatch(/news feed pending/i);
+  });
+
+  it("excludes stale media signals from the Today Overview media section", () => {
+    const investor = makeInvestor({
+      signals: [
+        {
+          type: "event",
+          description: "Attended DTNY deep tech event",
+          date: isoDaysAgo(240),
+          weight: "High",
+          source: "DTNY",
+        },
+      ],
+    });
+
+    const overview = buildTodayOverview([investor]);
+    const media = overview.sections.find((s) => s.id === "media-signals");
+    expect(media?.items).toHaveLength(0);
+  });
+
+  it("excludes stale discovery rows from new investor signals", () => {
+    const investor = makeInvestor({
+      discoverySource: "network_expansion",
+      lastSignalDate: isoDaysAgo(240),
+    });
+
+    const overview = buildTodayOverview([investor]);
+    const newSignals = overview.sections.find((s) => s.id === "new-signals");
+    expect(newSignals?.items).toHaveLength(0);
+  });
+
+  it("copies pending news feed state into plain text", () => {
+    const overview = buildTodayOverview([]);
+    const text = formatTodayOverviewPlainText(overview);
+    expect(text).toMatch(/News feed pending/i);
   });
 });
 

@@ -96,7 +96,11 @@ function collectNewSignals(investors: Investor[]): OverviewItem[] {
   const items: OverviewItem[] = [];
 
   for (const investor of investors) {
-    if (investor.discoverySource) {
+    if (
+      investor.discoverySource &&
+      investor.lastSignalDate &&
+      isRecentDate(investor.lastSignalDate, NEW_SIGNAL_WINDOW_DAYS)
+    ) {
       items.push({
         id: `${investor.id}-discovery`,
         investorId: investor.id,
@@ -173,7 +177,7 @@ function collectMediaSignals(investors: Investor[]): OverviewItem[] {
 
   for (const investor of investors) {
     investor.signals.forEach((signal, idx) => {
-      if (isMediaSignal(signal)) {
+      if (isMediaSignal(signal) && isRecentDate(signal.date, NEW_SIGNAL_WINDOW_DAYS)) {
         items.push(itemFromSignal(investor, signal, idx));
       }
     });
@@ -251,7 +255,9 @@ export function formatTodayOverviewPlainText(overview: TodayOverview): string {
 
   for (const section of overview.sections) {
     lines.push(`${section.title} (${section.items.length})`);
-    if (section.items.length === 0) {
+    if (section.pending) {
+      lines.push(`  ${section.pendingMessage ?? "Pending feed."}`);
+    } else if (section.items.length === 0) {
       lines.push("  No updates in this section.");
     } else {
       for (const item of section.items) {
