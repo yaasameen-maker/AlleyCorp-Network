@@ -18,13 +18,13 @@ Track only co-investors in AlleyCorp portfolio companies.
 
 ### Now
 
-Track the broader deep tech investor universe. Co-investors remain the highest-value nodes, but they are a VIP/starred subset inside a larger market map.
+Track the broader deep tech investor universe. Co-investors remain the highest-value nodes inside a larger market map. Confirmed anchor co-investors are VIP/starred; ordinary co-investors are known relationships but should not become VIP by code inference.
 
 This means the product should answer:
 
 - Who are all relevant deep tech investors?
 - Which ones does AlleyCorp already know?
-- Which ones are co-investors or VIP relationships?
+- Which ones are known co-investors, and which confirmed anchors are VIP relationships?
 - Which new investors are entering deep tech?
 - Who should Abe or Brannon invite, meet, monitor, or introduce to a portfolio company?
 
@@ -42,7 +42,7 @@ The north star is not an email digest or a static dashboard. It is a daily-updat
 | P0       | Evidence-gated Daily Intelligence Pipeline | Yaasameen + Luba    | The system can discover investors, enrich profiles, monitor signals, and publish only high-confidence evidence.              |
 | P0       | Source traceability                        | Luba                | Every published signal has source URL, title/snippet when available, date, signal type, and confidence.                      |
 | P0       | Broader investor schema                    | Luba                | Investor/fund profiles support location, AUM/check-size proxy, stage, geography, deep tech signal, and VIP/co-investor flag. |
-| P0       | Investor discovery/enrichment              | Luba + Yaasameen    | Discover and enrich deep tech investors beyond known co-investors; mark them as market prospects unless already known/VIP.   |
+| P0       | Investor discovery/enrichment              | Luba + Yaasameen    | Discover and enrich deep tech investors beyond known co-investors; write only accepted source-backed market prospects.       |
 | P0       | Obvious search + query readiness           | Michael + Yaasameen | Search is visible and chatbot can answer the three AlleyCorp query types from the meeting.                                   |
 | P0       | Safety fixes from review                   | Yaasameen + Luba    | Warmth tier normalization, scheduled write guardrails, and minimum app auth before sharing externally.                       |
 
@@ -92,7 +92,7 @@ portfolio companies + known funds + market watchlist
   -> investor discovery + profile enrichment + signal monitoring
   -> deterministic verification gate
   -> confidence policy
-  -> write accepted signals
+  -> write accepted profile facts + accepted relationship signals
   -> recalibrate warmth
   -> update Today Overview
   -> save run report
@@ -120,7 +120,7 @@ Write permission:
 
 - produces candidate investors and candidate signals only
 - writes to candidate storage, staging tables, or run reports
-- does not write directly to live `relationship`, `signal`, or scoring state
+- does not write directly to live `fund`, `relationship`, `signal`, or scoring state
 
 #### 2. Enrichment Agent
 
@@ -132,7 +132,8 @@ Responsibility:
 
 Write permission:
 
-- may write proposed profile updates with evidence and confidence
+- may write proposed profile updates with evidence and confidence to candidate storage or run reports
+- accepted profile facts are written only by the source-gated importer / verification path
 - does not publish relationship signals
 - does not alter warmth tier or relationship state
 
@@ -143,7 +144,7 @@ Responsibility:
 - decide whether a candidate is trustworthy enough to enter the product
 - classify each candidate as `Accepted`, `Needs Verification`, or `Rejected`
 
-Only `Accepted` signals can affect investor profiles, relationships, warmth scoring, or Today Overview.
+Only accepted profile facts can affect investor profiles. Only accepted relationship signals can affect relationships, warmth scoring, or Today Overview.
 
 #### 4. Scoring And Relationship Engine
 
@@ -168,7 +169,81 @@ Unverified signals must not appear in Today Overview.
 
 Critical rule:
 
-> Discovery and enrichment agents do not write directly to live relationship tables. Only verified and accepted signals may affect investor profiles, relationship records, warmth scoring, or content shown in Today Overview.
+> Discovery and enrichment agents do not write directly to live product tables. Only verified and accepted profile facts may update investor profiles. Only verified and accepted relationship signals may update relationship records, warmth scoring, or content shown in Today Overview.
+
+### Investor Prospect Discovery / Enrichment Loop
+
+The broader investor universe should not be a hand-curated static list. The sprint should build toward an automatic prospect loop that feeds the source-gated importer.
+
+Current safe path:
+
+```text
+public lead source or search result
+  -> candidate investor JSON / run report
+  -> official source enrichment with field-level evidence
+  -> `npm run import:prospects`
+  -> accepted `market_prospect` fund rows only
+```
+
+Next implementation step:
+
+- add an automatic discovery adapter/script that searches for new deep tech investors beyond known AlleyCorp co-investors
+- use OpenVC, DifferentFunds, public lists, newsletters, podcasts, and search as lead sources only
+- find official fund websites and credible profile sources before accepting profile fields
+- output the same candidate shape as `docs/investor-prospects-jun15.demo.json`
+- attach field-level source evidence for team location, stage, geography, AUM/check-size proxy, portfolio/deep-tech relevance
+- pass candidates through `npm run import:prospects`
+- write only accepted `market_prospect` rows
+- never create relationship rows, signal rows, VIP status, or warmth changes for investors with no verified AlleyCorp relationship signal
+
+This is the work that makes investors with no AlleyCorp signals appear from daily search while keeping them clearly separated from verified relationships.
+
+#### Phasing For Prospect Discovery
+
+Phase 1 — report-only scraper:
+
+- search public lead sources and the web for candidate deep tech investors
+- cap scope by default (`--quick` / `--max-targets`) so Exa and Anthropic usage stays controlled
+- enforce hard caps before CI: max 10 prospects/run and max 6 Exa results/query
+- output candidate JSON/run reports only
+- do not write to the DB
+- manually pass promising output through `npm run import:prospects`
+
+Phase 2 — scheduled dry run:
+
+- run in CI/GitHub Actions only after API keys and cost caps are configured
+- default to a small daily search scope, for example 10 targets or fewer
+- write reports to `agent-runs/` in CI and upload that directory with `actions/upload-artifact`
+- keep local runs in ignored `.agent-runs/`
+- save the latest successful artifact for demo fallback
+- still do not write to live DB by default
+
+Phase 3 — accepted market-prospect auto-write:
+
+- allow `--write` only after repeated clean dry runs
+- write only through `import-investor-prospects.ts`
+- write only accepted `market_prospect` fund rows, source-backed profile fields, notes/provenance, and `profile_last_checked_at`
+- never write relationship rows, signal rows, VIP status, or warmth changes
+
+Phase 4 — relationship-signal auto-write:
+
+- reuse `critic-agent.ts` and `canPublishRelationshipSignal()`
+- route candidate relationship signals through existing duplicate/date/source/entity checks
+- do not build a second verifier system
+
+Clean dry run means:
+
+- zero hallucinated profile fields
+- zero scraper `qualityWarnings` in the run report
+- `summary.isCleanDryRun = true`
+- every non-unknown profile field has matching field-level source evidence
+- fund name appears in the cited source text or snippet
+- official website is found, or the record remains candidate-only
+- no duplicate fund entities are proposed without aliases
+- no relationship, signal, VIP, or warmth writes occur
+- run report clearly separates accepted, candidate-only, rejected, errors, and skipped targets
+
+`scripts/discover-coinvestors.ts` is currently a manual research helper because it outputs raw SQL and predates the source-policy gate. It should either be refactored to emit candidate JSON and use `source-policy`, or remain clearly labeled manual-only. It should not be used for automated writes.
 
 ### Verification Gate
 
@@ -196,10 +271,12 @@ Agents must not treat search results, inferred URLs, or model output as verified
 >   (regulatory filings, fund-owned pages, credible press); excludes candidate-only.
 > - `sourceUseFromUrl` / `confidenceFromUrl` / `sourceNameFromUrl` — classification + naming.
 >
-> Already wired: `ingest-signals.ts` (confidence + source name) and `substackAdapter.ts`
-> (drops candidate-only at discovery input). **Not yet wired:** the write gate in the
-> discovery/ingest path and the staging→accept verification layer (Yaasameen, Agent write
-> path). The "source names both fund and company" rule is still done manually today.
+> Already wired: `ingest-signals.ts` (confidence + source name), `substackAdapter.ts`
+> (drops candidate-only at discovery input), `discovery-agent.ts` (critic gate for Phase 1
+> writes), and `import:prospects` (source-gated market prospect writes with field-level
+> evidence). **Still needed:** the automatic prospect discovery adapter that generates
+> candidate JSON from search/public lead sources, plus stronger source-text entity checks
+> before any new relationship signal is published.
 
 #### Verified Source Rules
 
@@ -254,7 +331,7 @@ AlleyCorp Substack, Abe Murray's Substack, and Brannon Jones's podcast are high-
 
 ### Loop State File
 
-Each run should write a report to `data/agent-runs/YYYY-MM-DD.md` or equivalent storage:
+Each run should write a report to `.agent-runs/` or equivalent ignored/local storage:
 
 - Run start/end time
 - Sources checked
@@ -510,9 +587,11 @@ No one should keep important local-only code overnight.
 #### Luba
 
 - Update data model and seed/update script for broad investor universe:
-  - existing co-investors are starred/VIP
+  - confirmed anchor co-investors are starred/VIP
+  - ordinary co-investors remain known co-investors, not automatically VIP
   - cold/prospect investors can exist without a co-investment
   - profiles can show why the investor is relevant to deep tech
+  - VIP/starred status should come from DB-backed `fund.is_vip`, not a broad code rule
 - Add investor discovery/enrichment fields for market prospects:
   - deep tech relevance
   - portfolio proof
@@ -529,6 +608,12 @@ No one should keep important local-only code overnight.
   - a few LA deep tech investors (verified)
   - a few Series A relevant investors (verified)
   - Portal Space Systems co-investors where publicly verified
+- Start the automatic investor prospect discovery loop after the source-gated importer exists:
+  - discover new deep tech investors from search and public lead sources
+  - enrich from official fund/profile sources
+  - output candidate JSON/run reports
+  - pass through `npm run import:prospects`
+  - write only accepted `market_prospect` rows
 
 #### Yaasameen
 
@@ -554,10 +639,11 @@ No one should keep important local-only code overnight.
   (P1: Brannon podcast + Abe Substack sources). Until that feed lands, hold it as a
   labeled placeholder ("pending news feed") or merge it into New investor signals so
   there is no empty/duplicate panel. (Review finding from luba/june14-fixes.)
-- Add "VIP" or starred treatment for known co-investors.
+- Add VIP/starred treatment for confirmed anchor co-investors only.
 - Make profile cards distinguish:
   - Active relationship
-  - Co-investor/VIP
+  - Known co-investor
+  - VIP anchor
   - Market prospect
   - Newly discovered
 
@@ -565,6 +651,7 @@ No one should keep important local-only code overnight.
 
 - `npm run discover:agent` dry run produces a readable report.
 - `npm run discover:agent -- --write` only writes accepted high-confidence candidates.
+- `npm run import:prospects` can dry-run verified market prospects and write accepted `market_prospect` rows without creating relationships, signals, warmth, or VIPs.
 - `npm run recalibrate` runs after accepted writes.
 - Today Overview can show at least one real relationship update or source-backed signal, with fallback data if the live run fails.
 
@@ -723,7 +810,7 @@ Primary focus: clear, well-defined product UI updates.
 
 - Obvious search bar.
 - Today Overview view.
-- VIP/starred co-investor treatment.
+- VIP/starred treatment for confirmed anchor co-investors.
 - Profile evidence grouping.
 - Freshness and source link display.
 - Empty states for market prospects.
@@ -738,7 +825,7 @@ Primary focus: clear, well-defined product UI updates.
 
 1. Open Today Overview.
 2. Show what changed today: new investor signal, relationship update, deep tech news, or podcast/Substack mention.
-3. Search for a known co-investor and show the VIP/starred relationship.
+3. Search for a confirmed anchor co-investor and show the VIP/starred relationship.
 4. Open profile and point to source-backed evidence.
 5. Ask: "Who should we invite to our rooftop happy hour?"
 6. Ask: "Who are the deep tech investors in LA?"
@@ -782,5 +869,5 @@ No major architecture changes unless something is broken.
 - No unverified raw agent candidates write directly to main product tables.
 - Today Overview replaces email digest as the main "what changed" experience.
 - Search is visible.
-- Co-investors are starred/VIP inside the broader investor universe.
+- Confirmed anchor co-investors are starred/VIP inside the broader investor universe; ordinary co-investors remain known co-investors.
 - Every published signal has source evidence, confidence, and freshness where available.

@@ -1,0 +1,146 @@
+{
+  "candidates": [
+    {
+      "fundName": "Lux Capital",
+      "website": "https://www.luxcapital.com",
+      "discoverySourceUrl": "https://www.luxcapital.com/contact",
+      "discoverySourceTitle": "Lux Capital contact page",
+      "teamLocation": "New York City / Silicon Valley",
+      "stageFocus": "Any stage",
+      "geographyFocus": "New York City and Silicon Valley network",
+      "aumTier": "Large ($7B+ AUM)",
+      "checkSizeProxy": "$100K to $100M stated investment range",
+      "deepTechEvidence": "Lux describes itself as a science and tech venture capital firm investing at the intersection of new and not-yet-imagined technologies.",
+      "profileSourceUrls": ["https://www.luxcapital.com", "https://www.luxcapital.com/contact"],
+      "fieldEvidence": [
+        {
+          "field": "teamLocation",
+          "sourceUrl": "https://www.luxcapital.com/contact",
+          "sourceTitle": "Lux Capital contact page",
+          "rawSnippet": "Lux has expanded from our New York City roots to Silicon Valley."
+        },
+        {
+          "field": "stageFocus",
+          "sourceUrl": "https://www.luxcapital.com/contact",
+          "sourceTitle": "Lux Capital contact page",
+          "rawSnippet": "The versatility to invest at any stage."
+        },
+        {
+          "field": "geographyFocus",
+          "sourceUrl": "https://www.luxcapital.com/contact",
+          "sourceTitle": "Lux Capital contact page",
+          "rawSnippet": "Lux has expanded from our New York City roots to Silicon Valley."
+        },
+        {
+          "field": "aumTier",
+          "sourceUrl": "https://www.luxcapital.com/contact",
+          "sourceTitle": "Lux Capital contact page",
+          "rawSnippet": "$7+ billion AUM firm."
+        },
+        {
+          "field": "checkSizeProxy",
+          "sourceUrl": "https://www.luxcapital.com/contact",
+          "sourceTitle": "Lux Capital contact page",
+          "rawSnippet": "Invest at any stage, from $100,000 to $100 million."
+        },
+        {
+          "field": "deepTechEvidence",
+          "sourceUrl": "https://www.luxcapital.com",
+          "sourceTitle": "Lux Capital homepage",
+          "rawSnippet": "We champion companies that work at the intersection of the new and the not-yet-imagined."
+        }
+      ]
+    },
+    {
+      "fundName": "Starburst",
+      "website": "https://starburst.aero",
+      "discoverySourceUrl": "https://starburst.aero/",
+      "discoverySourceTitle": "Starburst homepage",
+      "teamLocation": "Los Angeles",
+      "stageFocus": "Startup programs and venture investments",
+      "geographyFocus": "Global aerospace and defense ecosystem",
+      "checkSizeProxy": "Unknown; verify before matching to raise amount",
+      "deepTechEvidence": "Starburst describes its investment activity around aerospace, defense, electric flight, autonomous drones, urban air mobility, climate monitoring, communications, AI, energy, national security, and new materials.",
+      "profileSourceUrls": ["https://starburst.aero/"],
+      "fieldEvidence": [
+        {
+          "field": "teamLocation",
+          "sourceUrl": "https://starburst.aero/",
+          "sourceTitle": "Starburst homepage",
+          "rawSnippet": "Global Locations (and growing): Los Angeles, Paris, Tel Aviv, Munich."
+        },
+        {
+          "field": "stageFocus",
+          "sourceUrl": "https://starburst.aero/",
+          "sourceTitle": "Starburst homepage",
+          "rawSnippet": "Combining startup accelerators, strategy consulting, and venture investments."
+        },
+        {
+          "field": "geographyFocus",
+          "sourceUrl": "https://starburst.aero/",
+          "sourceTitle": "Starburst homepage",
+          "rawSnippet": "Driving Global Aerospace & Defense Innovation."
+        },
+        {
+          "field": "deepTechEvidence",
+          "sourceUrl": "https://starburst.aero/",
+          "sourceTitle": "Starburst homepage",
+          "rawSnippet": "Invest in proven and validated deep tech."
+        }
+      ]
+    },
+    {
+      "fundName": "a16z American Dynamism",
+      "website": "https://a16z.com/american-dynamism/",
+      "discoverySourceUrl": "https://a16z.com/american-dynamism/",
+      "discoverySourceTitle": "a16z American Dynamism",
+      "stageFocus": "Unknown; verify before matching to raise amount",
+      "geographyFocus": "US national-interest sectors with companies across all 50 states and global impact",
+      "aumTier": "Unknown for strategy; verify before use",
+      "checkSizeProxy": "Unknown; verify exact check size before matching to raise amount",
+      "deepTechEvidence": "American Dynamism invests in aerospace, defense, public safety, education, housing, supply chain, industrials, and manufacturing companies that support the national interest.",
+      "profileSourceUrls": ["https://a16z.com/american-dynamism/"],
+      "fieldEvidence": [
+        {
+          "field": "geographyFocus",
+          "sourceUrl": "https://a16z.com/american-dynamism/",
+          "sourceTitle": "a16z American Dynamism",
+          "rawSnippet": "Dynamic companies exist in all 50 states and have a global impact."
+        },
+        {
+          "field": "deepTechEvidence",
+          "sourceUrl": "https://a16z.com/american-dynamism/",
+          "sourceTitle": "a16z American Dynamism",
+          "rawSnippet": "Invests in founders and companies that support the national interest."
+        }
+      ]
+    },
+    {
+      "fundName": "Eclipse",
+      "aliases": ["Eclipse Ventures"],
+      "website": "https://eclipse.capital",
+      "discoverySourceUrl": "https://eclipse.capital/",
+      "discoverySourceTitle": "Eclipse homepage",
+      "stageFocus": "Unknown; verify before matching to raise amount",
+      "geographyFocus": "Physical economy and critical systems",
+      "aumTier": "Unknown; verify before use",
+      "checkSizeProxy": "Unknown; verify before matching to raise amount",
+      "deepTechEvidence": "Eclipse says it partners with innovators transforming the physical economy and strengthening the resilience, competitiveness, and security of critical systems.",
+      "profileSourceUrls": ["https://eclipse.capital/"],
+      "fieldEvidence": [
+        {
+          "field": "geographyFocus",
+          "sourceUrl": "https://eclipse.capital/",
+          "sourceTitle": "Eclipse homepage",
+          "rawSnippet": "Entrepreneurs rebuild the industries that power our world."
+        },
+        {
+          "field": "deepTechEvidence",
+          "sourceUrl": "https://eclipse.capital/",
+          "sourceTitle": "Eclipse homepage",
+          "rawSnippet": "Innovators transforming the physical economy."
+        }
+      ]
+    }
+  ]
+}

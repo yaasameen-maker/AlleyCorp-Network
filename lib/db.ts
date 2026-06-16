@@ -1,5 +1,8 @@
 import { Pool } from "pg";
+import { config } from "dotenv";
 import type { Relationship, Signal } from "./types";
+
+config();
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -164,7 +167,40 @@ export async function searchRelationships(query: string): Promise<Relationship[]
          END,
          f.name`
     );
-    return rows as Relationship[];
+    // Also include market_prospect funds that have no relationship row at all
+    const { rows: prospectRows } = await pool.query(
+      `SELECT
+         f.id, f.name, f.website, f.is_vip, f.investor_status,
+         f.hq_location, f.aum_tier, f.stage, f.deep_tech_signal,
+         f.geography_focus, f.check_size_proxy
+       FROM fund f
+       WHERE f.investor_status = 'market_prospect'
+         AND NOT EXISTS (SELECT 1 FROM relationship r2 WHERE r2.fund_id = f.id)
+       ORDER BY f.name`
+    );
+    const prospectRelationships = prospectRows.map((f) => ({
+      id: null,
+      fundId: f.id,
+      fund: {
+        id: f.id,
+        name: f.name,
+        website: f.website,
+        isVip: f.is_vip,
+        investorStatus: f.investor_status,
+        hqLocation: f.hq_location,
+        aumTier: f.aum_tier,
+        stage: f.stage,
+        deepTechSignal: f.deep_tech_signal,
+        geographyFocus: f.geography_focus,
+        checkSizeProxy: f.check_size_proxy,
+      },
+      warmthTier: null,
+      lastSignalDate: null,
+      portfolioCompanyId: null,
+      portfolioCompany: null,
+      signals: [],
+    }));
+    return [...(rows as Relationship[]), ...prospectRelationships] as Relationship[];
   }
 
   const param = `%${query}%`;
