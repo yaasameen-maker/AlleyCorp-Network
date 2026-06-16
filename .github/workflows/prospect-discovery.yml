@@ -1,0 +1,69 @@
+# Daily Investor Prospect Discovery — runs every morning
+#
+# Phase 1: discover-investor-prospects.ts
+#   Searches for new deep tech investors, enriches profiles, runs through
+#   the source-policy gate, and writes a JSON report to .agent-runs/.
+#
+# Phase 2: import-investor-prospects.ts
+#   Reads the report, imports accepted market_prospect rows into Railway DB.
+#   Deduplication is handled by the importer — known funds are never double-written.
+#
+# Required GitHub secrets (repo → Settings → Secrets and variables → Actions):
+#   DATABASE_URL      — Railway PostgreSQL connection string
+#   EXA_API_KEY       — Exa neural search API key
+#   ANTHROPIC_API_KEY — Claude API key
+
+name: Daily Prospect Discovery
+
+on:
+  schedule:
+    # Every day at 8am UTC — after the co-investor discovery run at 7am
+    - cron: "0 8 * * *"
+
+  workflow_dispatch:
+
+jobs:
+  discover:
+    name: Discover and import investor prospects
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run prospect discovery
+        run: npm run discover:prospects
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Import accepted prospects
+        run: |
+          REPORT=$(ls -t .agent-runs/*.json 2>/dev/null | head -1)
+          if [ -z "$REPORT" ]; then
+            echo "No report file found — discovery produced no output"
+            exit 1
+          fi
+          echo "Importing from: $REPORT"
+          npm run import:prospects -- --input "$REPORT" --write
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Upload run report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prospect-discovery-report
+          path: .agent-runs/*.json
+          retention-days: 30

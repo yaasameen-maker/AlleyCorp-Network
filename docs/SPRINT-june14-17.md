@@ -731,6 +731,10 @@ No one should keep important local-only code overnight.
   - Neon -> Railway
   - Lux -> Trimble where applicable
   - digest-first language -> Today Overview
+- Extend `enrich:funds` to auto-fill missing fund metadata fields (`aum_tier`, `stage`,
+  `check_size_proxy`, `deep_tech_signal`) when null — same staleness + `--force` pattern as
+  existing contact enrichment. Applies to both new market_prospect discoveries and existing
+  co-investors. This removes the need for manual metadata fill on every new fund imported.
 
 #### Yaasameen
 
