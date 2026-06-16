@@ -52,13 +52,18 @@ interface ReportCandidate extends ReviewedInvestorProspect {
   qualityWarnings: string[];
 }
 
+// News-based queries — naturally fresh every day because new funding articles appear constantly.
+// Avoid generic "top deep tech VC" queries — they surface the same well-known names every time.
+// Date anchors (2026, 2025) keep results recent; niche terms filter for relevant investors.
 const DEFAULT_QUERIES = [
-  "deep tech venture capital firm United States",
-  "hard tech VC firm aerospace robotics defense US",
-  "frontier technology venture fund New York Boston",
-  "deep tech investors seed series A Silicon Valley",
-  "defense tech venture capital firm US-based",
-  "deep tech venture capital Europe international",
+  "deep tech startup seed funding round announced 2026",
+  "aerospace defense robotics startup Series A investment 2026",
+  "hard tech frontier technology seed round closed 2025 2026",
+  "space tech autonomy manufacturing venture funding announcement 2026",
+  "defense tech dual-use startup investment round 2026",
+  "deep tech climate infrastructure industrial venture funding 2026",
+  "robotics AI hardware startup seed Series A funding 2026",
+  "frontier technology venture capital new investment 2026",
 ];
 
 const LEAD_SOURCE_DOMAINS = [
@@ -73,8 +78,8 @@ const LEAD_SOURCE_DOMAINS = [
   "businesswire.com",
 ];
 
-const HARD_MAX_TARGETS = 10;
-const HARD_MAX_RESULTS_PER_QUERY = 6;
+const HARD_MAX_TARGETS = 15;
+const HARD_MAX_RESULTS_PER_QUERY = 10;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
