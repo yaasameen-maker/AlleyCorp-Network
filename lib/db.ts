@@ -226,8 +226,6 @@ export async function searchRelationships(query: string): Promise<Relationship[]
 }
 
 // Return all relationships with their signals, ordered by warmth tier then last signal date.
-// Also includes market_prospect funds with no relationship row so they appear in the dashboard
-// with Michael's prospect visual treatment.
 // Used by GET /api/investors to power the dashboard list view.
 export async function getAllRelationships(): Promise<Relationship[]> {
   const { rows } = await pool.query(
@@ -237,55 +235,7 @@ export async function getAllRelationships(): Promise<Relationship[]> {
        CASE r.warmth_tier WHEN 'hot' THEN 1 WHEN 'warm' THEN 2 WHEN 'stale' THEN 3 WHEN 'cold' THEN 4 ELSE 5 END,
        r.last_signal_date DESC NULLS LAST`
   );
-
-  // Union in market_prospect funds that have no relationship row at all.
-  const { rows: prospectRows } = await pool.query(
-    `SELECT
-       f.id, f.name, f.website, f.is_vip, f.investor_status,
-       f.hq_location, f.aum_tier, f.stage, f.deep_tech_signal,
-       f.geography_focus, f.check_size_proxy, f.focus,
-       f.emerging_manager, f.logo_url, f.profile_last_checked_at
-     FROM fund f
-     WHERE f.investor_status = 'market_prospect'
-       AND NOT EXISTS (SELECT 1 FROM relationship r WHERE r.fund_id = f.id)
-     ORDER BY f.name`
-  );
-
-  const prospectRelationships = prospectRows.map((f) => ({
-    id: `prospect-${f.id}`,
-    fundId: f.id,
-    portfolioCompanyId: null,
-    alleyPartner: null,
-    warmthTier: "cold",
-    lastSignalDate: null,
-    overrideNote: null,
-    discoverySource: null,
-    discoveryContext: null,
-    fund: {
-      id: f.id,
-      name: f.name,
-      focus: f.focus,
-      aumTier: f.aum_tier,
-      emergingManager: f.emerging_manager,
-      website: f.website,
-      logoUrl: f.logo_url,
-      stage: f.stage,
-      hqLocation: f.hq_location,
-      geographyFocus: f.geography_focus,
-      checkSizeProxy: f.check_size_proxy,
-      deepTechSignal: f.deep_tech_signal,
-      investorStatus: f.investor_status,
-      isVip: f.is_vip,
-      profileLastCheckedAt: f.profile_last_checked_at
-        ? f.profile_last_checked_at.toISOString().split("T")[0]
-        : null,
-    },
-    investor: null,
-    portfolioCompany: null,
-    signals: [],
-  }));
-
-  return [...(rows as Relationship[]), ...prospectRelationships] as Relationship[];
+  return rows as Relationship[];
 }
 
 // Return all stale relationships ordered oldest signal first (most at-risk first).
