@@ -84,6 +84,7 @@ export function InvestorRow({ investor, isSelected, onClick }: InvestorRowProps)
   const signalCount = investor.signals.length;
   const category = getInvestorCategory(investor);
   const vip = isVipInvestor(investor);
+  const isProspect = category.id === "market_prospect" || category.id === "newly_discovered";
 
   // Build the subtext parts: company · N signals · date
   const subtextParts: string[] = [];
@@ -101,7 +102,9 @@ export function InvestorRow({ investor, isSelected, onClick }: InvestorRowProps)
         "border-l-2 transition-all duration-150 ease-out",
         isSelected
           ? "border-l-[#0EA5D6] bg-[#F8F7F4]"
-          : "border-l-transparent hover:bg-[#F8F7F4] hover:border-l-[#0EA5D6]",
+          : isProspect
+            ? "border-l-[#E5E7EB] hover:bg-[#FAFAFA] hover:border-l-[#CBD5E1]"
+            : "border-l-transparent hover:bg-[#F8F7F4] hover:border-l-[#0EA5D6]",
       ].join(" ")}
     >
       <div className="flex items-center gap-2.5 min-w-0 flex-1">
@@ -123,6 +126,11 @@ export function InvestorRow({ investor, isSelected, onClick }: InvestorRowProps)
               {subtextParts.join(" · ")}
             </p>
           )}
+          {isProspect ? (
+            <p className="text-[10px] text-[#9CA3AF] mt-0.5 italic leading-snug">
+              Prospect — not a confirmed relationship
+            </p>
+          ) : null}
         </div>
       </div>
       <div className="flex flex-col items-end gap-1.5 shrink-0">
