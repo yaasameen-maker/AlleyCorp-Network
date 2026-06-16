@@ -108,7 +108,6 @@ export default function DashboardPage() {
 
   const handleSelectInvestor = (investor: Investor) => {
     setSelectedInvestor(investor);
-    setActiveView("briefing");
   };
 
   return (
