@@ -1,6 +1,11 @@
 /**
  * Co-investor Discovery Script
  *
+ * MANUAL RESEARCH TOOL ONLY.
+ * This script predates the source-policy gate and outputs raw SQL for review.
+ * Do not wire it into scheduled or automated DB writes unless it is refactored
+ * to emit candidate JSON and pass through the critic/source-policy pipeline.
+ *
  * Searches the web for funding rounds for AlleyCorp portfolio companies that
  * have no co-investor data yet. Uses Exa for search + Claude for extraction.
  *
