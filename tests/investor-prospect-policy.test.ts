@@ -49,7 +49,7 @@ describe("investor prospect policy", () => {
     expect(reviewed.rejectionReasons).toHaveLength(0);
   });
 
-  it("keeps records with unsourced profile fields as candidate-only", () => {
+  it("blocks on missing deepTechEvidence source evidence but not other unsourced fields", () => {
     const reviewed = reviewInvestorProspectCandidate({
       fundName: "Unsourced Deep Tech Fund",
       website: "https://unsourced.vc",
@@ -61,8 +61,9 @@ describe("investor prospect policy", () => {
     });
 
     expect(reviewed.status).toBe("candidate_only");
-    expect(reviewed.rejectionReasons).toContain("missing source evidence for teamLocation");
+    // Path B: only deepTechEvidence requires source evidence; teamLocation does not
     expect(reviewed.rejectionReasons).toContain("missing source evidence for deepTechEvidence");
+    expect(reviewed.rejectionReasons).not.toContain("missing source evidence for teamLocation");
   });
 
   it("does not require evidence for fields explicitly marked unknown", () => {
@@ -71,8 +72,8 @@ describe("investor prospect policy", () => {
       website: "https://known-thesis.vc",
       discoverySourceUrl: "https://known-thesis.vc",
       discoverySourceTitle: "Known Thesis homepage",
-      aumTier: "Unknown; verify before use",
-      checkSizeProxy: "Unknown; verify before matching to raise amount",
+      aumTier: null,
+      checkSizeProxy: null,
       deepTechEvidence: "Official website describes a deep tech thesis",
       profileSourceUrls: ["https://known-thesis.vc"],
       fieldEvidence: [
@@ -86,6 +87,51 @@ describe("investor prospect policy", () => {
 
     expect(reviewed.status).toBe("accepted_for_market_map");
     expect(reviewed.rejectionReasons).toHaveLength(0);
+  });
+
+  it("blocks acceptance on hard quality warnings (placeholder text, fund name not in evidence)", () => {
+    const reviewed = reviewInvestorProspectCandidate({
+      fundName: "Warned Fund",
+      website: "https://warned.vc",
+      discoverySourceUrl: "https://warned.vc",
+      discoverySourceTitle: "Warned Fund homepage",
+      deepTechEvidence: "Warned Fund invests in frontier robotics.",
+      profileSourceUrls: ["https://warned.vc"],
+      fieldEvidence: [
+        {
+          field: "deepTechEvidence",
+          sourceUrl: "https://warned.vc",
+          rawSnippet: "Warned Fund invests in frontier robotics.",
+        },
+      ],
+      qualityWarnings: ["source evidence contains placeholder text"],
+    });
+
+    expect(reviewed.status).toBe("candidate_only");
+    expect(reviewed.rejectionReasons).toContain(
+      "quality warnings present: source evidence contains placeholder text"
+    );
+  });
+
+  it("accepts candidates with only soft quality warnings", () => {
+    const reviewed = reviewInvestorProspectCandidate({
+      fundName: "Soft Warned Fund",
+      website: "https://softwarn.vc",
+      discoverySourceUrl: "https://softwarn.vc",
+      discoverySourceTitle: "Soft Warned Fund homepage",
+      deepTechEvidence: "Soft Warned Fund invests in frontier robotics.",
+      profileSourceUrls: ["https://softwarn.vc"],
+      fieldEvidence: [
+        {
+          field: "deepTechEvidence",
+          sourceUrl: "https://softwarn.vc",
+          rawSnippet: "Soft Warned Fund invests in frontier robotics.",
+        },
+      ],
+      qualityWarnings: ["official website evidence does not name the fund"],
+    });
+
+    expect(reviewed.status).toBe("accepted_for_market_map");
   });
 
   it("keeps directory-only records as candidate-only leads", () => {

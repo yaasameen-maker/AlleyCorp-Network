@@ -22,14 +22,15 @@ export interface InvestorProspectCandidate {
   website?: string;
   discoverySourceUrl: string;
   discoverySourceTitle?: string;
-  teamLocation?: string;
-  stageFocus?: string;
-  geographyFocus?: string;
-  aumTier?: string;
-  checkSizeProxy?: string;
-  deepTechEvidence?: string;
+  teamLocation?: string | null;
+  stageFocus?: string | null;
+  geographyFocus?: string | null;
+  aumTier?: string | null;
+  checkSizeProxy?: string | null;
+  deepTechEvidence?: string | null;
   profileSourceUrls?: string[];
   fieldEvidence?: ProspectFieldEvidence[];
+  qualityWarnings?: string[];
 }
 
 export interface ReviewedInvestorProspect extends InvestorProspectCandidate {
@@ -40,12 +41,13 @@ export interface ReviewedInvestorProspect extends InvestorProspectCandidate {
   acceptedFieldEvidence: ProspectFieldEvidence[];
 }
 
-function hasText(value: string | undefined): boolean {
+function hasText(value: string | null | undefined): boolean {
   return Boolean(value?.trim());
 }
 
-function isUnknownValue(value: string | undefined): boolean {
-  return !hasText(value) || /\bunknown\b|verify before/i.test(value!);
+function isUnknownValue(value: string | null | undefined): boolean {
+  if (value === null || value === undefined) return true;
+  return !hasText(value) || /\bunknown\b|verify before/i.test(value);
 }
 
 function isOfficialWebsiteSource(sourceUrl: string, website: string | undefined): boolean {
@@ -109,12 +111,27 @@ export function reviewInvestorProspectCandidate(
     candidateOnlyReasons.push("no profile source is eligible for enrichment");
   }
 
-  for (const field of PROFILE_FIELDS) {
-    if (isUnknownValue(candidate[field])) continue;
+  // Hard warnings block acceptance — data is untrustworthy.
+  // Soft warnings (unknown optional fields, official website label mismatch) are
+  // informational only; the profile just shows what it has and omits the rest.
+  const HARD_WARNING_PREFIXES = [
+    "source evidence contains placeholder text",
+    "fund name is not visible in captured evidence snippets",
+  ];
+  const hardWarnings = (candidate.qualityWarnings ?? []).filter((w) =>
+    HARD_WARNING_PREFIXES.some((prefix) => w.startsWith(prefix))
+  );
+  if (hardWarnings.length > 0) {
+    candidateOnlyReasons.push(`quality warnings present: ${hardWarnings.join("; ")}`);
+  }
 
-    const hasFieldEvidence = acceptedFieldEvidence.some((evidence) => evidence.field === field);
-    if (!hasFieldEvidence) {
-      candidateOnlyReasons.push(`missing source evidence for ${field}`);
+  // Only deepTechEvidence requires a source-backed evidence entry for acceptance.
+  // Optional profile fields (location, stage, AUM, geography, check size) display
+  // when present and are omitted from the UI when Unknown — they do not block acceptance.
+  if (!isUnknownValue(candidate.deepTechEvidence)) {
+    const hasDeepTechEvidence = acceptedFieldEvidence.some((e) => e.field === "deepTechEvidence");
+    if (!hasDeepTechEvidence) {
+      candidateOnlyReasons.push("missing source evidence for deepTechEvidence");
     }
   }
 

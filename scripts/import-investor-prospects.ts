@@ -15,6 +15,7 @@
 import dotenv from "dotenv";
 dotenv.config({ override: true });
 
+import { createHash } from "crypto";
 import { mkdir, readFile, writeFile } from "fs/promises";
 import { pool } from "../lib/db.js";
 import {
@@ -66,8 +67,9 @@ function provenanceNote(candidate: ReviewedInvestorProspect): string {
     .join(" ");
 }
 
-function valueOrNull(value: string | undefined): string | null {
-  if (!value?.trim()) return null;
+function valueOrNull(value: string | null | undefined): string | null {
+  if (value === null || value === undefined) return null;
+  if (!value.trim()) return null;
   if (/\bunknown\b|verify before/i.test(value)) return null;
   return value;
 }
@@ -160,7 +162,8 @@ async function writeRunReport(reviewed: ReviewedInvestorProspect[], inputPath: s
   };
 
   await mkdir(".agent-runs", { recursive: true });
-  const fileName = `.agent-runs/investor-prospects-${endedAt.replace(/[:.]/g, "-")}.json`;
+  const inputHash = createHash("sha256").update(inputPath).digest("hex").slice(0, 8);
+  const fileName = `.agent-runs/investor-prospects-${endedAt.replace(/[:.]/g, "-")}-${inputHash}.json`;
   await writeFile(fileName, `${JSON.stringify(report, null, 2)}\n`, "utf8");
   return fileName;
 }
