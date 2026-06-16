@@ -375,7 +375,7 @@ async function searchSecFiling(fundName: string): Promise<SecFilingInfo | null> 
   try {
     const res = await fetch(url, { headers: { "User-Agent": SEC_USER_AGENT } });
     if (!res.ok) return null;
-    const data = await res.json() as {
+    const data = (await res.json()) as {
       hits?: {
         hits?: Array<{
           _id?: string;
@@ -408,12 +408,14 @@ async function searchSecFiling(fundName: string): Promise<SecFilingInfo | null> 
   }
 }
 
-async function fetchSecAdvText(info: SecFilingInfo): Promise<{ text: string; docUrl: string } | null> {
+async function fetchSecAdvText(
+  info: SecFilingInfo
+): Promise<{ text: string; docUrl: string } | null> {
   const indexUrl = `https://www.sec.gov/Archives/edgar/data/${info.cik}/${info.accessionId}/${info.accessionId}-index.json`;
   try {
     const idxRes = await fetch(indexUrl, { headers: { "User-Agent": SEC_USER_AGENT } });
     if (!idxRes.ok) return null;
-    const idx = await idxRes.json() as {
+    const idx = (await idxRes.json()) as {
       directory?: { item?: Array<{ name?: string; type?: string }> };
     };
     const items = idx?.directory?.item ?? [];
@@ -746,7 +748,11 @@ ${profilePages.map((p, i) => `[${i + 1}] ${p.title}\n${p.url}\n${p.snippet}`).jo
   const extractedWebsite = normalizeUrl(extracted.website) ?? website;
   const allFetchedPages = [
     ...profilePages,
-    { url: lead.discoverySourceUrl, title: lead.discoverySourceTitle ?? "", snippet: lead.rawSnippet },
+    {
+      url: lead.discoverySourceUrl,
+      title: lead.discoverySourceTitle ?? "",
+      snippet: lead.rawSnippet,
+    },
   ];
   const fetchedUrls = new Set(allFetchedPages.map((p) => p.url));
   // Only keep profileSourceUrls that were actually fetched — prevents Claude from
@@ -781,17 +787,22 @@ ${profilePages.map((p, i) => `[${i + 1}] ${p.title}\n${p.url}\n${p.snippet}`).jo
       const secDoc = await fetchSecAdvText(secInfo);
       await sleep(300);
       if (secDoc) {
-        const aumResult = await extractAumFromSecText(claude, lead.fundName, secInfo, secDoc.text, secDoc.docUrl);
+        const aumResult = await extractAumFromSecText(
+          claude,
+          lead.fundName,
+          secInfo,
+          secDoc.text,
+          secDoc.docUrl
+        );
         if (aumResult) {
           return {
             ...baseCandidate,
             aumTier: aumResult.aumTier,
-            profileSourceUrls: [...new Set([...baseCandidate.profileSourceUrls ?? [], secDoc.docUrl])],
-            // SEC doc is added as a trusted page so sanitizeFieldEvidence allows it.
-            fieldEvidence: [
-              ...(baseCandidate.fieldEvidence ?? []),
-              aumResult.evidence,
+            profileSourceUrls: [
+              ...new Set([...(baseCandidate.profileSourceUrls ?? []), secDoc.docUrl]),
             ],
+            // SEC doc is added as a trusted page so sanitizeFieldEvidence allows it.
+            fieldEvidence: [...(baseCandidate.fieldEvidence ?? []), aumResult.evidence],
           };
         }
       }

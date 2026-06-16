@@ -164,10 +164,21 @@ describe("enforceFieldEvidenceCoverage", () => {
   ): Partial<Candidate> {
     const coveredFields = new Set(evidence.map((e) => e.field));
     const overrides: Partial<Candidate> = {};
-    const fields = ["teamLocation", "stageFocus", "geographyFocus", "aumTier", "checkSizeProxy", "deepTechEvidence"];
+    const fields = [
+      "teamLocation",
+      "stageFocus",
+      "geographyFocus",
+      "aumTier",
+      "checkSizeProxy",
+      "deepTechEvidence",
+    ];
     for (const field of fields) {
       const value = candidate[field];
-      const isUnknown = value === null || value === undefined || !value.trim() || /\bunknown\b|verify before/i.test(value);
+      const isUnknown =
+        value === null ||
+        value === undefined ||
+        !value.trim() ||
+        /\bunknown\b|verify before/i.test(value);
       if (!isUnknown && !coveredFields.has(field)) {
         overrides[field] = null;
       }
@@ -183,7 +194,9 @@ describe("enforceFieldEvidenceCoverage", () => {
 
   it("leaves a field alone when it has matching fieldEvidence", () => {
     const candidate = { teamLocation: "New York, NY" };
-    const evidence = [{ field: "teamLocation", sourceUrl: "https://fund.com", rawSnippet: "NYC office." }];
+    const evidence = [
+      { field: "teamLocation", sourceUrl: "https://fund.com", rawSnippet: "NYC office." },
+    ];
     const result = enforceFieldEvidenceCoverage(candidate, evidence);
     expect(result.teamLocation).toBeUndefined();
   });
@@ -249,7 +262,11 @@ describe("sanitizeFieldEvidence", () => {
 
   it("keeps evidence whose sourceUrl was fetched", () => {
     const evidence: ProspectFieldEvidence[] = [
-      { field: "deepTechEvidence", sourceUrl: "https://example.vc", rawSnippet: "We invest in deep tech." },
+      {
+        field: "deepTechEvidence",
+        sourceUrl: "https://example.vc",
+        rawSnippet: "We invest in deep tech.",
+      },
     ];
     expect(sanitizeFieldEvidence(evidence, [knownPage])).toHaveLength(1);
   });
@@ -275,8 +292,16 @@ describe("sanitizeFieldEvidence", () => {
 
   it("drops evidence whose rawSnippet contains placeholder text", () => {
     const evidence: ProspectFieldEvidence[] = [
-      { field: "teamLocation", sourceUrl: "https://example.vc", rawSnippet: "111 Lorem Ipsum St. Austin, TX 73301" },
-      { field: "deepTechEvidence", sourceUrl: "https://example.vc", rawSnippet: "We invest in deep tech." },
+      {
+        field: "teamLocation",
+        sourceUrl: "https://example.vc",
+        rawSnippet: "111 Lorem Ipsum St. Austin, TX 73301",
+      },
+      {
+        field: "deepTechEvidence",
+        sourceUrl: "https://example.vc",
+        rawSnippet: "We invest in deep tech.",
+      },
     ];
     const result = sanitizeFieldEvidence(evidence, [knownPage]);
     expect(result).toHaveLength(1);
