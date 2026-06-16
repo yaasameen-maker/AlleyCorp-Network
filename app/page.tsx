@@ -154,7 +154,10 @@ export default function DashboardPage() {
             <nav className="flex items-center gap-3">
               <button
                 type="button"
-                onClick={() => setActiveView(activeView === "overview" ? "briefing" : "overview")}
+                onClick={() => {
+                  setSelectedInvestor(null);
+                  setActiveView(activeView === "overview" ? "briefing" : "overview");
+                }}
                 className={`text-[11px] font-medium transition-colors rounded ${
                   activeView === "overview"
                     ? "text-[#0EA5D6] hover:text-[#0891B2]"

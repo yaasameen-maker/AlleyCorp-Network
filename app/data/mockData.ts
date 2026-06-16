@@ -26,7 +26,7 @@ export const mockInvestors: Investor[] = [
   {
     id: "1",
     name: "Riot Ventures",
-    fund: { id: "f1", name: "Riot Ventures", isVip: true },
+    fund: { id: "f1", name: "Riot Ventures", isVip: true, profileLastCheckedAt: "2026-06-10" },
     warmthTier: "Hot",
     lastSignalDate: "Mar 2025",
     suggestedAction:
@@ -39,6 +39,8 @@ export const mockInvestors: Investor[] = [
         weight: "High",
         portfolioCompanyName: "Valar Atomics",
         sourceUrl: "https://alleycorp.substack.com",
+        sourceTitle: "AlleyCorp Substack — Valar Atomics Seed",
+        rawSnippet: "Riot co-led Valar Atomics Seed alongside AlleyCorp.",
       },
     ],
     coInvestments: [
@@ -197,7 +199,15 @@ export const mockInvestors: Investor[] = [
   {
     id: "6",
     name: "a16z American Dynamism",
-    fund: { id: "f6", name: "a16z American Dynamism", investorStatus: "market_prospect" },
+    fund: {
+      id: "f6",
+      name: "a16z American Dynamism",
+      investorStatus: "market_prospect",
+      deepTechSignal: "Defense & manufacturing — American Dynamism thesis",
+      profileLastCheckedAt: "2026-06-14",
+      stage: "Series A–B",
+      geographyFocus: "US",
+    },
     warmthTier: "Cold",
     lastSignalDate: undefined,
     suggestedAction:

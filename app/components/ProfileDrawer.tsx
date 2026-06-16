@@ -3,6 +3,11 @@
 import type { Investor, WarmthTier, DiscoveryContext } from "@/lib/investors";
 import { getInvestorCategory, isVipInvestor } from "@/app/lib/investorCategory";
 import { InvestorCategoryBadge, VipStar } from "@/app/components/InvestorCategoryBadge";
+import {
+  GroupedProfileEvidence,
+  MarketProspectNotice,
+  ProfileFreshness,
+} from "@/app/components/ProfileEvidence";
 import { WarmthBadge } from "./InvestorRow";
 
 interface ProfileDrawerProps {
@@ -337,6 +342,7 @@ export function ProfileDrawer({ investor, onClose }: ProfileDrawerProps) {
                   <WarmthBadge tier={investor.warmthTier} />
                   <InvestorCategoryBadge category={category} />
                 </div>
+                <ProfileFreshness investor={investor} />
               </div>
             </div>
             <button
@@ -352,6 +358,8 @@ export function ProfileDrawer({ investor, onClose }: ProfileDrawerProps) {
 
         {/* ── Scrollable content ── */}
         <div className="flex-1 min-h-0 overflow-y-auto">
+          <MarketProspectNotice category={category} />
+
           {/* Relationship summary */}
           <div className="px-7 pt-6 pb-6 border-b border-[#F3F4F6]">
             <SectionLabel>Relationship status</SectionLabel>
@@ -444,56 +452,11 @@ export function ProfileDrawer({ investor, onClose }: ProfileDrawerProps) {
             </div>
           )}
 
-          {/* Signal timeline */}
-          {investor.signals.length > 0 && (
-            <div className="px-7 pt-6 pb-8">
-              <SectionLabel>Engagement history</SectionLabel>
-              <div className="space-y-4">
-                {investor.signals.map((signal, i) => (
-                  <div key={i} className="flex gap-4">
-                    <span className="text-[10px] text-[#9CA3AF] shrink-0 w-[72px] tabular-nums pt-0.5 text-right">
-                      {signal.date}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-[#0D1320]">
-                        {signalLabel(signal.type)}
-                        {signal.type === "co-investment" && signal.portfolioCompanyName && (
-                          <span className="font-normal text-[#6B7280]">
-                            {" · "}
-                            {signal.portfolioCompanyName}
-                          </span>
-                        )}
-                      </p>
-                      {signal.description && (
-                        <p className="text-xs text-[#6B7280] mt-0.5 leading-relaxed">
-                          {signal.description}
-                        </p>
-                      )}
-                      {signal.sourceUrl && (
-                        <a
-                          href={signal.sourceUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-[11px] text-[#0EA5D6] hover:text-[#0284C7] transition-colors mt-1"
-                        >
-                          {signal.source ?? "Source"}
-                          <svg width="9" height="9" viewBox="0 0 10 10" fill="none" aria-hidden>
-                            <path
-                              d="M1.5 8.5L8.5 1.5M8.5 1.5H3.5M8.5 1.5V6.5"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Source-backed evidence — grouped by company / source type */}
+          <div className="px-7 pt-6 pb-8">
+            <SectionLabel>Evidence</SectionLabel>
+            <GroupedProfileEvidence signals={investor.signals} />
+          </div>
         </div>
       </aside>
     </>
