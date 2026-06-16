@@ -240,7 +240,12 @@ VALUES
   (gen_random_uuid(), 'SOSV',                       'sosv.com',              'Hard tech, biotech (HAX accelerator)',  'Pre-Seed/Seed',    now(), now()),
   (gen_random_uuid(), 'Trimble Ventures',           'trimbleventures.com',   'Construction tech, geospatial',         'Seed to Series A', now(), now()),
   (gen_random_uuid(), 'BOLD Capital Partners',      'boldcap.com',           'Robotics, AI, defense',                 'Seed to Series A', now(), now()),
-  (gen_random_uuid(), 'SineWave Ventures',          'sinewaveventures.com',  'Deep tech, advanced manufacturing',     'Series A/B',       now(), now());
+  (gen_random_uuid(), 'SineWave Ventures',          'sinewaveventures.com',  'Deep tech, advanced manufacturing',     'Series A/B',       now(), now()),
+  -- Portal Space Systems Series A participants (Apr 2026) — verified from press release
+  -- Source: https://www.portalsystems.space/news/press-release-portal-space-systems-raises-50-million-series-a-to-advance-rapidly-maneuverable-spacecraft-capabilities
+  (gen_random_uuid(), 'Booz Allen Ventures',        'boozallen.com',         'Defense tech, national security, deep tech', 'Series A+',    now(), now()),
+  (gen_random_uuid(), 'ARK Invest',                 'ark-invest.com',        'Disruptive innovation, space, autonomous technology', 'Multi-stage', now(), now()),
+  (gen_random_uuid(), 'FUSE',                       NULL,                    'Venture capital',                           NULL,           now(), now());
 
 -- ─────────────────────────────────────────
 -- 6. Additional Relationships
@@ -282,6 +287,27 @@ SELECT gen_random_uuid(),
   (SELECT id FROM fund WHERE name = 'Geodesic Capital'),
   (SELECT id FROM portfolio_company WHERE name = 'Portal Space Systems'),
   'hot', '2026-04-15', now(), now();
+
+-- Booz Allen Ventures + Portal Space Systems · hot (Series A Apr 2026)
+INSERT INTO relationship (id, fund_id, portfolio_company_id, warmth_tier, last_signal_date, created_at, updated_at)
+SELECT gen_random_uuid(),
+  (SELECT id FROM fund WHERE name = 'Booz Allen Ventures'),
+  (SELECT id FROM portfolio_company WHERE name = 'Portal Space Systems'),
+  'hot', '2026-04-09', now(), now();
+
+-- ARK Invest + Portal Space Systems · hot (Series A Apr 2026)
+INSERT INTO relationship (id, fund_id, portfolio_company_id, warmth_tier, last_signal_date, created_at, updated_at)
+SELECT gen_random_uuid(),
+  (SELECT id FROM fund WHERE name = 'ARK Invest'),
+  (SELECT id FROM portfolio_company WHERE name = 'Portal Space Systems'),
+  'hot', '2026-04-09', now(), now();
+
+-- FUSE + Portal Space Systems · hot (Series A Apr 2026)
+INSERT INTO relationship (id, fund_id, portfolio_company_id, warmth_tier, last_signal_date, created_at, updated_at)
+SELECT gen_random_uuid(),
+  (SELECT id FROM fund WHERE name = 'FUSE'),
+  (SELECT id FROM portfolio_company WHERE name = 'Portal Space Systems'),
+  'hot', '2026-04-09', now(), now();
 
 -- Amazon Climate Pledge Fund + Glacier · hot (Series A Apr 2025)
 INSERT INTO relationship (id, fund_id, portfolio_company_id, warmth_tier, last_signal_date, created_at, updated_at)
@@ -412,6 +438,39 @@ SELECT gen_random_uuid(), r.id, 'co_investment', '2026-04-20', 'AlleyCorp Substa
   'Series A $50M · Apr 2026 · co-lead alongside Geodesic Capital (AlleyCorp participated, $250M valuation)', 'high', 'confirmed', now()
 FROM relationship r JOIN fund f ON f.id = r.fund_id JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
 WHERE f.name = 'Mach33' AND pc.name = 'Portal Space Systems';
+
+-- Booz Allen Ventures + Portal Space Systems: Series A Apr 2026
+INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, source_url, source_title, raw_snippet, value, weight, confidence, created_at)
+SELECT gen_random_uuid(), r.id, 'co_investment', '2026-04-09',
+  'Portal Space Systems press release',
+  'https://www.portalsystems.space/news/press-release-portal-space-systems-raises-50-million-series-a-to-advance-rapidly-maneuverable-spacecraft-capabilities',
+  'Portal Space Systems Raises $50 Million Series A',
+  'The round was led by Geodesic Capital and Mach33, with participation from Booz Allen Ventures, ARK Invest, AlleyCorp, and FUSE.',
+  'Series A $50M · Apr 2026 · participant alongside Geodesic Capital, Mach33, ARK Invest, FUSE', 'high', 'confirmed', now()
+FROM relationship r JOIN fund f ON f.id = r.fund_id JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
+WHERE f.name = 'Booz Allen Ventures' AND pc.name = 'Portal Space Systems';
+
+-- ARK Invest + Portal Space Systems: Series A Apr 2026
+INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, source_url, source_title, raw_snippet, value, weight, confidence, created_at)
+SELECT gen_random_uuid(), r.id, 'co_investment', '2026-04-09',
+  'Portal Space Systems press release',
+  'https://www.portalsystems.space/news/press-release-portal-space-systems-raises-50-million-series-a-to-advance-rapidly-maneuverable-spacecraft-capabilities',
+  'Portal Space Systems Raises $50 Million Series A',
+  'The round was led by Geodesic Capital and Mach33, with participation from Booz Allen Ventures, ARK Invest, AlleyCorp, and FUSE.',
+  'Series A $50M · Apr 2026 · participant alongside Geodesic Capital, Mach33, Booz Allen Ventures, FUSE', 'high', 'confirmed', now()
+FROM relationship r JOIN fund f ON f.id = r.fund_id JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
+WHERE f.name = 'ARK Invest' AND pc.name = 'Portal Space Systems';
+
+-- FUSE + Portal Space Systems: Series A Apr 2026
+INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, source_url, source_title, raw_snippet, value, weight, confidence, created_at)
+SELECT gen_random_uuid(), r.id, 'co_investment', '2026-04-09',
+  'Portal Space Systems press release',
+  'https://www.portalsystems.space/news/press-release-portal-space-systems-raises-50-million-series-a-to-advance-rapidly-maneuverable-spacecraft-capabilities',
+  'Portal Space Systems Raises $50 Million Series A',
+  'The round was led by Geodesic Capital and Mach33, with participation from Booz Allen Ventures, ARK Invest, AlleyCorp, and FUSE.',
+  'Series A $50M · Apr 2026 · participant alongside Geodesic Capital, Mach33, Booz Allen Ventures, ARK Invest', 'high', 'confirmed', now()
+FROM relationship r JOIN fund f ON f.id = r.fund_id JOIN portfolio_company pc ON pc.id = r.portfolio_company_id
+WHERE f.name = 'FUSE' AND pc.name = 'Portal Space Systems';
 
 -- Amazon Climate Pledge Fund + Glacier: Seed Extension Mar 2024 + Series A Apr 2025
 INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, value, weight, confidence, created_at)
@@ -751,6 +810,9 @@ SET
     WHEN 'Trimble Ventures' THEN 'Westminster, CO'
     WHEN 'BOLD Capital Partners' THEN 'Los Angeles'
     WHEN 'SineWave Ventures' THEN 'Washington, DC'
+    WHEN 'Booz Allen Ventures' THEN 'McLean, VA'
+    WHEN 'ARK Invest' THEN 'New York / St. Petersburg, FL'
+    WHEN 'FUSE' THEN NULL
     ELSE hq_location
   END,
   geography_focus = CASE name

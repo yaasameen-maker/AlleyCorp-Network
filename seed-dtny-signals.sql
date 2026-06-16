@@ -5,16 +5,26 @@
 
 BEGIN;
 
--- USV has no relationship row yet — create one without a portfolio company.
--- portfolio_company_id is NULL: USV attended DTNY but has no AlleyCorp co-investment yet.
+-- USV, Eclipse, and a16z have no relationship rows — create cold ones (event contact, no co-investment yet).
 INSERT INTO relationship (id, fund_id, portfolio_company_id, warmth_tier, last_signal_date, created_at, updated_at)
 VALUES (
   gen_random_uuid(),
   (SELECT id FROM fund WHERE name = 'Union Square Ventures'),
-  NULL,
-  'cold',
-  '2026-01-28',
-  now(), now()
+  NULL, 'cold', '2026-01-28', now(), now()
+);
+
+INSERT INTO relationship (id, fund_id, portfolio_company_id, warmth_tier, last_signal_date, created_at, updated_at)
+VALUES (
+  gen_random_uuid(),
+  (SELECT id FROM fund WHERE name = 'Eclipse'),  -- fund is 'Eclipse' not 'Eclipse Ventures'
+  NULL, 'cold', '2026-01-28', now(), now()
+);
+
+INSERT INTO relationship (id, fund_id, portfolio_company_id, warmth_tier, last_signal_date, created_at, updated_at)
+VALUES (
+  gen_random_uuid(),
+  (SELECT id FROM fund WHERE name = 'a16z American Dynamism'),
+  NULL, 'cold', '2026-01-28', now(), now()
 );
 
 -- Riot Ventures — Nolan Van Nortwick (Principal) attended DTNY
@@ -49,7 +59,7 @@ VALUES (
 INSERT INTO signal (id, relationship_id, signal_type, signal_date, source, value, weight, confidence, created_at)
 VALUES (
   gen_random_uuid(),
-  (SELECT r.id FROM relationship r JOIN fund f ON f.id = r.fund_id WHERE f.name = 'Eclipse Ventures' LIMIT 1),
+  (SELECT r.id FROM relationship r JOIN fund f ON f.id = r.fund_id WHERE f.name = 'Eclipse' LIMIT 1),
   'event_attendance',
   '2026-01-28',
   'DTNY: Deep Tech New York',
@@ -117,12 +127,15 @@ VALUES (
 
 -- Update last_signal_date for all affected relationships
 -- NOTE: Riot Ventures is included here — was missing from original seed
+-- Only update last_signal_date for non-stale relationships.
+-- Stale warmth tiers are owned by recalibrate — the seed should not auto-upgrade them.
 UPDATE relationship SET last_signal_date = '2026-01-28', updated_at = now()
-WHERE fund_id IN (
-  SELECT id FROM fund WHERE name IN (
-    'Riot Ventures', 'BOLD Capital Partners', 'Eclipse Ventures', 'ff Venture Capital',
-    'Union Square Ventures', 'a16z American Dynamism', 'Mach33'
-  )
-);
+WHERE warmth_tier != 'stale'
+  AND fund_id IN (
+    SELECT id FROM fund WHERE name IN (
+      'Riot Ventures', 'BOLD Capital Partners', 'Eclipse', 'ff Venture Capital',
+      'Union Square Ventures', 'a16z American Dynamism', 'Mach33'
+    )
+  );
 
 COMMIT;
