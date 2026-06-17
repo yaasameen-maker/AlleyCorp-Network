@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef } from "react";
+import { ANIMATION_TOGGLE_EVENT } from "@/app/hooks/useAnimationToggle";
 
 interface Particle {
   x: number;
@@ -14,9 +15,12 @@ const PARTICLE_COUNT = 120;
 const CONNECTION_DISTANCE = 180;
 const REPULSION_RADIUS = 120;
 const REPULSION_STRENGTH = 0.012;
+const STORAGE_KEY = "alleycorp-animation";
 
 export default function NetworkBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  // Ref so the animation loop closure always reads the current value without re-mounting.
+  const enabledRef = useRef(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -24,13 +28,16 @@ export default function NetworkBackground() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Explicitly-typed non-null captures for use inside closures.
     const cv: HTMLCanvasElement = canvas;
     const cx: CanvasRenderingContext2D = ctx;
 
     let animationId: number;
     let particles: Particle[] = [];
     let mousePending = false;
+
+    // Read initial preference from localStorage (default OFF).
+    const stored = localStorage.getItem(STORAGE_KEY);
+    enabledRef.current = stored === null ? false : stored === "true";
 
     function createParticle(): Particle {
       return {
@@ -53,6 +60,8 @@ export default function NetworkBackground() {
     }
 
     function animate(): void {
+      if (!enabledRef.current) return;
+
       const isDark = document.documentElement.classList.contains("dark");
 
       cx.clearRect(0, 0, cv.width, cv.height);
@@ -92,8 +101,19 @@ export default function NetworkBackground() {
       animationId = requestAnimationFrame(animate);
     }
 
+    function start(): void {
+      resize();
+      init();
+      animate();
+    }
+
+    function stop(): void {
+      cancelAnimationFrame(animationId);
+      cx.clearRect(0, 0, cv.width, cv.height);
+    }
+
     function handleMouseMove(e: MouseEvent): void {
-      if (mousePending) return;
+      if (!enabledRef.current || mousePending) return;
       mousePending = true;
       requestAnimationFrame(() => {
         for (const p of particles) {
@@ -113,17 +133,29 @@ export default function NetworkBackground() {
       init();
     }
 
-    resize();
-    init();
-    animate();
+    function handleToggle(e: Event): void {
+      const next = (e as CustomEvent<{ enabled: boolean }>).detail.enabled;
+      enabledRef.current = next;
+      if (next) {
+        start();
+      } else {
+        stop();
+      }
+    }
 
     window.addEventListener("resize", handleResize);
     window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener(ANIMATION_TOGGLE_EVENT, handleToggle);
+
+    if (enabledRef.current) {
+      start();
+    }
 
     return () => {
       cancelAnimationFrame(animationId);
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener(ANIMATION_TOGGLE_EVENT, handleToggle);
     };
   }, []);
 

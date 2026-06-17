@@ -12,6 +12,7 @@ import { getInvestors } from "@/app/data/investors";
 import { matchesInvestorSearch } from "@/app/lib/investorSearch";
 import { type Investor, type WarmthTier } from "@/lib/investors";
 import { useDarkMode } from "@/app/hooks/useDarkMode";
+import { useAnimationToggle } from "@/app/hooks/useAnimationToggle";
 
 // AppSidebar is no longer used — layout is now full-width single column.
 // The sidebar's investor list, filter chips, and nav have moved inline below.
@@ -71,6 +72,7 @@ export default function DashboardPage() {
   const [activeView, setActiveView] = useState<"briefing" | "overview">("briefing");
   const [askOpen, setAskOpen] = useState(false);
   const { dark, toggle: toggleDark } = useDarkMode();
+  const { enabled: animEnabled, toggle: toggleAnim } = useAnimationToggle();
 
   useEffect(() => {
     getInvestors()
@@ -295,6 +297,16 @@ export default function DashboardPage() {
           </>
         )}
       </main>
+
+      {/* ── Animation toggle ── */}
+      <button
+        type="button"
+        onClick={toggleAnim}
+        aria-label={animEnabled ? "Turn off background animation" : "Turn on background animation"}
+        className="fixed bottom-6 left-6 z-30 px-3 py-1.5 rounded-full text-[11px] font-medium text-[#6B7280] bg-white/80 backdrop-blur-sm border border-[#E5E7EB] hover:text-[#0D1320] hover:border-[#D1D5DB] dark:bg-[#0D1320]/80 dark:text-[#9CA3AF] dark:border-[#1F2937] dark:hover:text-white transition-colors duration-150 tracking-wide shadow-sm"
+      >
+        {animEnabled ? "Animation off" : "Animation on"}
+      </button>
 
       {/* ── FAB: Ask the network ── */}
       <button

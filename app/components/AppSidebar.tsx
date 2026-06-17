@@ -3,6 +3,7 @@
 import type { Investor, WarmthTier } from "@/lib/investors";
 import { InvestorRow } from "./InvestorRow";
 import { useDarkMode } from "@/app/hooks/useDarkMode";
+import { useAnimationToggle } from "@/app/hooks/useAnimationToggle";
 
 interface AppSidebarProps {
   investors: Investor[];
@@ -38,13 +39,13 @@ function SearchIcon() {
 }
 
 /** Pill toggle — teal when on, gray when off */
-function DarkToggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
+function PillToggle({ on, onToggle, ariaLabel }: { on: boolean; onToggle: () => void; ariaLabel: string }) {
   return (
     <button
       type="button"
       role="switch"
       aria-checked={on}
-      aria-label={on ? "Switch to light mode" : "Switch to dark mode"}
+      aria-label={ariaLabel}
       onClick={onToggle}
       className="relative shrink-0 w-8 h-[18px] rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0EA5D6]"
       style={{ backgroundColor: on ? "#0EA5D6" : "#D1D5DB" }}
@@ -71,14 +72,24 @@ export function AppSidebar({
   onAskOpen,
 }: AppSidebarProps) {
   const { dark, toggle: toggleDark } = useDarkMode();
+  const { enabled: animEnabled, toggle: toggleAnim } = useAnimationToggle();
 
   return (
     <aside className="w-[272px] shrink-0 h-[100dvh] flex flex-col bg-white border-r border-[#EAECEF] z-10">
-      {/* ── Header — wordmark + dark toggle ── */}
+      {/* ── Header — wordmark + toggles ── */}
       <div className="px-5 pt-6 pb-4 shrink-0">
         <div className="flex items-center justify-between mb-3">
           <img src="/logo.png" alt="AlleyCorp" className="h-8 w-8 object-contain rounded-md" />
-          <DarkToggle on={dark} onToggle={toggleDark} />
+          <div className="flex items-center gap-3">
+            <div className="flex flex-col items-center gap-0.5">
+              <PillToggle on={animEnabled} onToggle={toggleAnim} ariaLabel="Toggle background animation" />
+              <span className="text-[8px] text-[#C4C9D4] select-none">FX</span>
+            </div>
+            <div className="flex flex-col items-center gap-0.5">
+              <PillToggle on={dark} onToggle={toggleDark} ariaLabel={dark ? "Switch to light mode" : "Switch to dark mode"} />
+              <span className="text-[8px] text-[#C4C9D4] select-none">Dark</span>
+            </div>
+          </div>
         </div>
         <p className="text-[11px] text-[#9CA3AF] leading-tight">
           Co-investor network
