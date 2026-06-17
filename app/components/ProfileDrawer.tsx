@@ -290,6 +290,44 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
+/* ── Fund metadata row ── */
+function MetaRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex gap-3 py-2 border-b border-[#FAFAFA] last:border-0">
+      <span className="text-[11px] text-[#9CA3AF] uppercase tracking-wide w-24 shrink-0 pt-px">
+        {label}
+      </span>
+      <span className="text-sm text-[#374151] leading-snug">{value}</span>
+    </div>
+  );
+}
+
+/* ── Fund profile metadata section ── */
+function FundProfile({ investor }: { investor: Investor }) {
+  const { fund } = investor;
+  const rows: { label: string; value: string }[] = [
+    fund.hqLocation ? { label: "Location", value: fund.hqLocation } : null,
+    fund.stage ? { label: "Stage", value: fund.stage } : null,
+    fund.aumTier ? { label: "AUM", value: fund.aumTier } : null,
+    fund.checkSizeProxy ? { label: "Check size", value: fund.checkSizeProxy } : null,
+    fund.geographyFocus ? { label: "Geography", value: fund.geographyFocus } : null,
+    fund.deepTechSignal ? { label: "Deep tech", value: fund.deepTechSignal } : null,
+  ].filter((r): r is { label: string; value: string } => r !== null);
+
+  if (rows.length === 0) return null;
+
+  return (
+    <div className="px-7 pt-6 pb-6 border-b border-[#F3F4F6]">
+      <SectionLabel>Fund profile</SectionLabel>
+      <div>
+        {rows.map((r) => (
+          <MetaRow key={r.label} label={r.label} value={r.value} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ── Drawer ── */
 export function ProfileDrawer({ investor, onClose }: ProfileDrawerProps) {
   const uniqueCoInvestments = investor.coInvestments.filter(
@@ -359,6 +397,9 @@ export function ProfileDrawer({ investor, onClose }: ProfileDrawerProps) {
         {/* ── Scrollable content ── */}
         <div className="flex-1 min-h-0 overflow-y-auto">
           <MarketProspectNotice category={category} />
+
+          {/* Fund profile metadata */}
+          <FundProfile investor={investor} />
 
           {/* Relationship summary */}
           <div className="px-7 pt-6 pb-6 border-b border-[#F3F4F6]">

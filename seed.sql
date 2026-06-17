@@ -60,7 +60,10 @@ VALUES
   -- Avatar Robotics co-investors — Seed $6.01M, Jan 30 2026
   -- Source: Crunchbase. Round led by ARV alongside Defy Partners and REFASHIOND Ventures.
   (gen_random_uuid(), 'Defy Partners',            'defy.vc',               'Early-stage technology',            'Pre-Seed to Series A', now(), now()),
-  (gen_random_uuid(), 'REFASHIOND Ventures',      'refashiond.vc',         'Supply chain technology',           'Pre-Seed / Seed',      now(), now());
+  (gen_random_uuid(), 'REFASHIOND Ventures',      'refashiond.vc',         'Supply chain technology',           'Pre-Seed / Seed',      now(), now()),
+  -- Overmatch Ventures — deep tech / defense / space. $250M Fund II (Mar 2026).
+  -- Source: businesswire.com/news/home/20260324607778 · overmatch.vc/faq
+  (gen_random_uuid(), 'Overmatch Ventures',       'overmatch.vc',          'Deep tech, defense, space',         'Seed to Growth',       now(), now());
 
 -- ─────────────────────────────────────────
 -- 3. Relationships
@@ -784,7 +787,7 @@ SET
 UPDATE fund
 SET
   investor_status = CASE
-    WHEN name IN ('Lux Capital', 'Union Square Ventures', 'a16z American Dynamism', 'Eclipse', 'Founders Fund') THEN 'market_prospect'
+    WHEN name IN ('Lux Capital', 'Union Square Ventures', 'a16z American Dynamism', 'Eclipse', 'Founders Fund', 'Overmatch Ventures') THEN 'market_prospect'
     WHEN name IN ('Riot Ventures', 'Snowpoint Ventures', 'General Catalyst', 'Mach33') THEN 'vip_co_investor'
     ELSE 'known_co_investor'
   END,
@@ -802,6 +805,7 @@ SET
     WHEN 'a16z American Dynamism' THEN NULL
     WHEN 'Eclipse' THEN NULL
     WHEN 'Founders Fund' THEN 'San Francisco'
+    WHEN 'Overmatch Ventures' THEN '108 W Gibson St, Austin, TX 78704'
     WHEN 'Defy Partners' THEN 'Woodside, CA (Bay Area)'
     WHEN 'REFASHIOND Ventures' THEN 'New York'
     WHEN 'Day One Ventures' THEN 'San Francisco'
@@ -827,6 +831,7 @@ SET
     WHEN 'a16z American Dynamism' THEN 'US national-interest sectors with companies across all 50 states and global impact'
     WHEN 'Eclipse' THEN 'Physical economy and critical systems'
     WHEN 'Founders Fund' THEN 'US, hard tech and frontier technology'
+    WHEN 'Overmatch Ventures' THEN 'Primarily US-based'
     WHEN 'Geodesic Capital' THEN 'US and global growth-stage network'
     WHEN 'Amazon Climate Pledge Fund' THEN 'Climate and sustainability network'
     ELSE 'US deep tech network'
@@ -840,6 +845,7 @@ SET
     WHEN name = 'FUSE' THEN 'Seed / early Series A (check size undisclosed)'
     WHEN name = 'Booz Allen Ventures' THEN '$5M–$10M (strategic co-investor, does not lead)'
     WHEN name IN ('a16z American Dynamism', 'Eclipse') THEN NULL
+    WHEN name = 'Overmatch Ventures' THEN 'Pre-Seed $1M · Seed ~$2M · Series A ~$3M · Series B-C $5-15M (SPV)'
     WHEN stage ILIKE '%Series A%' OR stage ILIKE '%Series B%' OR stage ILIKE '%Multi%' THEN 'Series A+ capable'
     WHEN stage ILIKE '%Pre-Seed%' THEN 'Pre-seed / seed'
     WHEN stage ILIKE '%Seed%' THEN 'Seed / early Series A'
@@ -890,6 +896,7 @@ SET aum_tier = CASE name
   WHEN 'REFASHIOND Ventures'        THEN 'Emerging (~$10M/yr rolling fund)'
   WHEN 'ARK Invest'                 THEN 'Emerging (~$110M — ARK Venture Fund ARKVX, as of end 2024)'
   WHEN 'Booz Allen Ventures'        THEN 'Mid (~$300M)'
+  WHEN 'Overmatch Ventures'         THEN 'Mid (~$320M)'
   ELSE aum_tier
 END;
 

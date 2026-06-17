@@ -51,6 +51,7 @@ export interface Investor {
     logoUrl?: string;
     website?: string;
     stage?: string;
+    aumTier?: string;
     hqLocation?: string;
     geographyFocus?: string;
     checkSizeProxy?: string;
@@ -177,6 +178,7 @@ export function groupByFund(relationships: Relationship[]): Investor[] {
           logoUrl: r.fund?.logoUrl,
           website: r.fund?.website,
           stage: r.fund?.stage,
+          aumTier: r.fund?.aumTier,
           hqLocation: r.fund?.hqLocation,
           geographyFocus: r.fund?.geographyFocus,
           checkSizeProxy: r.fund?.checkSizeProxy,

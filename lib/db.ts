@@ -244,7 +244,9 @@ export async function getAllRelationships(): Promise<Relationship[]> {
        f.id, f.name, f.website, f.is_vip, f.investor_status,
        f.hq_location, f.aum_tier, f.stage, f.deep_tech_signal,
        f.geography_focus, f.check_size_proxy, f.focus,
-       f.emerging_manager, f.logo_url, f.profile_last_checked_at
+       f.emerging_manager, f.logo_url, f.profile_last_checked_at,
+       (SELECT json_build_object('id', i.id, 'name', i.name, 'role', i.role, 'linkedinUrl', i.linkedin_url)
+        FROM investor i WHERE i.fund_id = f.id ORDER BY i.created_at LIMIT 1) AS investor
      FROM fund f
      WHERE f.investor_status = 'market_prospect'
        AND NOT EXISTS (SELECT 1 FROM relationship r WHERE r.fund_id = f.id)
@@ -280,7 +282,7 @@ export async function getAllRelationships(): Promise<Relationship[]> {
         ? f.profile_last_checked_at.toISOString().split("T")[0]
         : null,
     },
-    investor: null,
+    investor: f.investor ?? null,
     portfolioCompany: null,
     signals: [],
   }));
