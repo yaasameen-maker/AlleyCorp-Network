@@ -38,23 +38,49 @@ function SearchIcon() {
   );
 }
 
-/** Pill toggle — teal when on, gray when off */
-function PillToggle({ on, onToggle, ariaLabel }: { on: boolean; onToggle: () => void; ariaLabel: string }) {
+/** Skeuomorphic toggle — raised thumb, inset track, teal glow when on */
+function SkeuToggle({ on, onToggle, label }: { on: boolean; onToggle: () => void; label: string }) {
   return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={on}
-      aria-label={ariaLabel}
-      onClick={onToggle}
-      className="relative shrink-0 w-8 h-[18px] rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0EA5D6]"
-      style={{ backgroundColor: on ? "#0EA5D6" : "#D1D5DB" }}
-    >
-      <span
-        className="absolute top-[2px] left-0 w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform duration-200"
-        style={{ transform: on ? "translateX(18px)" : "translateX(2px)" }}
-      />
-    </button>
+    <div className="flex items-center justify-between gap-3">
+      <span style={{ fontSize: 9, color: "#9CA3AF", fontWeight: 600, letterSpacing: "0.08em", userSelect: "none" }}>
+        {label}
+      </span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={on}
+        aria-label={`Toggle ${label}`}
+        onClick={onToggle}
+        style={{
+          position: "relative",
+          width: 32,
+          height: 18,
+          borderRadius: 9,
+          border: "none",
+          cursor: "pointer",
+          flexShrink: 0,
+          backgroundColor: on ? "#0EA5D6" : "#CBD5E1",
+          boxShadow: on
+            ? "0 0 8px rgba(14,165,214,0.5), inset 0 1px 1px rgba(255,255,255,0.2)"
+            : "inset 0 2px 3px rgba(0,0,0,0.18), inset 0 0 0 1px rgba(0,0,0,0.06)",
+          transition: "background-color 0.2s, box-shadow 0.2s",
+        }}
+      >
+        <span
+          style={{
+            position: "absolute",
+            top: 2,
+            borderRadius: "50%",
+            width: 14,
+            height: 14,
+            background: "linear-gradient(180deg, #ffffff 0%, #f0f0f0 100%)",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.28), 0 0 0 0.5px rgba(0,0,0,0.06)",
+            transform: on ? "translateX(16px)" : "translateX(2px)",
+            transition: "transform 0.2s",
+          }}
+        />
+      </button>
+    </div>
   );
 }
 
@@ -80,15 +106,17 @@ export function AppSidebar({
       <div className="px-5 pt-6 pb-4 shrink-0">
         <div className="flex items-center justify-between mb-3">
           <img src="/logo.png" alt="AlleyCorp" className="h-8 w-8 object-contain rounded-md" />
-          <div className="flex items-center gap-3">
-            <div className="flex flex-col items-center gap-0.5">
-              <PillToggle on={animEnabled} onToggle={toggleAnim} ariaLabel="Toggle background animation" />
-              <span className="text-[8px] text-[#C4C9D4] select-none">FX</span>
-            </div>
-            <div className="flex flex-col items-center gap-0.5">
-              <PillToggle on={dark} onToggle={toggleDark} ariaLabel={dark ? "Switch to light mode" : "Switch to dark mode"} />
-              <span className="text-[8px] text-[#C4C9D4] select-none">Dark</span>
-            </div>
+          <div
+            style={{
+              background: dark ? "#1a2535" : "#F0F2F5",
+              borderRadius: 12,
+              padding: "8px 10px",
+              boxShadow: "inset 0 2px 4px rgba(0,0,0,0.10), inset 0 0 0 1px rgba(0,0,0,0.06)",
+            }}
+          >
+            <SkeuToggle on={animEnabled} onToggle={toggleAnim} label="FX" />
+            <div style={{ height: 6 }} />
+            <SkeuToggle on={dark} onToggle={toggleDark} label="Dark" />
           </div>
         </div>
         <p className="text-[11px] text-[#9CA3AF] leading-tight">
