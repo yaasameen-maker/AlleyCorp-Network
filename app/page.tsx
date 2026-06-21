@@ -130,7 +130,7 @@ export default function DashboardPage() {
         className="sticky top-0 z-20 bg-white/90 backdrop-blur-sm"
         style={{ paddingTop: "3px" }}
       >
-        <div className="w-full px-6 py-3 flex items-center justify-between gap-4">
+        <div className="w-full px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
           {/* Logo + wordmark */}
           <div className="flex items-center gap-3 min-w-0">
             <Image
@@ -152,7 +152,7 @@ export default function DashboardPage() {
 
           {/* Nav + dark toggle */}
           <div className="flex items-center gap-4 shrink-0">
-            <nav className="flex items-center gap-3">
+            <nav className="hidden sm:flex items-center gap-3">
               <button
                 type="button"
                 onClick={() => {
@@ -174,14 +174,14 @@ export default function DashboardPage() {
                 Portfolio
               </Link>
             </nav>
-            <div className="w-px h-4 bg-[#E5E7EB]" aria-hidden />
+            <div className="hidden sm:block w-px h-4 bg-[#E5E7EB]" aria-hidden />
             <DarkToggle on={dark} onToggle={toggleDark} />
           </div>
         </div>
       </header>
 
       {/* ── Main content ── */}
-      <main className="max-w-2xl mx-auto px-6 pb-28">
+      <main className="max-w-2xl mx-auto px-4 sm:px-6 pb-28">
         {loading ? (
           <div className="flex items-center justify-center py-24">
             <p className="text-sm text-[#9CA3AF]">Loading…</p>

@@ -317,7 +317,7 @@ function FundProfile({ investor }: { investor: Investor }) {
   if (rows.length === 0) return null;
 
   return (
-    <div className="px-7 pt-6 pb-6 border-b border-[#F3F4F6]">
+    <div className="px-4 sm:px-7 pt-6 pb-6 border-b border-[#F3F4F6]">
       <SectionLabel>Fund profile</SectionLabel>
       <div>
         {rows.map((r) => (
@@ -348,11 +348,11 @@ export function ProfileDrawer({ investor, onClose }: ProfileDrawerProps) {
 
       {/* Drawer panel — z-[60] so it's above its own scrim */}
       <aside
-        className="fixed top-0 right-0 h-[100dvh] w-[440px] max-w-[92vw] bg-white z-[60] flex flex-col shadow-2xl animate-drawer-in"
+        className="fixed top-0 right-0 h-[100dvh] w-full max-w-[92vw] sm:w-[440px] bg-white z-[60] flex flex-col shadow-2xl animate-drawer-in"
         aria-label={`${investor.fund.name} profile`}
       >
         {/* ── Header ── */}
-        <div className="px-7 pt-7 pb-6 border-b border-[#F3F4F6] shrink-0">
+        <div className="px-4 sm:px-7 pt-7 pb-6 border-b border-[#F3F4F6] shrink-0">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-start gap-3 min-w-0">
               {/* Fund logo */}
@@ -402,14 +402,14 @@ export function ProfileDrawer({ investor, onClose }: ProfileDrawerProps) {
           <FundProfile investor={investor} />
 
           {/* Relationship summary */}
-          <div className="px-7 pt-6 pb-6 border-b border-[#F3F4F6]">
+          <div className="px-4 sm:px-7 pt-6 pb-6 border-b border-[#F3F4F6]">
             <SectionLabel>Relationship status</SectionLabel>
             <RelationshipSummary investor={investor} />
           </div>
 
           {/* Recommended action */}
           {(investor.suggestedAction || investor.discoverySource === "network_expansion") && (
-            <div className="px-7 pt-6 pb-6 border-b border-[#F3F4F6]">
+            <div className="px-4 sm:px-7 pt-6 pb-6 border-b border-[#F3F4F6]">
               <SectionLabel>Suggested action</SectionLabel>
               <p className="text-sm text-[#374151] leading-relaxed border-l-[1.5px] border-[#0EA5D6] pl-4">
                 {investor.discoverySource === "network_expansion"
@@ -421,7 +421,7 @@ export function ProfileDrawer({ investor, onClose }: ProfileDrawerProps) {
 
           {/* Point of contact */}
           {investor.contact && (
-            <div className="px-7 pt-6 pb-6 border-b border-[#F3F4F6]">
+            <div className="px-4 sm:px-7 pt-6 pb-6 border-b border-[#F3F4F6]">
               <SectionLabel>Point of contact</SectionLabel>
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
@@ -471,7 +471,7 @@ export function ProfileDrawer({ investor, onClose }: ProfileDrawerProps) {
 
           {/* Co-investment history */}
           {uniqueCoInvestments.length > 0 && (
-            <div className="px-7 pt-6 pb-6 border-b border-[#F3F4F6]">
+            <div className="px-4 sm:px-7 pt-6 pb-6 border-b border-[#F3F4F6]">
               <SectionLabel>Co-investments</SectionLabel>
               <div className="space-y-0">
                 {uniqueCoInvestments.map((ci, i) => (
@@ -494,7 +494,7 @@ export function ProfileDrawer({ investor, onClose }: ProfileDrawerProps) {
           )}
 
           {/* Source-backed evidence — grouped by company / source type */}
-          <div className="px-7 pt-6 pb-8">
+          <div className="px-4 sm:px-7 pt-6 pb-8">
             <SectionLabel>Evidence</SectionLabel>
             <GroupedProfileEvidence signals={investor.signals} />
           </div>

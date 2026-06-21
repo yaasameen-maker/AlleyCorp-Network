@@ -167,7 +167,7 @@ export function BriefingDashboard({
 
         <div className="relative z-10">
           {/* Top row: title + stats */}
-          <div className="flex items-end justify-between gap-6 mb-5">
+          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 sm:gap-6 mb-5">
             <div>
               <p className="text-[9px] uppercase tracking-[0.18em] text-[#0EA5D6] font-semibold mb-1.5">
                 AlleyCorp · Deep Tech
@@ -188,7 +188,7 @@ export function BriefingDashboard({
           </div>
 
           {/* Intelligence strip */}
-          <div className="border-t border-white/10 pt-4 grid grid-cols-3 gap-5">
+          <div className="border-t border-white/10 pt-4 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
             <HeroInsight
               label="Strongest relationship"
               value={mostEngaged ? mostEngaged.fund.name : "No hot relationships"}
