@@ -11,8 +11,10 @@
  *   Hot relationships are excluded — they have recent signals and don't need proactive searches.
  *
  * Usage:
- *   npm run orchestrate              # dry run — prints prioritized target list, no writes
- *   npm run orchestrate -- --write   # live run — executes ingest pipeline against targets
+ *   npm run orchestrate                       # dry run — prints prioritized target list, no writes
+ *   npm run orchestrate -- --write            # live run — executes ingest pipeline against all targets
+ *   npm run orchestrate -- --focus            # dry run — prints only the single highest-priority target
+ *   npm run orchestrate -- --focus --write    # live run — full ingest for 1 target only
  */
 
 import dotenv from "dotenv";
@@ -28,6 +30,7 @@ import {
 } from "../lib/source-policy.js";
 
 const DRY_RUN = !process.argv.includes("--write");
+const FOCUS_MODE = process.argv.includes("--focus");
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -471,12 +474,15 @@ async function run(): Promise<void> {
   console.log("╔══════════════════════════════════════════════════════════╗");
   console.log("║   AlleyCorp Signal Orchestrator                          ║");
   console.log("╚══════════════════════════════════════════════════════════╝");
-  console.log(
-    `Mode: ${DRY_RUN ? "DRY RUN — prints plan, no DB writes" : "LIVE — executing ingest pipeline"}`
-  );
+  const modeLabel = [
+    DRY_RUN ? "DRY RUN" : "LIVE",
+    FOCUS_MODE ? "FOCUS (1 target)" : `ALL targets`,
+  ].join(" · ");
+  console.log(`Mode: ${modeLabel}`);
   console.log(`Date: ${new Date().toISOString().slice(0, 10)}\n`);
 
-  const targets = await loadTargetsFromDb();
+  const allTargets = await loadTargetsFromDb();
+  const targets = FOCUS_MODE ? allTargets.slice(0, 1) : allTargets;
 
   if (targets.length === 0) {
     console.log("No targets found — all relationships have recent signals or DB is empty.");
@@ -484,11 +490,22 @@ async function run(): Promise<void> {
     return;
   }
 
+  if (FOCUS_MODE && targets.length > 0) {
+    const t = targets[0];
+    console.log(`Focus target: ${t.fundName} + ${t.companyName} [${t.warmthTier}]`);
+    if (t.monthsSinceSignal !== null) {
+      console.log(`Last signal: ${t.monthsSinceSignal}mo ago (${t.lastSignalDate})`);
+    } else {
+      console.log(`Last signal: none on record`);
+    }
+    console.log();
+  }
+
   printPlan(targets);
 
   if (!DRY_RUN) {
     console.log("═".repeat(60));
-    console.log(`Starting ingest for ${targets.length} targets...`);
+    console.log(`Starting ingest for ${targets.length} target(s)...`);
     console.log("═".repeat(60));
     await runIngestForTargets(targets);
   }
