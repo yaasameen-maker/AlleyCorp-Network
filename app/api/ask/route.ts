@@ -20,14 +20,14 @@ const TOOLS: Anthropic.Tool[] = [
   {
     name: "search_relationships",
     description:
-      "Search the AlleyCorp deep tech investor universe by warmth tier, fund name, portfolio company, or market-prospect status. Use for broad network questions: 'Who are our warmest relationships?', 'Which funds co-invested in robotics?', 'Are there top deep tech funds we haven't co-invested with yet?'",
+      "Search the AlleyCorp deep tech investor universe. Use for any question about investors, relationships, or funds — including by location (city or region), stage (Seed, Series A, etc.), warmth tier, event/invite context, fund name, portfolio company, or market-prospect status. Examples: 'Who are deep tech investors in LA?', 'Which funds do Series A?', 'Who should we invite to our event?', 'Which funds co-invested in robotics?', 'Are there top deep tech funds we haven't co-invested with yet?'",
     input_schema: {
       type: "object" as const,
       properties: {
         query: {
           type: "string",
           description:
-            "Search term: warmth tier (Hot/Warm/Stale/Cold), fund name, portfolio company, or prospect/no co-investment intent",
+            "The search intent in natural language: can include a city/region (e.g. 'Los Angeles', 'New York'), a stage (e.g. 'Series A', 'Seed'), a warmth tier, a fund name, a portfolio company, or relationship context like 'invite' or 'reconnect'.",
         },
       },
       required: ["query"],
@@ -183,10 +183,19 @@ export async function POST(req: Request): Promise<NextResponse<AskResponse>> {
             : relationships
                 .map((r) => {
                   const fund = r.fund?.name ?? "Unknown";
-                  const company = r.portfolioCompany?.name ?? "No co-investment on record";
+                  const company = r.portfolioCompany?.name ?? null;
                   const signals = r.signals?.length ?? 0;
-                  const status = r.portfolioCompany ? "co-invested in" : "target/prospect";
-                  return `${fund} | warmth: ${r.warmthTier} | ${status}: ${company} | signals: ${signals}`;
+                  const parts = [
+                    `${fund}`,
+                    `warmth: ${r.warmthTier ?? "prospect"}`,
+                    company ? `co-invested in: ${company}` : "no co-investment yet",
+                    `signals: ${signals}`,
+                    r.fund?.hqLocation ? `location: ${r.fund.hqLocation}` : null,
+                    r.fund?.stage ? `stage: ${r.fund.stage}` : null,
+                    r.fund?.checkSizeProxy ? `check size: ${r.fund.checkSizeProxy}` : null,
+                    r.fund?.deepTechSignal ? `deep tech: ${r.fund.deepTechSignal}` : null,
+                  ].filter(Boolean);
+                  return parts.join(" | ");
                 })
                 .join("\n");
       } else if (toolName === "get_investor") {
@@ -212,11 +221,13 @@ export async function POST(req: Request): Promise<NextResponse<AskResponse>> {
       toolResults.push({ type: "tool_result", tool_use_id: toolUse.id, content: toolResultText });
     }
 
-    // Turn 2 — Claude synthesizes tool results into a final answer
+    // Turn 2 — Claude synthesizes tool results into a final answer.
+    // tool_choice: none forces a text response and prevents "No answer generated."
     const turn2 = await client.messages.create({
       model: "claude-sonnet-4-6",
       max_tokens: 1024,
       tools: TOOLS,
+      tool_choice: { type: "none" },
       system: SYSTEM,
       messages: [
         { role: "user", content: query },
