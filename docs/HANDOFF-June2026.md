@@ -1,9 +1,66 @@
 # AlleyCorp Relationship Intelligence — Handoff Doc
 
-**Updated:** June 10, 2026 · **Demo Day:** June 24, 2026  
+**Updated:** June 22, 2026 · **Demo Day:** June 24, 2026  
 **Author:** Luba Kaper
 
 > **Current sprint plan:** Use [SPRINT-june14-17.md](./SPRINT-june14-17.md). This plan reflects the June 11 AlleyCorp pivot: broader deep tech investor universe, co-investors as VIP/starred nodes, Today Overview as the main demo surface, and the Daily Intelligence Pipeline with deterministic verification.
+
+---
+
+## 0. What Changed — June 22 Update (Pre-Demo)
+
+### Daily Intelligence Pipeline — working, was broken by wrong secrets
+
+The pipeline scripts all work. GitHub Actions was failing silently every day since June 9 because:
+1. `DATABASE_URL` secret pointed to wrong Railway port (13998 → fixed to 55198 on June 22)
+2. `npm run discover:prospects` used `--env-file=.env` which crashes in CI when `.env` doesn't exist (fixed June 22 — scripts already call `dotenv.config()` internally)
+
+**What the pipeline does:**
+
+| Script | What it finds | How to run |
+|--------|--------------|------------|
+| `scripts/discovery-agent.ts` | New co-investors by scanning portfolio company funding news. Uses Claude tool-use to extract investor names. Runs critic-agent verification gate before any DB write. | `npm run discover:agent -- --write` |
+| `scripts/discover-investor-prospects.ts` | Brand new deep tech investors not in DB at all. Searches public lead sources, enriches profiles with field-level evidence, runs source-policy gate. | `npm run discover:prospects -- --quick` |
+| `scripts/orchestrator.ts` | New signals for existing known relationships (stale → cold → warm priority). | `npm run orchestrate -- --write` |
+
+All three are scheduled via GitHub Actions (7am and 8am UTC daily). After the secret fixes, cron should run cleanly. Can also trigger manually:
+```bash
+gh workflow run prospect-discovery.yml
+gh workflow run discovery.yml
+```
+
+**For the demo:** run `npm run discover:prospects -- --quick` live in the terminal. It finds real investors (Bison Ventures, QIC Ventures found on June 22 run) in ~2 minutes and shows the verification process in real time. More impressive than a silent cron.
+
+### What Luba built this sprint (June 14–22)
+
+- Evidence-gated Daily Intelligence Pipeline (`discover-investor-prospects.ts`, `import-investor-prospects.ts`) — Luba
+- Source traceability — every signal has source URL, title, confidence — Luba
+- Broader investor schema — location, AUM, stage, check-size proxy, deep tech signal, VIP flag — Luba
+- Market prospects visible in dashboard alongside known co-investors — Luba
+- Portal Space Systems co-investors (Booz Allen, ARK Invest, FUSE) — Luba
+- Chatbot routing for location/stage/event queries (PR #47, merged June 22) — Luba
+- Orchestrator `--write` run: 8 real signals inserted (SineWave, Trimble, SOSV) — Luba
+
+### Railway DB — use port 55198
+
+Correct `DATABASE_URL`: `postgresql://postgres:oYCrLOWrgTOPtdAgWHRZyflefGrEXAlS@zephyr.proxy.rlwy.net:55198/railway`
+
+Port 13998 is a dead instance. If the dashboard shows wrong data or missing investors, check which port is in use.
+
+### Demo strategy
+
+- **Deployed Railway URL** — dashboard, investor profiles, Today Overview
+- **Localhost only** — chatbot (`npm run dev`). ANTHROPIC_API_KEY is not on Railway to avoid draining the account.
+- **Terminal** — run `npm run discover:prospects -- --quick` live to show the pipeline finding new investors
+
+### Chatbot
+
+PR #47 fixed routing for:
+- Location queries ("deep tech investors in LA/NY") — routes to `getInvestorsByLocation`
+- Stage queries ("Series A investors") — routes to `getInvestorsByStage`
+- Event queries ("who was at DTNY") — routes to `getSignalsByType`
+
+Demo from localhost only.
 
 ---
 
