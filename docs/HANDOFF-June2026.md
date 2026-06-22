@@ -12,18 +12,20 @@
 ### Daily Intelligence Pipeline — working, was broken by wrong secrets
 
 The pipeline scripts all work. GitHub Actions was failing silently every day since June 9 because:
+
 1. `DATABASE_URL` secret pointed to wrong Railway port (13998 → fixed to 55198 on June 22)
 2. `npm run discover:prospects` used `--env-file=.env` which crashes in CI when `.env` doesn't exist (fixed June 22 — scripts already call `dotenv.config()` internally)
 
 **What the pipeline does:**
 
-| Script | What it finds | How to run |
-|--------|--------------|------------|
-| `scripts/discovery-agent.ts` | New co-investors by scanning portfolio company funding news. Uses Claude tool-use to extract investor names. Runs critic-agent verification gate before any DB write. | `npm run discover:agent -- --write` |
-| `scripts/discover-investor-prospects.ts` | Brand new deep tech investors not in DB at all. Searches public lead sources, enriches profiles with field-level evidence, runs source-policy gate. | `npm run discover:prospects -- --quick` |
-| `scripts/orchestrator.ts` | New signals for existing known relationships (stale → cold → warm priority). | `npm run orchestrate -- --write` |
+| Script                                   | What it finds                                                                                                                                                         | How to run                              |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| `scripts/discovery-agent.ts`             | New co-investors by scanning portfolio company funding news. Uses Claude tool-use to extract investor names. Runs critic-agent verification gate before any DB write. | `npm run discover:agent -- --write`     |
+| `scripts/discover-investor-prospects.ts` | Brand new deep tech investors not in DB at all. Searches public lead sources, enriches profiles with field-level evidence, runs source-policy gate.                   | `npm run discover:prospects -- --quick` |
+| `scripts/orchestrator.ts`                | New signals for existing known relationships (stale → cold → warm priority).                                                                                          | `npm run orchestrate -- --write`        |
 
 All three are scheduled via GitHub Actions (7am and 8am UTC daily). After the secret fixes, cron should run cleanly. Can also trigger manually:
+
 ```bash
 gh workflow run prospect-discovery.yml
 gh workflow run discovery.yml
@@ -56,6 +58,7 @@ Port 13998 is a dead instance. If the dashboard shows wrong data or missing inve
 ### Chatbot
 
 PR #47 fixed routing for:
+
 - Location queries ("deep tech investors in LA/NY") — routes to `getInvestorsByLocation`
 - Stage queries ("Series A investors") — routes to `getInvestorsByStage`
 - Event queries ("who was at DTNY") — routes to `getSignalsByType`
