@@ -42,7 +42,15 @@ function SearchIcon() {
 function SkeuToggle({ on, onToggle, label }: { on: boolean; onToggle: () => void; label: string }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <span style={{ fontSize: 9, color: "#9CA3AF", fontWeight: 600, letterSpacing: "0.08em", userSelect: "none" }}>
+      <span
+        style={{
+          fontSize: 9,
+          color: "#9CA3AF",
+          fontWeight: 600,
+          letterSpacing: "0.08em",
+          userSelect: "none",
+        }}
+      >
         {label}
       </span>
       <button

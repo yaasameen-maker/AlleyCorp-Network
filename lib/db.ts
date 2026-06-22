@@ -122,8 +122,57 @@ function isWarmRelationshipSearch(query: string): boolean {
     normalized.includes("strongest") ||
     normalized.includes("hottest") ||
     normalized.includes("best relationship") ||
+    normalized.includes("invite") ||
+    normalized.includes("event") ||
+    normalized.includes("happy hour") ||
+    normalized.includes("meet") ||
+    normalized.includes("reconnect") ||
     (normalized.includes("deep tech") && normalized.includes("relationship"))
   );
+}
+
+// Extract a location string from the query to filter by hq_location.
+// Returns null if no recognizable location is found.
+function extractLocation(query: string): string | null {
+  const normalized = query.toLowerCase();
+  const CITIES: Record<string, string> = {
+    "los angeles": "Los Angeles",
+    " la ": "Los Angeles",
+    " la,": "Los Angeles",
+    "la-based": "Los Angeles",
+    "new york": "New York",
+    " nyc": "New York",
+    " ny ": "New York",
+    "san francisco": "San Francisco",
+    " sf ": "San Francisco",
+    "sf-based": "San Francisco",
+    "bay area": "Bay Area",
+    boston: "Boston",
+    austin: "Austin",
+    chicago: "Chicago",
+    seattle: "Seattle",
+    washington: "Washington",
+    " dc ": "Washington",
+    "washington dc": "Washington",
+  };
+  for (const [pattern, city] of Object.entries(CITIES)) {
+    if (normalized.includes(pattern)) return city;
+  }
+  return null;
+}
+
+// Extract a stage string from the query to filter by stage focus.
+function extractStage(query: string): string | null {
+  const normalized = query.toLowerCase();
+  if (normalized.includes("pre-seed") || normalized.includes("pre seed")) return "Pre-Seed";
+  if (normalized.includes("seed")) return "Seed";
+  if (normalized.includes("series a")) return "Series A";
+  if (normalized.includes("series b")) return "Series B";
+  if (normalized.includes("series c")) return "Series C";
+  if (normalized.includes("growth")) return "Growth";
+  if (normalized.includes("early stage") || normalized.includes("early-stage")) return "Seed";
+  if (normalized.includes("late stage") || normalized.includes("late-stage")) return "Series B";
+  return null;
 }
 
 // Search relationships by fund name, fund focus, portfolio company name, sector, warmth tier,
@@ -203,6 +252,48 @@ export async function searchRelationships(query: string): Promise<Relationship[]
     return [...(rows as Relationship[]), ...prospectRelationships] as Relationship[];
   }
 
+  const location = extractLocation(query);
+  if (location) {
+    const { rows } = await pool.query(
+      `${REL_SELECT}
+       WHERE f.hq_location ILIKE $1
+          OR f.geography_focus ILIKE $1
+       GROUP BY r.id, f.id, pc.id
+       ORDER BY
+         CASE r.warmth_tier
+           WHEN 'hot'   THEN 1
+           WHEN 'warm'  THEN 2
+           WHEN 'stale' THEN 3
+           WHEN 'cold'  THEN 4
+           ELSE 5
+         END,
+         f.name`,
+      [`%${location}%`]
+    );
+    return rows as Relationship[];
+  }
+
+  const stage = extractStage(query);
+  if (stage) {
+    const { rows } = await pool.query(
+      `${REL_SELECT}
+       WHERE f.stage ILIKE $1
+          OR f.check_size_proxy IS NOT NULL
+       GROUP BY r.id, f.id, pc.id
+       ORDER BY
+         CASE r.warmth_tier
+           WHEN 'hot'   THEN 1
+           WHEN 'warm'  THEN 2
+           WHEN 'stale' THEN 3
+           WHEN 'cold'  THEN 4
+           ELSE 5
+         END,
+         f.name`,
+      [`%${stage}%`]
+    );
+    return rows as Relationship[];
+  }
+
   const param = `%${query}%`;
   const { rows } = await pool.query(
     `${REL_SELECT}
@@ -210,6 +301,8 @@ export async function searchRelationships(query: string): Promise<Relationship[]
         OR pc.name       ILIKE $1
         OR r.warmth_tier ILIKE $1
         OR f.focus       ILIKE $1
+        OR f.deep_tech_signal ILIKE $1
+        OR f.hq_location ILIKE $1
      GROUP BY r.id, f.id, pc.id
      ORDER BY
        CASE r.warmth_tier
