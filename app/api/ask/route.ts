@@ -5,47 +5,11 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { getInvestorByName, listStaleRelationships, searchRelationships } from "../../../lib/db";
+import { TOOLS } from "../../../lib/ai-tools";
 import type { Relationship } from "../../../lib/types";
 
 const client = new Anthropic();
 
-// Tool schemas — identical to mcp/tools/ definitions so Claude routes the same way
-const TOOLS: Anthropic.Tool[] = [
-  {
-    name: "list_stale_relationships",
-    description:
-      "Returns all co-investors currently in the Stale warmth tier. These are funds that co-invested with AlleyCorp but whose signals have decayed. Use this when asked about relationships that need attention, reconnection, or risk being lost.",
-    input_schema: { type: "object" as const, properties: {}, required: [] },
-  },
-  {
-    name: "search_relationships",
-    description:
-      "Search the AlleyCorp deep tech investor universe. Use for any question about investors, relationships, or funds — including by location (city or region), stage (Seed, Series A, etc.), warmth tier, event/invite context, fund name, portfolio company, or market-prospect status. Examples: 'Who are deep tech investors in LA?', 'Which funds do Series A?', 'Who should we invite to our event?', 'Which funds co-invested in robotics?', 'Are there top deep tech funds we haven't co-invested with yet?'",
-    input_schema: {
-      type: "object" as const,
-      properties: {
-        query: {
-          type: "string",
-          description:
-            "The search intent in natural language: can include a city/region (e.g. 'Los Angeles', 'New York'), a stage (e.g. 'Series A', 'Seed'), a warmth tier, a fund name, a portfolio company, or relationship context like 'invite' or 'reconnect'.",
-        },
-      },
-      required: ["query"],
-    },
-  },
-  {
-    name: "get_investor",
-    description:
-      "Look up a specific fund by name. Returns warmth tier, signal history, co-investment record, and suggested next action. Use when asked about a specific fund: 'What should I know about General Catalyst?' or 'Show me Trimble Ventures'.",
-    input_schema: {
-      type: "object" as const,
-      properties: {
-        name: { type: "string", description: "Fund or investor name to look up" },
-      },
-      required: ["name"],
-    },
-  },
-];
 
 function toWarmthTier(s: string): "Hot" | "Warm" | "Stale" | "Cold" {
   const map: Record<string, "Hot" | "Warm" | "Stale" | "Cold"> = {
