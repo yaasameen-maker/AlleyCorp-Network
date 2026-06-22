@@ -190,11 +190,9 @@ import { createHash } from "crypto";
 
 const HIGH_CONFIDENCE_DOMAINS = [
   "techcrunch.com",
-  "bloomberg.com",
   "prnewswire.com",
   "businesswire.com",
   "axios.com",
-  "reuters.com",
   "venturebeat.com",
 ];
 const MEDIUM_CONFIDENCE_DOMAINS = ["forbes.com", "wsj.com", "ft.com", "cnbc.com"];

@@ -353,8 +353,6 @@ async function searchForSignals(
           "prnewswire.com",
           "businesswire.com",
           "axios.com",
-          "reuters.com",
-          "bloomberg.com",
           "crunchbase.com",
           "forbes.com",
           "venturebeat.com",
