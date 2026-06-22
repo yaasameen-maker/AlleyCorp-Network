@@ -3,6 +3,8 @@
 // Now: fetches all 20 portfolio companies + overlays co-investor relationship data.
 // Shows all companies including those with no co-investors seeded yet.
 
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { getAllRelationships, pool } from "../../lib/db";
 import { WarmthBadge } from "../components/InvestorRow";
