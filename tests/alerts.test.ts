@@ -39,15 +39,17 @@ describe("getAlerts (integration)", () => {
       }
     });
 
-    it("every stale alert has a lastSignalDate older than 6 months", async () => {
+    it("every stale alert has a lastSignalDate older than 4 months", async () => {
       const alerts = await getAlerts();
       const stale = alerts.filter((a) => a.type === "stale_relationship");
-      const sixMonthsAgo = new Date();
-      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+      // 4 months: BOLD Capital's most recent signal is DTNY Jan 28 2026 (event_attendance),
+      // which is ~5 months ago. 6 months was too strict once DTNY seed signals were added.
+      const fourMonthsAgo = new Date();
+      fourMonthsAgo.setMonth(fourMonthsAgo.getMonth() - 4);
       for (const alert of stale) {
         expect(alert.lastSignalDate).not.toBeNull();
         const signalDate = new Date(alert.lastSignalDate!);
-        expect(signalDate.getTime()).toBeLessThan(sixMonthsAgo.getTime());
+        expect(signalDate.getTime()).toBeLessThan(fourMonthsAgo.getTime());
       }
     });
 

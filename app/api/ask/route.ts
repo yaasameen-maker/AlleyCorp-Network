@@ -10,7 +10,6 @@ import type { Relationship } from "../../../lib/types";
 
 const client = new Anthropic();
 
-
 function toWarmthTier(s: string): "Hot" | "Warm" | "Stale" | "Cold" {
   const map: Record<string, "Hot" | "Warm" | "Stale" | "Cold"> = {
     hot: "Hot",
