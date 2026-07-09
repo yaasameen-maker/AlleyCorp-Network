@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import type { Investor, WarmthTier } from "@/lib/investors";
 import { InvestorRow } from "./InvestorRow";
 import { useDarkMode } from "@/app/hooks/useDarkMode";
@@ -113,7 +114,13 @@ export function AppSidebar({
       {/* ── Header — wordmark + toggles ── */}
       <div className="px-5 pt-6 pb-4 shrink-0">
         <div className="flex items-center justify-between mb-3">
-          <img src="/logo.png" alt="AlleyCorp" className="h-8 w-8 object-contain rounded-md" />
+          <Image
+            src="/logo.png"
+            alt="AlleyCorp"
+            width={32}
+            height={32}
+            className="object-contain rounded-md"
+          />
           <div
             style={{
               background: dark ? "#1a2535" : "#F0F2F5",
