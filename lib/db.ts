@@ -1,6 +1,16 @@
 import { Pool } from "pg";
 import { config } from "dotenv";
 import type { Relationship, Signal } from "./types";
+import { isMockMode } from "./mock/mode";
+import {
+  getAllRelationshipsMock,
+  getInvestorByNameMock,
+  searchRelationshipsMock,
+  listStaleRelationshipsMock,
+  getWarmthSignalsMock,
+  getRecentSignalsMock,
+  getAllPortfolioCompaniesMock,
+} from "./mock/repository";
 
 config();
 
@@ -91,6 +101,7 @@ const REL_SELECT = `
 // Look up the first relationship whose fund name matches the search string.
 // Returns the full relationship with fund, portfolio company, and all signals attached.
 export async function getInvestorByName(name: string): Promise<Relationship | null> {
+  if (isMockMode()) return getInvestorByNameMock(name);
   const { rows } = await pool.query(
     `${REL_SELECT}
      WHERE f.name ILIKE $1
@@ -179,6 +190,7 @@ function extractStage(query: string): string | null {
 // or the broader market-prospect class introduced after the June 11 AlleyCorp pivot.
 // Signals are not loaded here — callers only need the count (r.signals?.length).
 export async function searchRelationships(query: string): Promise<Relationship[]> {
+  if (isMockMode()) return searchRelationshipsMock(query);
   if (isWarmRelationshipSearch(query)) {
     const { rows } = await pool.query(
       `${REL_SELECT}
@@ -323,6 +335,7 @@ export async function searchRelationships(query: string): Promise<Relationship[]
 // with Michael's prospect visual treatment.
 // Used by GET /api/investors to power the dashboard list view.
 export async function getAllRelationships(): Promise<Relationship[]> {
+  if (isMockMode()) return getAllRelationshipsMock();
   const { rows } = await pool.query(
     `${REL_SELECT}
      GROUP BY r.id, f.id, pc.id
@@ -385,6 +398,7 @@ export async function getAllRelationships(): Promise<Relationship[]> {
 
 // Return all stale relationships ordered oldest signal first (most at-risk first).
 export async function listStaleRelationships(): Promise<Relationship[]> {
+  if (isMockMode()) return listStaleRelationshipsMock();
   const { rows } = await pool.query(
     `${REL_SELECT}
      WHERE r.warmth_tier = 'stale'
@@ -398,6 +412,7 @@ export async function listStaleRelationships(): Promise<Relationship[]> {
 // The parameter is named investorId to match the MCP tool surface but resolves
 // against relationship.id — the MCP tool description clarifies this is a relationship record id.
 export async function getWarmthSignals(investorId: string): Promise<Signal[]> {
+  if (isMockMode()) return getWarmthSignalsMock(investorId);
   const { rows } = await pool.query(
     `SELECT
        id,
@@ -421,6 +436,7 @@ export async function getWarmthSignals(investorId: string): Promise<Signal[]> {
 }
 
 export async function getRecentSignals(limit = 20): Promise<Signal[]> {
+  if (isMockMode()) return getRecentSignalsMock(limit);
   const { rows } = await pool.query(
     `SELECT
        id,
@@ -441,6 +457,22 @@ export async function getRecentSignals(limit = 20): Promise<Signal[]> {
     [limit]
   );
   return rows as Signal[];
+}
+
+// Return all portfolio companies (active and alumni), ordered by name.
+// Used by app/portfolio/page.tsx to seed the full company list before
+// overlaying co-investor relationship data.
+export async function getAllPortfolioCompanies(): Promise<
+  { id: string; name: string; website: string | null; status: string }[]
+> {
+  if (isMockMode()) return getAllPortfolioCompaniesMock();
+  const { rows } = await pool.query<{
+    id: string;
+    name: string;
+    website: string | null;
+    status: string;
+  }>(`SELECT id, name, website, status FROM portfolio_company ORDER BY name`);
+  return rows;
 }
 
 export { pool };
