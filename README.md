@@ -15,6 +15,10 @@ VCs lose track of their best relationships the same way anyone loses track of a 
 
 It watches a firm's co-investor network, scores every relationship by warmth, and surfaces the ones drifting out of reach — before that window closes.
 
+This isn't a class project sitting in a repo — it ran in production, tracking a real network for a real early-stage VC firm's investment team.
+
+Built for venture capital, but the underlying idea isn't VC-specific — any team managing a network that quietly goes stale if ignored (sales pipelines, partnerships, alumni relations) could run on the same approach: score relationship health from real signals, and surface who needs attention before it's too late.
+
 ---
 
 ## What It Does
