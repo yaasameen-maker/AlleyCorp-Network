@@ -1105,7 +1105,7 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
       hqLocation: "Los Angeles",
       geographyFocus: "US deep tech network",
       checkSizeProxy: "$100K\u2013$5M per deal (sweet spot ~$1.5M)",
-      deepTechSignal: "Advanced robotics, AI, biotechnology, and longevity technology (Peter Diamandis / XPRIZE)",
+      deepTechSignal: "Advanced robotics, AI, biotechnology, and longevity technology; co-founded by an XPRIZE affiliate",
       website: "boldcap.com",
       logoUrl: "https://www.google.com/s2/favicons?domain=boldcap.com&sz=128",
     },
