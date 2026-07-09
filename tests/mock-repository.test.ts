@@ -25,11 +25,22 @@ describe("mock repository", () => {
     expect(rel).toBeNull();
   });
 
-  it("searchRelationshipsMock matches fund name substrings", async () => {
+  it("searchRelationshipsMock matches across fund name, company, tier, and focus", async () => {
     const rows = await searchRelationshipsMock("Capital");
     expect(rows.length).toBeGreaterThan(0);
     for (const r of rows) {
-      expect(r.fund?.name.toLowerCase()).toContain("capital");
+      const haystack = [
+        r.fund?.name,
+        r.portfolioCompany?.name,
+        r.warmthTier,
+        r.fund?.focus,
+        r.fund?.deepTechSignal,
+        r.fund?.hqLocation,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      expect(haystack).toContain("capital");
     }
   });
 

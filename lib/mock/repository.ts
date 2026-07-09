@@ -17,7 +17,15 @@ export async function getInvestorByNameMock(name: string): Promise<Relationship 
 
 export async function searchRelationshipsMock(query: string): Promise<Relationship[]> {
   const needle = query.toLowerCase();
-  return MOCK_RELATIONSHIPS.filter((r) => r.fund?.name.toLowerCase().includes(needle));
+  return MOCK_RELATIONSHIPS.filter(
+    (r) =>
+      r.fund?.name.toLowerCase().includes(needle) ||
+      r.portfolioCompany?.name.toLowerCase().includes(needle) ||
+      r.warmthTier.toLowerCase().includes(needle) ||
+      r.fund?.focus?.toLowerCase().includes(needle) ||
+      r.fund?.deepTechSignal?.toLowerCase().includes(needle) ||
+      r.fund?.hqLocation?.toLowerCase().includes(needle)
+  );
 }
 
 export async function listStaleRelationshipsMock(): Promise<Relationship[]> {
