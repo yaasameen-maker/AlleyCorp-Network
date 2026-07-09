@@ -7,7 +7,7 @@ import type { Relationship, Signal } from "../types";
 import type { Alert } from "../alerts";
 
 export async function getAllRelationshipsMock(): Promise<Relationship[]> {
-  return MOCK_RELATIONSHIPS;
+  return [...MOCK_RELATIONSHIPS];
 }
 
 export async function getInvestorByNameMock(name: string): Promise<Relationship | null> {
@@ -30,9 +30,10 @@ export async function searchRelationshipsMock(query: string): Promise<Relationsh
 
 export async function listStaleRelationshipsMock(): Promise<Relationship[]> {
   return MOCK_RELATIONSHIPS.filter((r) => r.warmthTier === "Stale").sort((a, b) => {
-    const aDate = a.lastSignalDate ? new Date(a.lastSignalDate).getTime() : 0;
-    const bDate = b.lastSignalDate ? new Date(b.lastSignalDate).getTime() : 0;
-    return aDate - bDate;
+    if (!a.lastSignalDate && !b.lastSignalDate) return 0;
+    if (!a.lastSignalDate) return 1;
+    if (!b.lastSignalDate) return -1;
+    return new Date(a.lastSignalDate).getTime() - new Date(b.lastSignalDate).getTime();
   });
 }
 
