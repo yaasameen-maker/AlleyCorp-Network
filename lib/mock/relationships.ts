@@ -28,7 +28,12 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
       website: "geodesiccap.com",
       logoUrl: "https://www.google.com/s2/favicons?domain=geodesiccap.com&sz=128",
     },
-    investor: { id: "mock-contact-1", name: "Jordan Reyes", role: "General Partner", linkedinUrl: GENERIC_LINKEDIN },
+    investor: {
+      id: "mock-contact-1",
+      name: "Jordan Reyes",
+      role: "General Partner",
+      linkedinUrl: GENERIC_LINKEDIN,
+    },
     portfolioCompanyId: "mock-pc-portal-space-systems",
     portfolioCompany: {
       id: "mock-pc-portal-space-systems",
@@ -49,10 +54,13 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         type: "co_investment",
         date: "2026-04-20",
         source: "SpaceNews",
-        sourceUrl: "https://spacenews.com/portal-space-systems-raises-50-million-to-accelerate-spacecraft-development/",
+        sourceUrl:
+          "https://spacenews.com/portal-space-systems-raises-50-million-to-accelerate-spacecraft-development/",
         sourceTitle: "Portal Space Systems raises $50 million to accelerate spacecraft development",
-        rawSnippet: "Series A $50M \u00b7 Apr 2026 \u00b7 co-lead alongside Mach33 (the firm participated, $250M valuation)",
-        value: "Series A $50M \u00b7 Apr 2026 \u00b7 co-lead alongside Mach33 (the firm participated, $250M valuation)",
+        rawSnippet:
+          "Series A $50M \u00b7 Apr 2026 \u00b7 co-lead alongside Mach33 (the firm participated, $250M valuation)",
+        value:
+          "Series A $50M \u00b7 Apr 2026 \u00b7 co-lead alongside Mach33 (the firm participated, $250M valuation)",
         weight: "high",
         confidence: "confirmed",
       },
@@ -69,11 +77,17 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
       hqLocation: "Seattle, WA",
       geographyFocus: "US deep tech network",
       checkSizeProxy: "Seed / early Series A (check size undisclosed)",
-      deepTechSignal: "Space tech and deep tech; early-stage investor in Portal Space Systems (seed + Series A)",
+      deepTechSignal:
+        "Space tech and deep tech; early-stage investor in Portal Space Systems (seed + Series A)",
       website: "fuse.vc",
       logoUrl: "https://www.google.com/s2/favicons?domain=fuse.vc&sz=128",
     },
-    investor: { id: "mock-contact-2", name: "Casey Lin", role: "Managing Partner", linkedinUrl: GENERIC_LINKEDIN },
+    investor: {
+      id: "mock-contact-2",
+      name: "Casey Lin",
+      role: "Managing Partner",
+      linkedinUrl: GENERIC_LINKEDIN,
+    },
     portfolioCompanyId: "mock-pc-portal-space-systems",
     portfolioCompany: {
       id: "mock-pc-portal-space-systems",
@@ -94,10 +108,13 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         type: "co_investment",
         date: "2026-04-09",
         source: "Portal Space Systems press release",
-        sourceUrl: "https://www.portalsystems.space/news/press-release-portal-space-systems-raises-50-million-series-a-to-advance-rapidly-maneuverable-spacecraft-capabilities",
+        sourceUrl:
+          "https://www.portalsystems.space/news/press-release-portal-space-systems-raises-50-million-series-a-to-advance-rapidly-maneuverable-spacecraft-capabilities",
         sourceTitle: "Portal Space Systems Raises $50 Million Series A",
-        rawSnippet: "The round was led by Geodesic Capital and Mach33, with participation from Booz Allen Ventures, ARK Invest, the firm, and FUSE.",
-        value: "Series A $50M \u00b7 Apr 2026 \u00b7 participant alongside Geodesic Capital, Mach33, Booz Allen Ventures, ARK Invest",
+        rawSnippet:
+          "The round was led by Geodesic Capital and Mach33, with participation from Booz Allen Ventures, ARK Invest, the firm, and FUSE.",
+        value:
+          "Series A $50M \u00b7 Apr 2026 \u00b7 participant alongside Geodesic Capital, Mach33, Booz Allen Ventures, ARK Invest",
         weight: "high",
         confidence: "confirmed",
       },
@@ -107,9 +124,12 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         type: "co_investment",
         date: "2025-04-03",
         source: "GeekWire",
-        sourceUrl: "https://www.geekwire.com/2025/portal-space-systems-raises-17-5m-for-orbital-spacecraft-powered-by-solar-heating/",
-        sourceTitle: "Portal Space Systems raises $17.5M for orbital spacecraft powered by solar heating",
-        rawSnippet: "Portal Space Systems raised a $17.5M seed round led by the firm, with FUSE among the participants.",
+        sourceUrl:
+          "https://www.geekwire.com/2025/portal-space-systems-raises-17-5m-for-orbital-spacecraft-powered-by-solar-heating/",
+        sourceTitle:
+          "Portal Space Systems raises $17.5M for orbital spacecraft powered by solar heating",
+        rawSnippet:
+          "Portal Space Systems raised a $17.5M seed round led by the firm, with FUSE among the participants.",
         value: "Seed $17.5M \u00b7 Apr 2025 \u00b7 participant (the firm led)",
         weight: "high",
         confidence: "confirmed",
@@ -128,11 +148,17 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
       hqLocation: "McLean, VA",
       geographyFocus: "US deep tech network",
       checkSizeProxy: "$5M\u2013$10M (strategic co-investor, does not lead)",
-      deepTechSignal: "Defense tech, AI, cyber, quantum computing, and US manufacturing/reindustrialization (Booz Allen Hamilton CVC)",
+      deepTechSignal:
+        "Defense tech, AI, cyber, quantum computing, and US manufacturing/reindustrialization (Booz Allen Hamilton CVC)",
       website: "boozallen.com",
       logoUrl: "https://www.google.com/s2/favicons?domain=boozallen.com&sz=128",
     },
-    investor: { id: "mock-contact-3", name: "Alex Morgan", role: "Principal", linkedinUrl: GENERIC_LINKEDIN },
+    investor: {
+      id: "mock-contact-3",
+      name: "Alex Morgan",
+      role: "Principal",
+      linkedinUrl: GENERIC_LINKEDIN,
+    },
     portfolioCompanyId: "mock-pc-portal-space-systems",
     portfolioCompany: {
       id: "mock-pc-portal-space-systems",
@@ -153,10 +179,13 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         type: "co_investment",
         date: "2026-04-09",
         source: "Portal Space Systems press release",
-        sourceUrl: "https://www.portalsystems.space/news/press-release-portal-space-systems-raises-50-million-series-a-to-advance-rapidly-maneuverable-spacecraft-capabilities",
+        sourceUrl:
+          "https://www.portalsystems.space/news/press-release-portal-space-systems-raises-50-million-series-a-to-advance-rapidly-maneuverable-spacecraft-capabilities",
         sourceTitle: "Portal Space Systems Raises $50 Million Series A",
-        rawSnippet: "The round was led by Geodesic Capital and Mach33, with participation from Booz Allen Ventures, ARK Invest, the firm, and FUSE.",
-        value: "Series A $50M \u00b7 Apr 2026 \u00b7 participant alongside Geodesic Capital, Mach33, ARK Invest, FUSE",
+        rawSnippet:
+          "The round was led by Geodesic Capital and Mach33, with participation from Booz Allen Ventures, ARK Invest, the firm, and FUSE.",
+        value:
+          "Series A $50M \u00b7 Apr 2026 \u00b7 participant alongside Geodesic Capital, Mach33, ARK Invest, FUSE",
         weight: "high",
         confidence: "confirmed",
       },
@@ -178,7 +207,12 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
       website: "ark-invest.com",
       logoUrl: "https://www.google.com/s2/favicons?domain=ark-invest.com&sz=128",
     },
-    investor: { id: "mock-contact-4", name: "Sam Whitfield", role: "Partner", linkedinUrl: GENERIC_LINKEDIN },
+    investor: {
+      id: "mock-contact-4",
+      name: "Sam Whitfield",
+      role: "Partner",
+      linkedinUrl: GENERIC_LINKEDIN,
+    },
     portfolioCompanyId: "mock-pc-portal-space-systems",
     portfolioCompany: {
       id: "mock-pc-portal-space-systems",
@@ -199,10 +233,13 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         type: "co_investment",
         date: "2026-04-09",
         source: "Portal Space Systems press release",
-        sourceUrl: "https://www.portalsystems.space/news/press-release-portal-space-systems-raises-50-million-series-a-to-advance-rapidly-maneuverable-spacecraft-capabilities",
+        sourceUrl:
+          "https://www.portalsystems.space/news/press-release-portal-space-systems-raises-50-million-series-a-to-advance-rapidly-maneuverable-spacecraft-capabilities",
         sourceTitle: "Portal Space Systems Raises $50 Million Series A",
-        rawSnippet: "The round was led by Geodesic Capital and Mach33, with participation from Booz Allen Ventures, ARK Invest, the firm, and FUSE.",
-        value: "Series A $50M \u00b7 Apr 2026 \u00b7 participant alongside Geodesic Capital, Mach33, Booz Allen Ventures, FUSE",
+        rawSnippet:
+          "The round was led by Geodesic Capital and Mach33, with participation from Booz Allen Ventures, ARK Invest, the firm, and FUSE.",
+        value:
+          "Series A $50M \u00b7 Apr 2026 \u00b7 participant alongside Geodesic Capital, Mach33, Booz Allen Ventures, FUSE",
         weight: "high",
         confidence: "confirmed",
       },
@@ -225,7 +262,12 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
       logoUrl: "https://www.google.com/s2/favicons?domain=riotvc.com&sz=128",
       isVip: true,
     },
-    investor: { id: "mock-contact-5", name: "Riley Chen", role: "Managing Director", linkedinUrl: GENERIC_LINKEDIN },
+    investor: {
+      id: "mock-contact-5",
+      name: "Riley Chen",
+      role: "Managing Director",
+      linkedinUrl: GENERIC_LINKEDIN,
+    },
     portfolioCompanyId: "mock-pc-valar-atomics",
     portfolioCompany: {
       id: "mock-pc-valar-atomics",
@@ -246,7 +288,8 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         type: "co_investment",
         date: "2025-02-20",
         source: "TechCrunch",
-        sourceUrl: "https://techcrunch.com/2025/02/20/valar-atomics-comes-out-of-stealth-with-19m-and-a-pilot-reactor-site/",
+        sourceUrl:
+          "https://techcrunch.com/2025/02/20/valar-atomics-comes-out-of-stealth-with-19m-and-a-pilot-reactor-site/",
         sourceTitle: "Valar Atomics comes out of stealth with $19M and a pilot reactor site",
         rawSnippet: "Seed $19M \u00b7 Feb 2025 \u00b7 led by Riot Ventures (the firm participated)",
         value: "Seed $19M \u00b7 Feb 2025 \u00b7 led by Riot Ventures (the firm participated)",
@@ -282,7 +325,12 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
       logoUrl: "https://www.google.com/s2/favicons?domain=33fg.com&sz=128",
       isVip: true,
     },
-    investor: { id: "mock-contact-6", name: "Morgan Ellis", role: "General Partner", linkedinUrl: GENERIC_LINKEDIN },
+    investor: {
+      id: "mock-contact-6",
+      name: "Morgan Ellis",
+      role: "General Partner",
+      linkedinUrl: GENERIC_LINKEDIN,
+    },
     portfolioCompanyId: "mock-pc-portal-space-systems",
     portfolioCompany: {
       id: "mock-pc-portal-space-systems",
@@ -303,10 +351,13 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         type: "co_investment",
         date: "2026-04-20",
         source: "SpaceNews",
-        sourceUrl: "https://spacenews.com/portal-space-systems-raises-50-million-to-accelerate-spacecraft-development/",
+        sourceUrl:
+          "https://spacenews.com/portal-space-systems-raises-50-million-to-accelerate-spacecraft-development/",
         sourceTitle: "Portal Space Systems raises $50 million to accelerate spacecraft development",
-        rawSnippet: "Series A $50M \u00b7 Apr 2026 \u00b7 co-lead alongside Geodesic Capital (the firm participated, $250M valuation)",
-        value: "Series A $50M \u00b7 Apr 2026 \u00b7 co-lead alongside Geodesic Capital (the firm participated, $250M valuation)",
+        rawSnippet:
+          "Series A $50M \u00b7 Apr 2026 \u00b7 co-lead alongside Geodesic Capital (the firm participated, $250M valuation)",
+        value:
+          "Series A $50M \u00b7 Apr 2026 \u00b7 co-lead alongside Geodesic Capital (the firm participated, $250M valuation)",
         weight: "high",
         confidence: "confirmed",
       },
@@ -350,7 +401,12 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
       website: "ffvc.com",
       logoUrl: "https://www.google.com/s2/favicons?domain=ffvc.com&sz=128",
     },
-    investor: { id: "mock-contact-7", name: "Taylor Brooks", role: "Managing Partner", linkedinUrl: GENERIC_LINKEDIN },
+    investor: {
+      id: "mock-contact-7",
+      name: "Taylor Brooks",
+      role: "Managing Partner",
+      linkedinUrl: GENERIC_LINKEDIN,
+    },
     portfolioCompanyId: "mock-pc-civ-robotics",
     portfolioCompany: {
       id: "mock-pc-civ-robotics",
@@ -371,7 +427,8 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         type: "co_investment",
         date: "2025-07-01",
         source: "The Robot Report",
-        sourceUrl: "https://www.therobotreport.com/civ-robotics-spots-series-a-funding-automated-surveying/",
+        sourceUrl:
+          "https://www.therobotreport.com/civ-robotics-spots-series-a-funding-automated-surveying/",
         sourceTitle: "Civ Robotics spots Series A funding for automated surveying",
         rawSnippet: "Series A $7.5M \u00b7 Jul 2025 \u00b7 participant (the firm led)",
         value: "Series A $7.5M \u00b7 Jul 2025 \u00b7 participant (the firm led)",
@@ -384,10 +441,13 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         type: "co_investment",
         date: "2022-09-21",
         source: "GlobeNewswire",
-        sourceUrl: "https://www.globenewswire.com/news-release/2022/09/21/2520253/0/en/Civ-Robotics-Raises-5-Million-Seed-Funding-Round.html",
+        sourceUrl:
+          "https://www.globenewswire.com/news-release/2022/09/21/2520253/0/en/Civ-Robotics-Raises-5-Million-Seed-Funding-Round.html",
         sourceTitle: "Civ Robotics Raises $5 Million Seed Funding Round",
-        rawSnippet: "Seed $5M \u00b7 Sep 2022 \u00b7 co-investor alongside ff Venture Capital and others",
-        value: "Seed $5M \u00b7 Sep 2022 \u00b7 co-investor alongside ff Venture Capital and others",
+        rawSnippet:
+          "Seed $5M \u00b7 Sep 2022 \u00b7 co-investor alongside ff Venture Capital and others",
+        value:
+          "Seed $5M \u00b7 Sep 2022 \u00b7 co-investor alongside ff Venture Capital and others",
         weight: "high",
         confidence: "confirmed",
       },
@@ -419,7 +479,12 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
       website: "dayoneventures.com",
       logoUrl: "https://www.google.com/s2/favicons?domain=dayoneventures.com&sz=128",
     },
-    investor: { id: "mock-contact-8", name: "Drew Sato", role: "Principal", linkedinUrl: GENERIC_LINKEDIN },
+    investor: {
+      id: "mock-contact-8",
+      name: "Drew Sato",
+      role: "Principal",
+      linkedinUrl: GENERIC_LINKEDIN,
+    },
     portfolioCompanyId: "mock-pc-valar-atomics",
     portfolioCompany: {
       id: "mock-pc-valar-atomics",
@@ -440,7 +505,8 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         type: "co_investment",
         date: "2025-02-20",
         source: "TechCrunch",
-        sourceUrl: "https://techcrunch.com/2025/02/20/valar-atomics-comes-out-of-stealth-with-19m-and-a-pilot-reactor-site/",
+        sourceUrl:
+          "https://techcrunch.com/2025/02/20/valar-atomics-comes-out-of-stealth-with-19m-and-a-pilot-reactor-site/",
         sourceTitle: "Valar Atomics comes out of stealth with $19M and a pilot reactor site",
         rawSnippet: "Seed $19M \u00b7 Feb 2025 \u00b7 co-investor alongside Riot Ventures",
         value: "Seed $19M \u00b7 Feb 2025 \u00b7 co-investor alongside Riot Ventures",
@@ -454,8 +520,10 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         date: "2025-11-10",
         source: "Firm Blog",
         sourceTitle: "the firm Substack",
-        rawSnippet: "Series A $130M \u00b7 Nov 2025 \u00b7 led by Snowpoint Ventures, co-investors: Day One Ventures, Dream Ventures",
-        value: "Series A $130M \u00b7 Nov 2025 \u00b7 led by Snowpoint Ventures, co-investors: Day One Ventures, Dream Ventures",
+        rawSnippet:
+          "Series A $130M \u00b7 Nov 2025 \u00b7 led by Snowpoint Ventures, co-investors: Day One Ventures, Dream Ventures",
+        value:
+          "Series A $130M \u00b7 Nov 2025 \u00b7 led by Snowpoint Ventures, co-investors: Day One Ventures, Dream Ventures",
         weight: "high",
         confidence: "confirmed",
       },
@@ -478,7 +546,12 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
       logoUrl: "https://www.google.com/s2/favicons?domain=generalcatalyst.com&sz=128",
       isVip: true,
     },
-    investor: { id: "mock-contact-9", name: "Jamie Park", role: "Partner", linkedinUrl: GENERIC_LINKEDIN },
+    investor: {
+      id: "mock-contact-9",
+      name: "Jamie Park",
+      role: "Partner",
+      linkedinUrl: GENERIC_LINKEDIN,
+    },
     portfolioCompanyId: "mock-pc-eyebot",
     portfolioCompany: {
       id: "mock-pc-eyebot",
@@ -499,7 +572,8 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         type: "co_investment",
         date: "2025-08-26",
         source: "TechCrunch",
-        sourceUrl: "https://techcrunch.com/2025/08/26/eyebot-gets-20m-series-a-to-boost-to-expand-eye-care-access/",
+        sourceUrl:
+          "https://techcrunch.com/2025/08/26/eyebot-gets-20m-series-a-to-boost-to-expand-eye-care-access/",
         sourceTitle: "Eyebot gets $20M Series A to expand eye care access",
         rawSnippet: "Series A $20M \u00b7 Aug 2025 \u00b7 lead",
         value: "Series A $20M \u00b7 Aug 2025 \u00b7 lead",
@@ -524,7 +598,12 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
       website: "ubiquity.vc",
       logoUrl: "https://www.google.com/s2/favicons?domain=ubiquity.vc&sz=128",
     },
-    investor: { id: "mock-contact-10", name: "Avery Kim", role: "Managing Director", linkedinUrl: GENERIC_LINKEDIN },
+    investor: {
+      id: "mock-contact-10",
+      name: "Avery Kim",
+      role: "Managing Director",
+      linkedinUrl: GENERIC_LINKEDIN,
+    },
     portfolioCompanyId: "mock-pc-eyebot",
     portfolioCompany: {
       id: "mock-pc-eyebot",
@@ -545,8 +624,10 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         type: "co_investment",
         date: "2024-06-01",
         source: "TechCrunch",
-        sourceUrl: "https://techcrunch.com/2024/06/06/eyebot-raised-6m-for-ai-powered-kiosks-that-provide-90-second-eye-exams-without-optometrist/",
-        sourceTitle: "Eyebot raised $6M for AI-powered kiosks that provide 90-second vision exams without an on-site optometrist",
+        sourceUrl:
+          "https://techcrunch.com/2024/06/06/eyebot-raised-6m-for-ai-powered-kiosks-that-provide-90-second-eye-exams-without-optometrist/",
+        sourceTitle:
+          "Eyebot raised $6M for AI-powered kiosks that provide 90-second vision exams without an on-site optometrist",
         rawSnippet: "Seed $6M \u00b7 Jun 2024 \u00b7 co-lead with the firm",
         value: "Seed $6M \u00b7 Jun 2024 \u00b7 co-lead with the firm",
         weight: "high",
@@ -558,7 +639,8 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         type: "co_investment",
         date: "2025-08-26",
         source: "TechCrunch",
-        sourceUrl: "https://techcrunch.com/2025/08/26/eyebot-gets-20m-series-a-to-boost-to-expand-eye-care-access/",
+        sourceUrl:
+          "https://techcrunch.com/2025/08/26/eyebot-gets-20m-series-a-to-boost-to-expand-eye-care-access/",
         sourceTitle: "Eyebot gets $20M Series A to expand eye care access",
         rawSnippet: "Series A $20M \u00b7 Aug 2025 \u00b7 participant",
         value: "Series A $20M \u00b7 Aug 2025 \u00b7 participant",
@@ -581,7 +663,12 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
       checkSizeProxy: "Series A+ capable",
       deepTechSignal: "Climate tech",
     },
-    investor: { id: "mock-contact-11", name: "Quinn Sullivan", role: "General Partner", linkedinUrl: GENERIC_LINKEDIN },
+    investor: {
+      id: "mock-contact-11",
+      name: "Quinn Sullivan",
+      role: "General Partner",
+      linkedinUrl: GENERIC_LINKEDIN,
+    },
     portfolioCompanyId: "mock-pc-glacier",
     portfolioCompany: {
       id: "mock-pc-glacier",
@@ -615,7 +702,8 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         type: "co_investment",
         date: "2025-04-28",
         source: "TechCrunch",
-        sourceUrl: "https://techcrunch.com/2025/04/28/amazon-backed-glacier-gets-16m-to-expand-its-robot-recycling-fleet/",
+        sourceUrl:
+          "https://techcrunch.com/2025/04/28/amazon-backed-glacier-gets-16m-to-expand-its-robot-recycling-fleet/",
         sourceTitle: "Amazon-backed Glacier gets $16M to expand its robot recycling fleet",
         rawSnippet: "Series A $16M \u00b7 Apr 2025 \u00b7 participant",
         value: "Series A $16M \u00b7 Apr 2025 \u00b7 participant",
@@ -640,7 +728,12 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
       website: "nea.com",
       logoUrl: "https://www.google.com/s2/favicons?domain=nea.com&sz=128",
     },
-    investor: { id: "mock-contact-12", name: "Harper Diaz", role: "Managing Partner", linkedinUrl: GENERIC_LINKEDIN },
+    investor: {
+      id: "mock-contact-12",
+      name: "Harper Diaz",
+      role: "Managing Partner",
+      linkedinUrl: GENERIC_LINKEDIN,
+    },
     portfolioCompanyId: "mock-pc-glacier",
     portfolioCompany: {
       id: "mock-pc-glacier",
@@ -661,8 +754,10 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         type: "co_investment",
         date: "2022-04-19",
         source: "PR Newswire",
-        sourceUrl: "https://www.prnewswire.com/news-releases/glacier-raises-4-5m-to-combat-climate-change-with-ai-powered-recycling-robots-301527666.html",
-        sourceTitle: "Glacier Raises $4.5M to Combat Climate Change with AI-Powered Recycling Robots",
+        sourceUrl:
+          "https://www.prnewswire.com/news-releases/glacier-raises-4-5m-to-combat-climate-change-with-ai-powered-recycling-robots-301527666.html",
+        sourceTitle:
+          "Glacier Raises $4.5M to Combat Climate Change with AI-Powered Recycling Robots",
         rawSnippet: "Seed $4.5M \u00b7 Apr 2022 \u00b7 lead",
         value: "Seed $4.5M \u00b7 Apr 2022 \u00b7 lead",
         weight: "high",
@@ -674,7 +769,8 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         type: "co_investment",
         date: "2025-04-28",
         source: "TechCrunch",
-        sourceUrl: "https://techcrunch.com/2025/04/28/amazon-backed-glacier-gets-16m-to-expand-its-robot-recycling-fleet/",
+        sourceUrl:
+          "https://techcrunch.com/2025/04/28/amazon-backed-glacier-gets-16m-to-expand-its-robot-recycling-fleet/",
         sourceTitle: "Amazon-backed Glacier gets $16M to expand its robot recycling fleet",
         rawSnippet: "Series A $16M \u00b7 Apr 2025 \u00b7 participant",
         value: "Series A $16M \u00b7 Apr 2025 \u00b7 participant",
@@ -713,7 +809,12 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
       logoUrl: "https://www.google.com/s2/favicons?domain=snowpoint.vc&sz=128",
       isVip: true,
     },
-    investor: { id: "mock-contact-13", name: "Rowan Bennett", role: "Principal", linkedinUrl: GENERIC_LINKEDIN },
+    investor: {
+      id: "mock-contact-13",
+      name: "Rowan Bennett",
+      role: "Principal",
+      linkedinUrl: GENERIC_LINKEDIN,
+    },
     portfolioCompanyId: "mock-pc-valar-atomics",
     portfolioCompany: {
       id: "mock-pc-valar-atomics",
@@ -734,8 +835,10 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         type: "co_investment",
         date: "2025-11-10",
         source: "TradedVC",
-        sourceUrl: "https://traded.co/vc/deal/valar-atomics-closes-130-million-series-a-funding-round-led-by-snowpoint-ventures/",
-        sourceTitle: "Valar Atomics Closes $130 Million Series A Funding Round Led By Snowpoint Ventures",
+        sourceUrl:
+          "https://traded.co/vc/deal/valar-atomics-closes-130-million-series-a-funding-round-led-by-snowpoint-ventures/",
+        sourceTitle:
+          "Valar Atomics Closes $130 Million Series A Funding Round Led By Snowpoint Ventures",
         rawSnippet: "Series A $130M \u00b7 Nov 2025 \u00b7 lead alongside the firm",
         value: "Series A $130M \u00b7 Nov 2025 \u00b7 lead alongside the firm",
         weight: "high",
@@ -755,11 +858,17 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
       hqLocation: "New York",
       geographyFocus: "US deep tech network",
       checkSizeProxy: "$25K\u2013$750K (minority, non-lead; rolling fund)",
-      deepTechSignal: "Supply chain technology reinventing legacy industrial networks (Pre-Seed/Seed, rolling fund)",
+      deepTechSignal:
+        "Supply chain technology reinventing legacy industrial networks (Pre-Seed/Seed, rolling fund)",
       website: "refashiond.vc",
       logoUrl: "https://www.google.com/s2/favicons?domain=refashiond.vc&sz=128",
     },
-    investor: { id: "mock-contact-14", name: "Reese Coleman", role: "Partner", linkedinUrl: GENERIC_LINKEDIN },
+    investor: {
+      id: "mock-contact-14",
+      name: "Reese Coleman",
+      role: "Partner",
+      linkedinUrl: GENERIC_LINKEDIN,
+    },
     portfolioCompanyId: "mock-pc-avatar",
     portfolioCompany: {
       id: "mock-pc-avatar",
@@ -804,7 +913,12 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
       website: "defy.vc",
       logoUrl: "https://www.google.com/s2/favicons?domain=defy.vc&sz=128",
     },
-    investor: { id: "mock-contact-15", name: "Skyler Vance", role: "Managing Director", linkedinUrl: GENERIC_LINKEDIN },
+    investor: {
+      id: "mock-contact-15",
+      name: "Skyler Vance",
+      role: "Managing Director",
+      linkedinUrl: GENERIC_LINKEDIN,
+    },
     portfolioCompanyId: "mock-pc-avatar",
     portfolioCompany: {
       id: "mock-pc-avatar",
@@ -849,7 +963,12 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
       website: "cherubic.com",
       logoUrl: "https://www.google.com/s2/favicons?domain=cherubic.com&sz=128",
     },
-    investor: { id: "mock-contact-16", name: "Emerson Cole", role: "General Partner", linkedinUrl: GENERIC_LINKEDIN },
+    investor: {
+      id: "mock-contact-16",
+      name: "Emerson Cole",
+      role: "General Partner",
+      linkedinUrl: GENERIC_LINKEDIN,
+    },
     portfolioCompanyId: "mock-pc-cargo-robotics",
     portfolioCompany: {
       id: "mock-pc-cargo-robotics",
@@ -894,7 +1013,12 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
       website: "flybridge.com",
       logoUrl: "https://www.google.com/s2/favicons?domain=flybridge.com&sz=128",
     },
-    investor: { id: "mock-contact-17", name: "Finley Nash", role: "Managing Partner", linkedinUrl: GENERIC_LINKEDIN },
+    investor: {
+      id: "mock-contact-17",
+      name: "Finley Nash",
+      role: "Managing Partner",
+      linkedinUrl: GENERIC_LINKEDIN,
+    },
     portfolioCompanyId: "mock-pc-halo-braid",
     portfolioCompany: {
       id: "mock-pc-halo-braid",
@@ -939,7 +1063,12 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
       website: "sinewaveventures.com",
       logoUrl: "https://www.google.com/s2/favicons?domain=sinewaveventures.com&sz=128",
     },
-    investor: { id: "mock-contact-18", name: "Dakota Reed", role: "Principal", linkedinUrl: GENERIC_LINKEDIN },
+    investor: {
+      id: "mock-contact-18",
+      name: "Dakota Reed",
+      role: "Principal",
+      linkedinUrl: GENERIC_LINKEDIN,
+    },
     portfolioCompanyId: "mock-pc-aon-3d",
     portfolioCompany: {
       id: "mock-pc-aon-3d",
@@ -960,8 +1089,10 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         type: "co_investment",
         date: "2021-09-02",
         source: "TechCrunch",
-        sourceUrl: "https://techcrunch.com/2021/09/02/3d-printing-startup-aon3d-closes-11-5m-series-a/",
-        sourceTitle: "AON3D closes $11.5M Series A, partners with Astrobotic to send 3D-printed parts to the moon",
+        sourceUrl:
+          "https://techcrunch.com/2021/09/02/3d-printing-startup-aon3d-closes-11-5m-series-a/",
+        sourceTitle:
+          "AON3D closes $11.5M Series A, partners with Astrobotic to send 3D-printed parts to the moon",
         rawSnippet: "Series A $11.5M \u00b7 Sep 2021 \u00b7 lead",
         value: "Series A $11.5M \u00b7 Sep 2021 \u00b7 lead",
         weight: "high",
@@ -972,11 +1103,16 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         relationshipId: "mock-sinewave-ventures",
         type: "co_investment",
         date: "2026-01-28",
-        source: "https://www.prnewswire.com/news-releases/cycle-capital-leads-new-investment-in-aon3d-to-support-build-out-and-commercialization-of-high-temperature-3d-printers-302671842.html",
-        sourceUrl: "https://www.prnewswire.com/news-releases/cycle-capital-leads-new-investment-in-aon3d-to-support-build-out-and-commercialization-of-high-temperature-3d-printers-302671842.html",
-        sourceTitle: "Cycle Capital leads new investment in AON3D to support build-out and commercialization of high-temperature 3D Printers",
-        rawSnippet: "Cycle Capital has led an investment round with the participation of Desjardins Capital, along with continued participation from existing investors including SineWave Ventures, IronGate Capital Advisors, Starship Ventures and EDC Capital.",
-        value: "SineWave Ventures participated as an existing investor in AON3D's new funding round led by Cycle Capital",
+        source:
+          "https://www.prnewswire.com/news-releases/cycle-capital-leads-new-investment-in-aon3d-to-support-build-out-and-commercialization-of-high-temperature-3d-printers-302671842.html",
+        sourceUrl:
+          "https://www.prnewswire.com/news-releases/cycle-capital-leads-new-investment-in-aon3d-to-support-build-out-and-commercialization-of-high-temperature-3d-printers-302671842.html",
+        sourceTitle:
+          "Cycle Capital leads new investment in AON3D to support build-out and commercialization of high-temperature 3D Printers",
+        rawSnippet:
+          "Cycle Capital has led an investment round with the participation of Desjardins Capital, along with continued participation from existing investors including SineWave Ventures, IronGate Capital Advisors, Starship Ventures and EDC Capital.",
+        value:
+          "SineWave Ventures participated as an existing investor in AON3D's new funding round led by Cycle Capital",
         weight: "high",
         confidence: "confirmed",
       },
@@ -985,10 +1121,14 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         relationshipId: "mock-sinewave-ventures",
         type: "co_investment",
         date: "2021-09-02",
-        source: "https://techcrunch.com/2021/09/02/3d-printing-startup-aon3d-closes-11-5m-series-a/",
-        sourceUrl: "https://techcrunch.com/2021/09/02/3d-printing-startup-aon3d-closes-11-5m-series-a/",
-        sourceTitle: "AON3D closes $11.5M Series A, partners with Astrobotic to send 3D printed parts to the moon",
-        rawSnippet: "This latest round was led by SineWave Ventures, with participation from the firm and Y Combinator Continuity. BDC, EDC, Panache Ventures, MANA Ventures, several social-media investors, and SV angels also participated.",
+        source:
+          "https://techcrunch.com/2021/09/02/3d-printing-startup-aon3d-closes-11-5m-series-a/",
+        sourceUrl:
+          "https://techcrunch.com/2021/09/02/3d-printing-startup-aon3d-closes-11-5m-series-a/",
+        sourceTitle:
+          "AON3D closes $11.5M Series A, partners with Astrobotic to send 3D printed parts to the moon",
+        rawSnippet:
+          "This latest round was led by SineWave Ventures, with participation from the firm and Y Combinator Continuity. BDC, EDC, Panache Ventures, MANA Ventures, several social-media investors, and SV angels also participated.",
         value: "SineWave Ventures led AON3D's $11.5M Series A round, per TechCrunch",
         weight: "high",
         confidence: "confirmed",
@@ -998,10 +1138,13 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         relationshipId: "mock-sinewave-ventures",
         type: "press_mention",
         date: "2021-09-02",
-        source: "https://www.businesswire.com/news/home/20210902005332/en/AON3D-Secures-%2411.5M-Manufactures-First-3D-Printed-Parts-for-the-Moon",
-        sourceUrl: "https://www.businesswire.com/news/home/20210902005332/en/AON3D-Secures-%2411.5M-Manufactures-First-3D-Printed-Parts-for-the-Moon",
+        source:
+          "https://www.businesswire.com/news/home/20210902005332/en/AON3D-Secures-%2411.5M-Manufactures-First-3D-Printed-Parts-for-the-Moon",
+        sourceUrl:
+          "https://www.businesswire.com/news/home/20210902005332/en/AON3D-Secures-%2411.5M-Manufactures-First-3D-Printed-Parts-for-the-Moon",
         sourceTitle: "AON3D Secures $11.5M & Manufactures First 3D Printed Parts for the Moon",
-        rawSnippet: "\"AON3D is on a mission to 3D print the future by creating solutions that positively affect more business while addressing the pain points in global manufacturing,\" said a SineWave Ventures General Partner.",
+        rawSnippet:
+          '"AON3D is on a mission to 3D print the future by creating solutions that positively affect more business while addressing the pain points in global manufacturing," said a SineWave Ventures General Partner.',
         value: "a SineWave Ventures General Partner quoted in AON3D Series A announcement",
         weight: "high",
         confidence: "confirmed",
@@ -1011,10 +1154,13 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         relationshipId: "mock-sinewave-ventures",
         type: "co_investment",
         date: "2021-09-02",
-        source: "https://www.businesswire.com/news/home/20210902005332/en/AON3D-Secures-%2411.5M-Manufactures-First-3D-Printed-Parts-for-the-Moon",
-        sourceUrl: "https://www.businesswire.com/news/home/20210902005332/en/AON3D-Secures-%2411.5M-Manufactures-First-3D-Printed-Parts-for-the-Moon",
+        source:
+          "https://www.businesswire.com/news/home/20210902005332/en/AON3D-Secures-%2411.5M-Manufactures-First-3D-Printed-Parts-for-the-Moon",
+        sourceUrl:
+          "https://www.businesswire.com/news/home/20210902005332/en/AON3D-Secures-%2411.5M-Manufactures-First-3D-Printed-Parts-for-the-Moon",
         sourceTitle: "AON3D Secures $11.5M & Manufactures First 3D Printed Parts for the Moon",
-        rawSnippet: "SineWave Ventures led the round with participation from the firm, Y Combinator Continuity, BDC Capital, EDC, Panache Ventures, MANA Ventures, top social-media influencers several social-media investors, and leading Silicon Valley angels.",
+        rawSnippet:
+          "SineWave Ventures led the round with participation from the firm, Y Combinator Continuity, BDC Capital, EDC, Panache Ventures, MANA Ventures, top social-media influencers several social-media investors, and leading Silicon Valley angels.",
         value: "SineWave Ventures led AON3D's $11.5M Series A round",
         weight: "high",
         confidence: "confirmed",
@@ -1037,7 +1183,12 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
       website: "sosv.com",
       logoUrl: "https://www.google.com/s2/favicons?domain=sosv.com&sz=128",
     },
-    investor: { id: "mock-contact-19", name: "Sawyer Voss", role: "Partner", linkedinUrl: GENERIC_LINKEDIN },
+    investor: {
+      id: "mock-contact-19",
+      name: "Sawyer Voss",
+      role: "Partner",
+      linkedinUrl: GENERIC_LINKEDIN,
+    },
     portfolioCompanyId: "mock-pc-renovate-robotics",
     portfolioCompany: {
       id: "mock-pc-renovate-robotics",
@@ -1058,10 +1209,13 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         type: "co_investment",
         date: "2023-02-01",
         source: "SOSV",
-        sourceUrl: "https://sosv.com/haxs-renovate-robotics-closes-2-5m-pre-seed-to-automate-roofing/",
+        sourceUrl:
+          "https://sosv.com/haxs-renovate-robotics-closes-2-5m-pre-seed-to-automate-roofing/",
         sourceTitle: "HAX's Renovate Robotics closes $2.5M pre-seed to automate roofing",
-        rawSnippet: "Pre-Seed $2.5M \u00b7 Feb 2023 \u00b7 the firm's venture arm led, SOSV/HAX co-investor",
-        value: "Pre-Seed $2.5M \u00b7 Feb 2023 \u00b7 the firm's venture arm led, SOSV/HAX co-investor",
+        rawSnippet:
+          "Pre-Seed $2.5M \u00b7 Feb 2023 \u00b7 the firm's venture arm led, SOSV/HAX co-investor",
+        value:
+          "Pre-Seed $2.5M \u00b7 Feb 2023 \u00b7 the firm's venture arm led, SOSV/HAX co-investor",
         weight: "high",
         confidence: "confirmed",
       },
@@ -1070,11 +1224,15 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         relationshipId: "mock-sosv",
         type: "press_mention",
         date: "2024-04-22",
-        source: "https://techcrunch.com/2024/04/22/here-are-the-30-startups-showcasing-at-haxs-may-1-demo-day/",
-        sourceUrl: "https://techcrunch.com/2024/04/22/here-are-the-30-startups-showcasing-at-haxs-may-1-demo-day/",
+        source:
+          "https://techcrunch.com/2024/04/22/here-are-the-30-startups-showcasing-at-haxs-may-1-demo-day/",
+        sourceUrl:
+          "https://techcrunch.com/2024/04/22/here-are-the-30-startups-showcasing-at-haxs-may-1-demo-day/",
         sourceTitle: "Here are the 30+ startups showcasing at HAX's May 1 Demo Day - TechCrunch",
-        rawSnippet: "Renovate Robotics: We first covered this robotic roofing firm last March, when it announced a $2.5 million seed round. The news also found a HAX associate/analyst jumping to the startup side of the fence as COO. Renovate produced a winch-based robot that installs roof shingles in a gantry-like X,Y axis pattern.",
-        value: "Renovate Robotics featured at HAX (SOSV) Demo Day, with prior a HAX associate serving as COO",
+        rawSnippet:
+          "Renovate Robotics: We first covered this robotic roofing firm last March, when it announced a $2.5 million seed round. The news also found a HAX associate/analyst jumping to the startup side of the fence as COO. Renovate produced a winch-based robot that installs roof shingles in a gantry-like X,Y axis pattern.",
+        value:
+          "Renovate Robotics featured at HAX (SOSV) Demo Day, with prior a HAX associate serving as COO",
         weight: "medium",
         confidence: "confirmed",
       },
@@ -1083,10 +1241,13 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         relationshipId: "mock-sosv",
         type: "co_investment",
         date: "2023-03-02",
-        source: "https://techcrunch.com/2023/03/02/renovate-is-building-robots-to-install-roof-shingles/",
-        sourceUrl: "https://techcrunch.com/2023/03/02/renovate-is-building-robots-to-install-roof-shingles/",
+        source:
+          "https://techcrunch.com/2023/03/02/renovate-is-building-robots-to-install-roof-shingles/",
+        sourceUrl:
+          "https://techcrunch.com/2023/03/02/renovate-is-building-robots-to-install-roof-shingles/",
         sourceTitle: "Renovate is building robots to install roof shingles - TechCrunch",
-        rawSnippet: "Renovate Robotics is building systems for the express purpose of installing shingles \u2014 including the asphalt and solar varieties at launch. This morning, the startup announced a $2.5 million pre-seed, led by the firm's venture arm and featuring SOSV's HAX, Newlab, Uphonest Capital and Climate Capital.",
+        rawSnippet:
+          "Renovate Robotics is building systems for the express purpose of installing shingles \u2014 including the asphalt and solar varieties at launch. This morning, the startup announced a $2.5 million pre-seed, led by the firm's venture arm and featuring SOSV's HAX, Newlab, Uphonest Capital and Climate Capital.",
         value: "$2.5M pre-seed round featuring SOSV's HAX as an investor in Renovate Robotics",
         weight: "high",
         confidence: "confirmed",
@@ -1105,11 +1266,17 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
       hqLocation: "Los Angeles",
       geographyFocus: "US deep tech network",
       checkSizeProxy: "$100K\u2013$5M per deal (sweet spot ~$1.5M)",
-      deepTechSignal: "Advanced robotics, AI, biotechnology, and longevity technology; co-founded by an XPRIZE affiliate",
+      deepTechSignal:
+        "Advanced robotics, AI, biotechnology, and longevity technology; co-founded by an XPRIZE affiliate",
       website: "boldcap.com",
       logoUrl: "https://www.google.com/s2/favicons?domain=boldcap.com&sz=128",
     },
-    investor: { id: "mock-contact-20", name: "Cameron Fields", role: "Managing Director", linkedinUrl: GENERIC_LINKEDIN },
+    investor: {
+      id: "mock-contact-20",
+      name: "Cameron Fields",
+      role: "Managing Director",
+      linkedinUrl: GENERIC_LINKEDIN,
+    },
     portfolioCompanyId: "mock-pc-earth-force",
     portfolioCompany: {
       id: "mock-pc-earth-force",
@@ -1130,8 +1297,10 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         type: "co_investment",
         date: "2022-11-29",
         source: "GlobeNewswire",
-        sourceUrl: "https://www.globenewswire.com/news-release/2022/11/29/2564034/0/en/Earth-Force-Technologies-Announces-8-6-Million-Raise-to-Prevent-Catastrophic-Wildfire.html",
-        sourceTitle: "Earth Force Technologies Announces $8.6 Million Raise to Prevent Catastrophic Wildfire",
+        sourceUrl:
+          "https://www.globenewswire.com/news-release/2022/11/29/2564034/0/en/Earth-Force-Technologies-Announces-8-6-Million-Raise-to-Prevent-Catastrophic-Wildfire.html",
+        sourceTitle:
+          "Earth Force Technologies Announces $8.6 Million Raise to Prevent Catastrophic Wildfire",
         rawSnippet: "Seed $8.6M \u00b7 Nov 2022 \u00b7 participant",
         value: "Seed $8.6M \u00b7 Nov 2022 \u00b7 participant",
         weight: "medium",
@@ -1161,11 +1330,17 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
       hqLocation: "Westminster, CO",
       geographyFocus: "US deep tech network",
       checkSizeProxy: "Series A+ capable (CVC, $200M fund, undisclosed check size)",
-      deepTechSignal: "Construction tech, geospatial, and physical-world technology (corporate venture arm of Trimble Inc.)",
+      deepTechSignal:
+        "Construction tech, geospatial, and physical-world technology (corporate venture arm of Trimble Inc.)",
       website: "trimbleventures.com",
       logoUrl: "https://www.google.com/s2/favicons?domain=trimbleventures.com&sz=128",
     },
-    investor: { id: "mock-contact-21", name: "Blake Whitmore", role: "General Partner", linkedinUrl: GENERIC_LINKEDIN },
+    investor: {
+      id: "mock-contact-21",
+      name: "Blake Whitmore",
+      role: "General Partner",
+      linkedinUrl: GENERIC_LINKEDIN,
+    },
     portfolioCompanyId: "mock-pc-civ-robotics",
     portfolioCompany: {
       id: "mock-pc-civ-robotics",
@@ -1186,7 +1361,8 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         type: "co_investment",
         date: "2022-09-21",
         source: "PR Newswire",
-        sourceUrl: "https://www.prnewswire.com/news-releases/trimble-ventures-invests-in-civ-roboticsa-construction-tech-startup-focused-on-autonomous-surveying-solutions-301629136.html",
+        sourceUrl:
+          "https://www.prnewswire.com/news-releases/trimble-ventures-invests-in-civ-roboticsa-construction-tech-startup-focused-on-autonomous-surveying-solutions-301629136.html",
         sourceTitle: "Trimble Ventures Invests in Civ Robotics",
         rawSnippet: "Seed $5M \u00b7 Sep 2022 \u00b7 strategic participant",
         value: "Seed $5M \u00b7 Sep 2022 \u00b7 strategic participant",
@@ -1201,8 +1377,10 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         source: "https://www.prnewswire.com/news/trimble/?page=8",
         sourceUrl: "https://www.prnewswire.com/news/trimble/?page=8",
         sourceTitle: "Trimble News and Press Releases | PR Newswire",
-        rawSnippet: "Sep 21, 2022, 09:05 ET Trimble Ventures Invests in Civ Robotics--A Construction Tech Startup Focused on Autonomous Surveying Solutions. Trimble Ventures, Trimble's (NASDAQ: TRMB) corporate venture capital fund, announced today its investment in Civ Robotics, a San Francisco-based...",
-        value: "Trimble Ventures investment in Civ Robotics listed in Trimble's official news and press releases archive",
+        rawSnippet:
+          "Sep 21, 2022, 09:05 ET Trimble Ventures Invests in Civ Robotics--A Construction Tech Startup Focused on Autonomous Surveying Solutions. Trimble Ventures, Trimble's (NASDAQ: TRMB) corporate venture capital fund, announced today its investment in Civ Robotics, a San Francisco-based...",
+        value:
+          "Trimble Ventures investment in Civ Robotics listed in Trimble's official news and press releases archive",
         weight: "medium",
         confidence: "confirmed",
       },
@@ -1214,8 +1392,10 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         source: "https://techcrunch.com/2022/09/22/humanoid-robots-boston-dynamics-tesla/",
         sourceUrl: "https://techcrunch.com/2022/09/22/humanoid-robots-boston-dynamics-tesla/",
         sourceTitle: "Humankinda | TechCrunch",
-        rawSnippet: "The seed round was led by ff Venture Capital and the firm's venture arm and features Trimble Ventures. So many ventures, so little time.",
-        value: "TechCrunch confirmed Trimble Ventures participated in Civ Robotics' $5M seed round alongside ff Venture Capital and the firm's venture arm",
+        rawSnippet:
+          "The seed round was led by ff Venture Capital and the firm's venture arm and features Trimble Ventures. So many ventures, so little time.",
+        value:
+          "TechCrunch confirmed Trimble Ventures participated in Civ Robotics' $5M seed round alongside ff Venture Capital and the firm's venture arm",
         weight: "high",
         confidence: "confirmed",
       },
@@ -1224,10 +1404,13 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
         relationshipId: "mock-trimble-ventures",
         type: "co_investment",
         date: "2022-09-21",
-        source: "https://www.prnewswire.com/news-releases/trimble-ventures-invests-in-civ-roboticsa-construction-tech-startup-focused-on-autonomous-surveying-solutions-301629136.html",
-        sourceUrl: "https://www.prnewswire.com/news-releases/trimble-ventures-invests-in-civ-roboticsa-construction-tech-startup-focused-on-autonomous-surveying-solutions-301629136.html",
+        source:
+          "https://www.prnewswire.com/news-releases/trimble-ventures-invests-in-civ-roboticsa-construction-tech-startup-focused-on-autonomous-surveying-solutions-301629136.html",
+        sourceUrl:
+          "https://www.prnewswire.com/news-releases/trimble-ventures-invests-in-civ-roboticsa-construction-tech-startup-focused-on-autonomous-surveying-solutions-301629136.html",
         sourceTitle: "Trimble Ventures Invests in Civ Robotics - PR Newswire",
-        rawSnippet: "Trimble Ventures, Trimble's (NASDAQ: TRMB) corporate venture capital fund, announced today its investment in Civ Robotics, a San Francisco-based construction tech startup focusing on transforming surveying layout for civil engineering and infrastructure projects.",
+        rawSnippet:
+          "Trimble Ventures, Trimble's (NASDAQ: TRMB) corporate venture capital fund, announced today its investment in Civ Robotics, a San Francisco-based construction tech startup focusing on transforming surveying layout for civil engineering and infrastructure projects.",
         value: "Trimble Ventures invested in Civ Robotics' $5M seed round (terms undisclosed)",
         weight: "high",
         confidence: "confirmed",
@@ -1306,11 +1489,15 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
     fund: {
       id: "mock-fund-a16z-american-dynamism",
       name: "a16z American Dynamism",
-      focus: "American Dynamism: aerospace, defense, public safety, education, housing, supply chain, industrials, and manufacturing",
-      geographyFocus: "US national-interest sectors with companies across all 50 states and global impact",
-      deepTechSignal: "American Dynamism: aerospace, defense, public safety, education, housing, supply chain, industrials, and manufacturing",
+      focus:
+        "American Dynamism: aerospace, defense, public safety, education, housing, supply chain, industrials, and manufacturing",
+      geographyFocus:
+        "US national-interest sectors with companies across all 50 states and global impact",
+      deepTechSignal:
+        "American Dynamism: aerospace, defense, public safety, education, housing, supply chain, industrials, and manufacturing",
       website: "https://a16z.com/american-dynamism/",
-      logoUrl: "https://www.google.com/s2/favicons?domain=https://a16z.com/american-dynamism/&sz=128",
+      logoUrl:
+        "https://www.google.com/s2/favicons?domain=https://a16z.com/american-dynamism/&sz=128",
     },
     investor: null,
     portfolioCompanyId: "",
@@ -1369,13 +1556,15 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
     fund: {
       id: "mock-fund-137-ventures",
       name: "137 Ventures",
-      focus: "defense, AI, and industrial systems; portfolio includes Cognition, Hadrian Automation, and Anduril",
+      focus:
+        "defense, AI, and industrial systems; portfolio includes Cognition, Hadrian Automation, and Anduril",
       aumTier: "$700M+ (two growth-stage funds)",
       stage: "multi-stage",
       hqLocation: "San Francisco, California",
       geographyFocus: "United States",
       checkSizeProxy: "deployed more than a billion dollars",
-      deepTechSignal: "defense, AI, and industrial systems; portfolio includes Cognition, Hadrian Automation, and Anduril",
+      deepTechSignal:
+        "defense, AI, and industrial systems; portfolio includes Cognition, Hadrian Automation, and Anduril",
       website: "https://www.137ventures.com",
       logoUrl: "https://www.google.com/s2/favicons?domain=137ventures.com&sz=128",
     },
@@ -1393,13 +1582,15 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
     fund: {
       id: "mock-fund-bison-ventures",
       name: "Bison Ventures",
-      focus: "We invest in frontier technology companies that use innovative science and deep technology to address some of the world's most pressing challenges.",
+      focus:
+        "We invest in frontier technology companies that use innovative science and deep technology to address some of the world's most pressing challenges.",
       aumTier: "$135M fund",
       stage: "Early Stage Venture, Seed",
       hqLocation: "Seattle, WA",
       geographyFocus: "United States",
       checkSizeProxy: "co-led $20M Series A",
-      deepTechSignal: "We invest in frontier technology companies that use innovative science and deep technology to address some of the world's most pressing challenges.",
+      deepTechSignal:
+        "We invest in frontier technology companies that use innovative science and deep technology to address some of the world's most pressing challenges.",
       website: "https://www.bison.vc",
       logoUrl: "https://www.google.com/s2/favicons?domain=bison.vc&sz=128",
     },
@@ -1417,12 +1608,16 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
     fund: {
       id: "mock-fund-climate-investment",
       name: "Climate Investment",
-      focus: "Climate Investment currently has over 40 innovative companies in its portfolio across energy-intensive sectors: energy systems, buildings, transport and industry, including cement, steel, chemicals, power and agriculture. Many of these portfolio companies have integrated artificial intelligence (\"AI\") within physical technologies to deliver the most efficient and low-emitting solutions.",
-      aumTier: "$450M+ (Decarbonization Acceleration Fund alone closed at $450M; team manages over $1.4 billion of capital)",
+      focus:
+        'Climate Investment currently has over 40 innovative companies in its portfolio across energy-intensive sectors: energy systems, buildings, transport and industry, including cement, steel, chemicals, power and agriculture. Many of these portfolio companies have integrated artificial intelligence ("AI") within physical technologies to deliver the most efficient and low-emitting solutions.',
+      aumTier:
+        "$450M+ (Decarbonization Acceleration Fund alone closed at $450M; team manages over $1.4 billion of capital)",
       hqLocation: "London, UK",
       geographyFocus: "Global",
-      checkSizeProxy: "Growth equity fund (DAF) targeting companies post-revenue ready to scale; venture series also active",
-      deepTechSignal: "Climate Investment currently has over 40 innovative companies in its portfolio across energy-intensive sectors: energy systems, buildings, transport and industry, including cement, steel, chemicals, power and agriculture. Many of these portfolio companies have integrated artificial intelligence (\"AI\") within physical technologies to deliver the most efficient and low-emitting solutions.",
+      checkSizeProxy:
+        "Growth equity fund (DAF) targeting companies post-revenue ready to scale; venture series also active",
+      deepTechSignal:
+        'Climate Investment currently has over 40 innovative companies in its portfolio across energy-intensive sectors: energy systems, buildings, transport and industry, including cement, steel, chemicals, power and agriculture. Many of these portfolio companies have integrated artificial intelligence ("AI") within physical technologies to deliver the most efficient and low-emitting solutions.',
       website: "https://www.climateinvestment.com",
     },
     investor: null,
@@ -1439,13 +1634,15 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
     fund: {
       id: "mock-fund-construct-capital",
       name: "Construct Capital",
-      focus: "Construct executes on a concentrated strategy to invest in startups that leverage technologies such as robotics, AI, and automation to reshape Foundational Industries essential to the U.S. economy",
+      focus:
+        "Construct executes on a concentrated strategy to invest in startups that leverage technologies such as robotics, AI, and automation to reshape Foundational Industries essential to the U.S. economy",
       aumTier: "$750M AUM",
       stage: "Seed, Series A",
       hqLocation: "Washington, DC",
       geographyFocus: "United States",
       checkSizeProxy: "$300 million Fund III",
-      deepTechSignal: "Construct executes on a concentrated strategy to invest in startups that leverage technologies such as robotics, AI, and automation to reshape Foundational Industries essential to the U.S. economy",
+      deepTechSignal:
+        "Construct executes on a concentrated strategy to invest in startups that leverage technologies such as robotics, AI, and automation to reshape Foundational Industries essential to the U.S. economy",
       website: "https://www.constructcap.com",
       logoUrl: "https://www.google.com/s2/favicons?domain=constructcap.com&sz=128",
     },
@@ -1463,13 +1660,15 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
     fund: {
       id: "mock-fund-gigascale-capital",
       name: "Gigascale Capital",
-      focus: "Gigascale Capital backs early-stage companies rebuilding the physical economy. Climate progress comes from better performance: technologies that are cheaper to deploy, faster to scale, and cleaner than what they replace.",
+      focus:
+        "Gigascale Capital backs early-stage companies rebuilding the physical economy. Climate progress comes from better performance: technologies that are cheaper to deploy, faster to scale, and cleaner than what they replace.",
       aumTier: "$250M",
       stage: "pre-seed to Series A",
       hqLocation: "Palo Alto, California",
       geographyFocus: "United States",
       checkSizeProxy: "early-stage",
-      deepTechSignal: "Gigascale Capital backs early-stage companies rebuilding the physical economy. Climate progress comes from better performance: technologies that are cheaper to deploy, faster to scale, and cleaner than what they replace.",
+      deepTechSignal:
+        "Gigascale Capital backs early-stage companies rebuilding the physical economy. Climate progress comes from better performance: technologies that are cheaper to deploy, faster to scale, and cleaner than what they replace.",
       website: "https://gigascale.com",
       logoUrl: "https://www.google.com/s2/favicons?domain=gigascale.com&sz=128",
     },
@@ -1487,13 +1686,15 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
     fund: {
       id: "mock-fund-harpoon-ventures",
       name: "Harpoon Ventures",
-      focus: "We back groundbreaking technology companies in AI, cybersecurity, infrastructure, and deep tech. Harpoon invests in the risk takers, outliers, pioneers, and innovators building category defining businesses.",
+      focus:
+        "We back groundbreaking technology companies in AI, cybersecurity, infrastructure, and deep tech. Harpoon invests in the risk takers, outliers, pioneers, and innovators building category defining businesses.",
       aumTier: "$300M AUM",
       stage: "early-stage",
       hqLocation: "San Diego",
       geographyFocus: "United States",
       checkSizeProxy: "pre-seed through growth stages",
-      deepTechSignal: "We back groundbreaking technology companies in AI, cybersecurity, infrastructure, and deep tech. Harpoon invests in the risk takers, outliers, pioneers, and innovators building category defining businesses.",
+      deepTechSignal:
+        "We back groundbreaking technology companies in AI, cybersecurity, infrastructure, and deep tech. Harpoon invests in the risk takers, outliers, pioneers, and innovators building category defining businesses.",
       website: "https://www.harpoon.vc",
       logoUrl: "https://www.google.com/s2/favicons?domain=harpoon.vc&sz=128",
     },
@@ -1511,13 +1712,15 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
     fund: {
       id: "mock-fund-infinite-capital",
       name: "Infinite Capital",
-      focus: "Infinite Capital backs the founders leading technological shifts across deep tech. Conviction capital focused on structural change.",
+      focus:
+        "Infinite Capital backs the founders leading technological shifts across deep tech. Conviction capital focused on structural change.",
       aumTier: "undisclosed",
       stage: "pre-seed to Series A+",
       hqLocation: "West Palm Beach, Florida, United States",
       geographyFocus: "United States",
       checkSizeProxy: "up to $50 million",
-      deepTechSignal: "Infinite Capital backs the founders leading technological shifts across deep tech. Conviction capital focused on structural change.",
+      deepTechSignal:
+        "Infinite Capital backs the founders leading technological shifts across deep tech. Conviction capital focused on structural change.",
       website: "https://www.infinite.xyz",
       logoUrl: "https://www.google.com/s2/favicons?domain=infinite.xyz&sz=128",
     },
@@ -1535,10 +1738,12 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
     fund: {
       id: "mock-fund-ixsar-capital",
       name: "IXSAR Capital",
-      focus: "Space Technology, Autonomy, and Robotics \u2014 intelligent systems, physical AI, and advanced infrastructure",
+      focus:
+        "Space Technology, Autonomy, and Robotics \u2014 intelligent systems, physical AI, and advanced infrastructure",
       stage: "Pre-seed to Series A",
       hqLocation: "San Francisco, CA",
-      deepTechSignal: "Space Technology, Autonomy, and Robotics \u2014 intelligent systems, physical AI, and advanced infrastructure",
+      deepTechSignal:
+        "Space Technology, Autonomy, and Robotics \u2014 intelligent systems, physical AI, and advanced infrastructure",
       website: "https://ixsar.com",
       logoUrl: "https://www.google.com/s2/favicons?domain=ixsar.com&sz=128",
     },
@@ -1556,13 +1761,15 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
     fund: {
       id: "mock-fund-lockheed-martin-ventures",
       name: "Lockheed Martin Ventures",
-      focus: "Lockheed Martin Ventures is the strategic investment arm of Lockheed Martin, dedicated to identifying and accelerating deep-tech pioneers and dual-use technologies. We invest in the breakthroughs that will shape the next generation of defense and aerospace capabilities.",
+      focus:
+        "Lockheed Martin Ventures is the strategic investment arm of Lockheed Martin, dedicated to identifying and accelerating deep-tech pioneers and dual-use technologies. We invest in the breakthroughs that will shape the next generation of defense and aerospace capabilities.",
       aumTier: "$1 billion evergreen fund",
       stage: "Seed, Series A, Series B, Series C, Series D",
       hqLocation: "Bethesda, Maryland",
       geographyFocus: "United States and worldwide",
       checkSizeProxy: "$1M\u2013$10M",
-      deepTechSignal: "Lockheed Martin Ventures is the strategic investment arm of Lockheed Martin, dedicated to identifying and accelerating deep-tech pioneers and dual-use technologies. We invest in the breakthroughs that will shape the next generation of defense and aerospace capabilities.",
+      deepTechSignal:
+        "Lockheed Martin Ventures is the strategic investment arm of Lockheed Martin, dedicated to identifying and accelerating deep-tech pioneers and dual-use technologies. We invest in the breakthroughs that will shape the next generation of defense and aerospace capabilities.",
       website: "https://www.lockheedmartin.com/en-us/who-we-are/lockheed-martin-ventures.html",
     },
     investor: null,
@@ -1603,13 +1810,15 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
     fund: {
       id: "mock-fund-marlinspike",
       name: "Marlinspike",
-      focus: "dual-use venture fund Marlinspike... There's the lead backer Marlinspike, which is already invested in Anduril and a number of other defense-focused manufacturing companies.",
+      focus:
+        "dual-use venture fund Marlinspike... There's the lead backer Marlinspike, which is already invested in Anduril and a number of other defense-focused manufacturing companies.",
       aumTier: "$100M",
       stage: "Early stage",
       hqLocation: "Arlington, VA",
       geographyFocus: "Primarily US and allied countries",
       checkSizeProxy: "$200k \u2013 $7m",
-      deepTechSignal: "dual-use venture fund Marlinspike... There's the lead backer Marlinspike, which is already invested in Anduril and a number of other defense-focused manufacturing companies.",
+      deepTechSignal:
+        "dual-use venture fund Marlinspike... There's the lead backer Marlinspike, which is already invested in Anduril and a number of other defense-focused manufacturing companies.",
       website: "https://marlinspike.us",
       logoUrl: "https://www.google.com/s2/favicons?domain=marlinspike.us&sz=128",
     },
@@ -1627,11 +1836,13 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
     fund: {
       id: "mock-fund-mfv-partners",
       name: "MFV Partners",
-      focus: "MFV Partners is an early-stage venture capital firm based in Silicon valley exclusively investing in deep tech that is transforming industries and the planet. Solving the biggest challenges facing industries and society \u2013 from labor shortages and the urgency to address the climate crisis \u2013 requires radically new capabilities and novel technologies. And engineering-led innovations in sensors, AI, robotics, quantum computing, IoT, and other deep tech areas have the potential to disrupt traditional ecosystems, create enormous value over the decades ahead and drive the most positive impacts on our planet.",
+      focus:
+        "MFV Partners is an early-stage venture capital firm based in Silicon valley exclusively investing in deep tech that is transforming industries and the planet. Solving the biggest challenges facing industries and society \u2013 from labor shortages and the urgency to address the climate crisis \u2013 requires radically new capabilities and novel technologies. And engineering-led innovations in sensors, AI, robotics, quantum computing, IoT, and other deep tech areas have the potential to disrupt traditional ecosystems, create enormous value over the decades ahead and drive the most positive impacts on our planet.",
       stage: "Early-stage",
       hqLocation: "San Francisco Bay Area / Silicon Valley",
       geographyFocus: "US",
-      deepTechSignal: "MFV Partners is an early-stage venture capital firm based in Silicon valley exclusively investing in deep tech that is transforming industries and the planet. Solving the biggest challenges facing industries and society \u2013 from labor shortages and the urgency to address the climate crisis \u2013 requires radically new capabilities and novel technologies. And engineering-led innovations in sensors, AI, robotics, quantum computing, IoT, and other deep tech areas have the potential to disrupt traditional ecosystems, create enormous value over the decades ahead and drive the most positive impacts on our planet.",
+      deepTechSignal:
+        "MFV Partners is an early-stage venture capital firm based in Silicon valley exclusively investing in deep tech that is transforming industries and the planet. Solving the biggest challenges facing industries and society \u2013 from labor shortages and the urgency to address the climate crisis \u2013 requires radically new capabilities and novel technologies. And engineering-led innovations in sensors, AI, robotics, quantum computing, IoT, and other deep tech areas have the potential to disrupt traditional ecosystems, create enormous value over the decades ahead and drive the most positive impacts on our planet.",
       website: "https://mfvpartners.com",
       logoUrl: "https://www.google.com/s2/favicons?domain=mfvpartners.com&sz=128",
     },
@@ -1649,12 +1860,15 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
     fund: {
       id: "mock-fund-mundi-ventures",
       name: "Mundi Ventures",
-      focus: "Kembara Fund I is focused on deep tech and climate; portfolio includes deep tech companies such as Submer (liquid-cooled datacenters) and advanced robotics firms",
+      focus:
+        "Kembara Fund I is focused on deep tech and climate; portfolio includes deep tech companies such as Submer (liquid-cooled datacenters) and advanced robotics firms",
       aumTier: "\u20ac750M+ (first close of Kembara Fund I; potential final close of \u20ac1.25B)",
       stage: "Early Stage and Growth Stage",
       hqLocation: "Madrid, Spain",
-      geographyFocus: "Global, including United States, Europe, Asia & Middle East, and Spanish-speaking diaspora markets",
-      deepTechSignal: "Kembara Fund I is focused on deep tech and climate; portfolio includes deep tech companies such as Submer (liquid-cooled datacenters) and advanced robotics firms",
+      geographyFocus:
+        "Global, including United States, Europe, Asia & Middle East, and Spanish-speaking diaspora markets",
+      deepTechSignal:
+        "Kembara Fund I is focused on deep tech and climate; portfolio includes deep tech companies such as Submer (liquid-cooled datacenters) and advanced robotics firms",
       website: "https://mundiventures.com",
       logoUrl: "https://www.google.com/s2/favicons?domain=mundiventures.com&sz=128",
     },
@@ -1677,7 +1891,8 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
       stage: "Seed to Growth",
       hqLocation: "108 W Gibson St, Austin, TX 78704",
       geographyFocus: "Primarily US-based",
-      checkSizeProxy: "Pre-Seed $1M \u00b7 Seed ~$2M \u00b7 Series A ~$3M \u00b7 Series B-C $5-15M (SPV)",
+      checkSizeProxy:
+        "Pre-Seed $1M \u00b7 Seed ~$2M \u00b7 Series A ~$3M \u00b7 Series B-C $5-15M (SPV)",
       deepTechSignal: "Deep tech, defense, space",
       website: "overmatch.vc",
       logoUrl: "https://www.google.com/s2/favicons?domain=overmatch.vc&sz=128",
@@ -1696,12 +1911,14 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
     fund: {
       id: "mock-fund-scout-ventures",
       name: "Scout Ventures",
-      focus: "Scout Ventures is a seed-stage venture capital firm that invests at the intersection of National Security and Critical Technology Innovation, including AI, Autonomy, Robotics, Cybersecurity, Quantum, AdvancedEnergy and Storage, Space and Aerospace, and Microelectronics.",
+      focus:
+        "Scout Ventures is a seed-stage venture capital firm that invests at the intersection of National Security and Critical Technology Innovation, including AI, Autonomy, Robotics, Cybersecurity, Quantum, AdvancedEnergy and Storage, Space and Aerospace, and Microelectronics.",
       stage: "Seed",
       hqLocation: "Austin, TX",
       geographyFocus: "United States",
       checkSizeProxy: "$12M seed round led by Scout Ventures",
-      deepTechSignal: "Scout Ventures is a seed-stage venture capital firm that invests at the intersection of National Security and Critical Technology Innovation, including AI, Autonomy, Robotics, Cybersecurity, Quantum, AdvancedEnergy and Storage, Space and Aerospace, and Microelectronics.",
+      deepTechSignal:
+        "Scout Ventures is a seed-stage venture capital firm that invests at the intersection of National Security and Critical Technology Innovation, including AI, Autonomy, Robotics, Cybersecurity, Quantum, AdvancedEnergy and Storage, Space and Aerospace, and Microelectronics.",
       website: "https://www.scout.vc",
       logoUrl: "https://www.google.com/s2/favicons?domain=scout.vc&sz=128",
     },
@@ -1719,13 +1936,15 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
     fund: {
       id: "mock-fund-silent-ventures",
       name: "Silent Ventures",
-      focus: "Silent Ventures invests in exceptional founders building unrivaled aerospace, defense, and national security companies; portfolio includes Swarm Aero (UAV swarms), Traysar (subterranean defense), and Castelion.",
+      focus:
+        "Silent Ventures invests in exceptional founders building unrivaled aerospace, defense, and national security companies; portfolio includes Swarm Aero (UAV swarms), Traysar (subterranean defense), and Castelion.",
       aumTier: "$4.2B (estimated, per Capital Atlas)",
       stage: "Early stage (Pre-Seed, Seed, Series A)",
       hqLocation: "Dallas, Texas",
       geographyFocus: "United States",
       checkSizeProxy: "$1.5M - $3M",
-      deepTechSignal: "Silent Ventures invests in exceptional founders building unrivaled aerospace, defense, and national security companies; portfolio includes Swarm Aero (UAV swarms), Traysar (subterranean defense), and Castelion.",
+      deepTechSignal:
+        "Silent Ventures invests in exceptional founders building unrivaled aerospace, defense, and national security companies; portfolio includes Swarm Aero (UAV swarms), Traysar (subterranean defense), and Castelion.",
       website: "https://silentvc.com",
       logoUrl: "https://www.google.com/s2/favicons?domain=silentvc.com&sz=128",
     },
@@ -1749,7 +1968,8 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
       hqLocation: "New York, NY",
       geographyFocus: "United States",
       checkSizeProxy: "$100-500k",
-      deepTechSignal: "Led a round for a space power-infrastructure startup, citing power as a bottleneck across the space companies in its portfolio",
+      deepTechSignal:
+        "Led a round for a space power-infrastructure startup, citing power as a bottleneck across the space companies in its portfolio",
       website: "https://spacecadet.ventures",
       logoUrl: "https://www.google.com/s2/favicons?domain=spacecadet.ventures&sz=128",
     },
@@ -1767,13 +1987,15 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
     fund: {
       id: "mock-fund-voyager-ventures",
       name: "Voyager Ventures",
-      focus: "We invest in both hardware and software, with frequent investments in energy production and distribution, advanced manufacturing, production of critical materials, artificial intelligence, mobility, and compute.",
+      focus:
+        "We invest in both hardware and software, with frequent investments in energy production and distribution, advanced manufacturing, production of critical materials, artificial intelligence, mobility, and compute.",
       aumTier: "$475M",
       stage: "Pre-Seed, Seed and Series A",
       hqLocation: "San Francisco, California",
       geographyFocus: "North America and Europe",
       checkSizeProxy: "$500K \u2013 $5M",
-      deepTechSignal: "We invest in both hardware and software, with frequent investments in energy production and distribution, advanced manufacturing, production of critical materials, artificial intelligence, mobility, and compute.",
+      deepTechSignal:
+        "We invest in both hardware and software, with frequent investments in energy production and distribution, advanced manufacturing, production of critical materials, artificial intelligence, mobility, and compute.",
       website: "https://www.voyagervc.com",
       logoUrl: "https://www.google.com/s2/favicons?domain=voyagervc.com&sz=128",
     },
@@ -1791,13 +2013,15 @@ export const MOCK_RELATIONSHIPS: Relationship[] = [
     fund: {
       id: "mock-fund-washington-harbour-partners",
       name: "Washington Harbour Partners",
-      focus: "Led Series A investment in Scout Space, a space domain awareness sensors and software company; portfolio includes cybersecurity, defense technology, and government technology companies including Epirus, Shield AI, and space autonomy platforms",
+      focus:
+        "Led Series A investment in Scout Space, a space domain awareness sensors and software company; portfolio includes cybersecurity, defense technology, and government technology companies including Epirus, Shield AI, and space autonomy platforms",
       aumTier: "$4.7B AUM",
       stage: "Series A through Pre-IPO",
       hqLocation: "Arlington, VA",
       geographyFocus: "U.S. and Five Eyes",
       checkSizeProxy: "led $18M Series A for Scout Space",
-      deepTechSignal: "Led Series A investment in Scout Space, a space domain awareness sensors and software company; portfolio includes cybersecurity, defense technology, and government technology companies including Epirus, Shield AI, and space autonomy platforms",
+      deepTechSignal:
+        "Led Series A investment in Scout Space, a space domain awareness sensors and software company; portfolio includes cybersecurity, defense technology, and government technology companies including Epirus, Shield AI, and space autonomy platforms",
       website: "https://washingtonharbour.com",
       logoUrl: "https://www.google.com/s2/favicons?domain=washingtonharbour.com&sz=128",
     },
