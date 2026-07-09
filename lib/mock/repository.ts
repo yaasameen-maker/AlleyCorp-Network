@@ -2,6 +2,7 @@
 // signatures in lib/db.ts and lib/alerts.server.ts exactly, so callers
 // never need to know whether they're talking to Postgres or this file.
 import { MOCK_RELATIONSHIPS } from "./relationships";
+import { MOCK_PORTFOLIO_COMPANIES, type MockPortfolioCompany } from "./portfolio-companies";
 import { isWarmAtRisk } from "../scoring";
 import type { Relationship, Signal } from "../types";
 import type { Alert } from "../alerts";
@@ -56,6 +57,10 @@ export async function getRecentSignalsMock(limit = 20): Promise<Signal[]> {
   return allSignals
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, limit);
+}
+
+export async function getAllPortfolioCompaniesMock(): Promise<MockPortfolioCompany[]> {
+  return [...MOCK_PORTFOLIO_COMPANIES];
 }
 
 export async function getAlertsMock(): Promise<Alert[]> {

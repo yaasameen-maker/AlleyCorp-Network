@@ -6,7 +6,7 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
-import { getAllRelationships, pool } from "../../lib/db";
+import { getAllRelationships, getAllPortfolioCompanies } from "../../lib/db";
 import { WarmthBadge } from "../components/InvestorRow";
 import { AskFAB } from "../components/AskFAB";
 import type { WarmthTier } from "@/lib/investors";
@@ -47,12 +47,7 @@ function formatDate(d: string | undefined): string {
 async function getPortfolioData(): Promise<CompanyGroup[]> {
   try {
     // 1. Get all portfolio companies (all 20, regardless of co-investor data)
-    const { rows: allCompanies } = await pool.query<{
-      id: string;
-      name: string;
-      website: string | null;
-      status: string;
-    }>(`SELECT id, name, website, status FROM portfolio_company ORDER BY name`);
+    const allCompanies = await getAllPortfolioCompanies();
 
     // 2. Build map seeded with all companies — co-investors start empty
     const companyMap = new Map<string, CompanyGroup>(

@@ -9,6 +9,7 @@ import {
   listStaleRelationshipsMock,
   getWarmthSignalsMock,
   getRecentSignalsMock,
+  getAllPortfolioCompaniesMock,
 } from "./mock/repository";
 
 config();
@@ -456,6 +457,22 @@ export async function getRecentSignals(limit = 20): Promise<Signal[]> {
     [limit]
   );
   return rows as Signal[];
+}
+
+// Return all portfolio companies (active and alumni), ordered by name.
+// Used by app/portfolio/page.tsx to seed the full company list before
+// overlaying co-investor relationship data.
+export async function getAllPortfolioCompanies(): Promise<
+  { id: string; name: string; website: string | null; status: string }[]
+> {
+  if (isMockMode()) return getAllPortfolioCompaniesMock();
+  const { rows } = await pool.query<{
+    id: string;
+    name: string;
+    website: string | null;
+    status: string;
+  }>(`SELECT id, name, website, status FROM portfolio_company ORDER BY name`);
+  return rows;
 }
 
 export { pool };
