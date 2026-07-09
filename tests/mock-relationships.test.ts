@@ -29,7 +29,10 @@ describe("MOCK_RELATIONSHIPS", () => {
     expect(serialized).not.toContain("AlleyCorp");
   });
 
-  it("Cold relationships have no signals and no contact (unresearched prospects)", () => {
+  it("Cold relationships never have a researched contact, even if they have an event signal", () => {
+    // Cold means "no confirmed co-investment" — a Cold fund can still have a
+    // non-co-investment signal (e.g. attended an event) without becoming Warm/Hot.
+    // What Cold guarantees is no Point of Contact has been researched yet.
     const cold = MOCK_RELATIONSHIPS.filter((r) => r.warmthTier === "Cold");
     expect(cold.length).toBeGreaterThan(0);
     for (const r of cold) {
