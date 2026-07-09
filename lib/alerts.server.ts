@@ -1,8 +1,12 @@
 import { pool } from "./db";
 import { isWarmAtRisk } from "./scoring";
+import { isMockMode } from "./mock/mode";
+import { getAlertsMock } from "./mock/repository";
 import type { Alert } from "./alerts";
 
 export async function getAlerts(): Promise<Alert[]> {
+  if (isMockMode()) return getAlertsMock();
+
   const { rows } = await pool.query<{
     warmth_tier: string;
     last_signal_date: Date | null;
