@@ -28,13 +28,22 @@ export async function searchRelationshipsMock(query: string): Promise<Relationsh
   );
 }
 
+// Ascending by lastSignalDate, nulls last — matches SQL's ORDER BY ... ASC NULLS LAST,
+// which the real listStaleRelationships in lib/db.ts uses.
+export function compareByLastSignalDateAscNullsLast(
+  a: Pick<Relationship, "lastSignalDate">,
+  b: Pick<Relationship, "lastSignalDate">
+): number {
+  if (!a.lastSignalDate && !b.lastSignalDate) return 0;
+  if (!a.lastSignalDate) return 1;
+  if (!b.lastSignalDate) return -1;
+  return new Date(a.lastSignalDate).getTime() - new Date(b.lastSignalDate).getTime();
+}
+
 export async function listStaleRelationshipsMock(): Promise<Relationship[]> {
-  return MOCK_RELATIONSHIPS.filter((r) => r.warmthTier === "Stale").sort((a, b) => {
-    if (!a.lastSignalDate && !b.lastSignalDate) return 0;
-    if (!a.lastSignalDate) return 1;
-    if (!b.lastSignalDate) return -1;
-    return new Date(a.lastSignalDate).getTime() - new Date(b.lastSignalDate).getTime();
-  });
+  return MOCK_RELATIONSHIPS.filter((r) => r.warmthTier === "Stale").sort(
+    compareByLastSignalDateAscNullsLast
+  );
 }
 
 export async function getWarmthSignalsMock(investorId: string): Promise<Signal[]> {

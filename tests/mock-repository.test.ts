@@ -7,6 +7,7 @@ import {
   getWarmthSignalsMock,
   getRecentSignalsMock,
   getAlertsMock,
+  compareByLastSignalDateAscNullsLast,
 } from "../lib/mock/repository";
 
 describe("mock repository", () => {
@@ -91,25 +92,19 @@ describe("mock repository", () => {
     }
   });
 
-  it("null-date sort comparator puts null lastSignalDate last (matches SQL NULLS LAST)", () => {
-    // No current Stale fixture has a null lastSignalDate, so this exercises the
-    // comparator logic in isolation rather than via listStaleRelationshipsMock,
-    // without modifying the shared fixture in lib/mock/relationships.ts.
-    type Row = { id: string; lastSignalDate: string | null | undefined };
-    const rows: Row[] = [
-      { id: "no-date-a", lastSignalDate: null },
-      { id: "has-date", lastSignalDate: "2024-01-01" },
-      { id: "no-date-b", lastSignalDate: undefined },
+  it("compareByLastSignalDateAscNullsLast puts null dates last", () => {
+    const rows = [
+      { lastSignalDate: undefined },
+      { lastSignalDate: "2024-01-01" },
+      { lastSignalDate: undefined },
+      { lastSignalDate: "2023-01-01" },
     ];
-
-    const sorted = [...rows].sort((a, b) => {
-      if (!a.lastSignalDate && !b.lastSignalDate) return 0;
-      if (!a.lastSignalDate) return 1;
-      if (!b.lastSignalDate) return -1;
-      return new Date(a.lastSignalDate).getTime() - new Date(b.lastSignalDate).getTime();
-    });
-
-    expect(sorted[0].id).toBe("has-date");
-    expect(sorted.slice(1).map((r) => r.id).sort()).toEqual(["no-date-a", "no-date-b"]);
+    const sorted = [...rows].sort(compareByLastSignalDateAscNullsLast);
+    expect(sorted.map((r) => r.lastSignalDate)).toEqual([
+      "2023-01-01",
+      "2024-01-01",
+      undefined,
+      undefined,
+    ]);
   });
 });
